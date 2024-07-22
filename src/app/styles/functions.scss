@@ -1,0 +1,11 @@
+@function vw($size) {
+    $wvSize: $size / 430 * 100 * 1vw;
+
+    @return $wvSize;
+}
+
+@function vh($size) {
+    $wvSize: $size / 932 * 100 * 1vh;
+
+    @return $wvSize;
+}
