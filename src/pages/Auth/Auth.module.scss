@@ -43,33 +43,33 @@
     position: absolute;
 
     &-p {
-        top: vh(172);
-        left: vw(18);
-        width: vw(105);
+        top: hp(172);
+        left: wp(18);
+        width: wp(105);
     }
 
     &-o {
-        top: vh(193);
-        left: vw(118);
-        width: vw(67);
+        top: hp(193);
+        left: wp(118);
+        width: wp(67);
     }
 
     &-n {
-        top: vh(191);
-        left: vw(187);
-        width: vw(76);
+        top: hp(191);
+        left: wp(187);
+        width: wp(76);
     }
 
     &-k {
-        top: vh(155);
-        left: vw(270);
-        width: vw(90);
+        top: hp(155);
+        left: wp(270);
+        width: wp(90);
     }
 
     &-e {
-        top: vh(189);
-        left: vw(346);
-        width: vw(66);
+        top: hp(189);
+        left: wp(346);
+        width: wp(66);
     }
 }
 
@@ -77,27 +77,29 @@
     position: absolute;
 
     &-t {
-        top: vh(269);
-        left: vh(144);
-        width: vw(48.79);
+        top: hp(269);
+        left: wp(144);
+        width: wp(48.79);
     }
 
     &-o {
-        top: vh(272.94);
-        left: vh(193);
-        width: vw(44.77);
+        top: hp(272.94);
+        left: wp(193);
+        width: wp(44.77);
     }
 
     &-n {
-        top: vh(269.36);
-        left: vh(242.64);
-        width: vw(42.36);
+        top: hp(269.36);
+        left: wp(242.64);
+        width: wp(42.36);
     }
 }
 
 .ponke_img {
     position: absolute;
-    left: vw(25);
-    bottom: vh(196);
-    width: vw(380);
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: hp(196);
+    height: hp(380);
+    aspect-ratio: 1;
 }

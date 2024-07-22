@@ -9,3 +9,15 @@
 
     @return $wvSize;
 }
+
+@function wp($size) {
+    $wpSize: $size / 430 * 100 * 1%;
+
+    @return $wpSize;
+}
+
+@function hp($size) {
+    $hpSize: $size / 932 * 100 * 1%;
+
+    @return $hpSize;
+}
