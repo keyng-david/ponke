@@ -1,15 +1,3 @@
-@function vw($size) {
-    $wvSize: $size / 430 * 100 * 1vw;
-
-    @return $wvSize;
-}
-
-@function vh($size) {
-    $wvSize: $size / 932 * 100 * 1vh;
-
-    @return $wvSize;
-}
-
 @function wp($size) {
     $wpSize: $size / 430 * 100 * 1%;
 
@@ -18,6 +6,18 @@
 
 @function hp($size) {
     $hpSize: $size / 932 * 100 * 1%;
+
+    @return $hpSize;
+}
+
+@function wpSmall($size) {
+    $wpSize: $size / 380 * 100 * 1%;
+
+    @return $wpSize;
+}
+
+@function hpSmall($size) {
+    $hpSize: $size / 580 * 100 * 1%;
 
     @return $hpSize;
 }

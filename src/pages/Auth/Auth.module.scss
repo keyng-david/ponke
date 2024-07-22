@@ -103,3 +103,70 @@
     width: wp(380);
     aspect-ratio: 1;
 }
+
+@media (max-height: 650px) {
+    .ponke_letter {
+        position: absolute;
+
+        &-p {
+            top: hpSmall(62);
+            left: wpSmall(25);
+            width: wpSmall(87);
+        }
+
+        &-o {
+            top: hpSmall(79);
+            left: wpSmall(109);
+            width: wpSmall(55);
+        }
+
+        &-n {
+            top: hpSmall(78);
+            left: wpSmall(166);
+            width: wpSmall(63);
+        }
+
+        &-k {
+            top: hpSmall(48);
+            left: wpSmall(235);
+            width: wpSmall(75);
+        }
+
+        &-e {
+            top: hpSmall(77);
+            left: wpSmall(298);
+            width: wpSmall(56);
+        }
+    }
+
+    .ton_letter {
+        position: absolute;
+
+        &-t {
+            top: hpSmall(143);
+            left: wpSmall(130);
+            width: wpSmall(40);
+        }
+
+        &-o {
+            top: hpSmall(146);
+            left: wpSmall(170);
+            width: wpSmall(38);
+        }
+
+        &-n {
+            top: hpSmall(143);
+            left: wpSmall(212);
+            width: wpSmall(36);
+        }
+    }
+
+    .ponke_img {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: hpSmall(215);
+        width: wpSmall(316);
+        aspect-ratio: 1;
+    }
+}
