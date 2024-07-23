@@ -32,7 +32,7 @@ const Ponke = () => {
 
     const letters = ['p', 'o', 'n', 'k', 'e'] as const
 
-    return <>
+    return <div className={styles['ponke-wrapper']}>
         {letters.map(letter => (
             <img
                 src={images[letter]}
@@ -40,7 +40,7 @@ const Ponke = () => {
                 alt={'letter'}
             />
         ))}
-    </>
+    </div>
 }
 
 const Ton = () => {
@@ -52,7 +52,7 @@ const Ton = () => {
 
     const letters = ['t', 'o', 'n'] as const
 
-    return <>
+    return <div>
         {letters.map(letter => (
             <img
                 src={images[letter]}
@@ -60,5 +60,5 @@ const Ton = () => {
                 alt={'letter'}
             />
         ))}
-    </>
+    </div>
 }
