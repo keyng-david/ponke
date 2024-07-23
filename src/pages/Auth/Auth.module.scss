@@ -148,7 +148,7 @@ $animationTime: 0.5s;
 .root {
     position: relative;
     width: 100vw;
-    height: 100vh;
+    height: var(--tg-viewport-stable-height);
     overflow-x: hidden;
     overflow-y: hidden;
     background: linear-gradient(182deg, #3aacff 0%, #469fe0 100%);
@@ -183,7 +183,7 @@ $animationTime: 0.5s;
     position: relative;
     z-index: 4;
     width: 100vw;
-    height: 100vh;
+    height: var(--tg-viewport-stable-height);
     overflow: hidden;
 }
 
