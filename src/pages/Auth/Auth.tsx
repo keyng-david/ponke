@@ -36,6 +36,7 @@ const Ponke = () => {
         {letters.map(letter => (
             <img
                 src={images[letter]}
+                key={`ponke-${letter}`}
                 className={`${styles['ponke_letter']} ${styles[`ponke_letter-${letter}`]}`}
                 alt={'letter'}
             />
@@ -56,6 +57,7 @@ const Ton = () => {
         {letters.map(letter => (
             <img
                 src={images[letter]}
+                key={`ton-${letter}`}
                 className={`${styles['ton_letter']} ${styles[`ton_letter-${letter}`]}`}
                 alt={'letter'}
             />
