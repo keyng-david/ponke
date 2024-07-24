@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkponke_clicker=self.webpackChunkponke_clicker||[]).push([[234],{996:(e,c,n)=>{n.r(c),n.d(c,{default:()=>i});var r=n(43),s=n(216),l=n(579);const i=r.memo((()=>{const e=(0,s.Zp)();return(0,l.jsxs)("div",{children:[(0,l.jsx)("h1",{children:"Main"}),(0,l.jsx)("button",{onClick:()=>e("/"),children:"go loader"})]})}))}}]);
-//# sourceMappingURL=234.3fda64cc.chunk.js.map

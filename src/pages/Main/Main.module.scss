@@ -1,0 +1,54 @@
+@import "src/app/styles/index";
+
+.root {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.logo {
+    position: absolute;
+    top: hp(72);
+    left: 50%;
+    transform: translateX(-50%);
+    width: wp(151);
+}
+
+.monitor {
+    &-top {
+        position: absolute;
+        width: wp(313);
+        top: hp(197);
+        left: wp(67);
+    }
+
+    &-center {
+        position: absolute;
+        width: wp(217);
+        top: hp(420);
+        left: wp(108);
+    }
+
+    &-right {
+        position: absolute;
+        width: wp(176);
+        top: hp(400);
+        right: wp(-82);
+    }
+
+    &-left {
+        position: absolute;
+        width: wp(176);
+        top: hp(393);
+        left: wp(-68);
+    }
+}

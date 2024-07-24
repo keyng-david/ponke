@@ -1,23 +1,31 @@
 {
   "files": {
-    "main.css": "/static/css/main.b81cc824.css",
-    "main.js": "/static/js/main.61ef94e9.js",
-    "static/js/234.3fda64cc.chunk.js": "/static/js/234.3fda64cc.chunk.js",
+    "main.css": "/static/css/main.66a6b681.css",
+    "main.js": "/static/js/main.1380d97c.js",
+    "static/css/393.63b4579b.chunk.css": "/static/css/393.63b4579b.chunk.css",
+    "static/js/393.168e11b6.chunk.js": "/static/js/393.168e11b6.chunk.js",
     "static/js/453.2c396120.chunk.js": "/static/js/453.2c396120.chunk.js",
     "static/media/auth-background.png": "/static/media/auth-background.675a3c3e45a68b530f15.png",
     "static/media/ponke.png": "/static/media/ponke.bb2b494ef46323a34e34.png",
+    "static/media/grafic-top.svg": "/static/media/grafic-top.68a8cc681878622b4e6f0ae27e21a550.svg",
+    "static/media/CCMaladroit-Bold.woff": "/static/media/CCMaladroit-Bold.72ed5d95d5f4b3d0b3fd.woff",
+    "static/media/graphic-center.svg": "/static/media/graphic-center.f495da0abcf0dbc61cc1d47be7ff9d89.svg",
+    "static/media/CCMaladroit-Bold.woff2": "/static/media/CCMaladroit-Bold.2fb0c63abd3eaada2d4e.woff2",
+    "static/media/logo.png": "/static/media/logo.f3a14be2a796c0b52167.png",
     "static/media/p.png": "/static/media/p.99cb2f664b12e9f5bb5d.png",
     "static/media/k.png": "/static/media/k.368b0728b22ee8cbb008.png",
+    "static/media/background.svg": "/static/media/background.33af5926135da3722c727c17d53fe309.svg",
     "static/media/n.png": "/static/media/n.ba6fc72b265b42654c23.png",
     "static/media/o.png": "/static/media/o.06c189766c318fd8e689.png",
     "index.html": "/index.html",
-    "main.b81cc824.css.map": "/static/css/main.b81cc824.css.map",
-    "main.61ef94e9.js.map": "/static/js/main.61ef94e9.js.map",
-    "234.3fda64cc.chunk.js.map": "/static/js/234.3fda64cc.chunk.js.map",
+    "main.66a6b681.css.map": "/static/css/main.66a6b681.css.map",
+    "main.1380d97c.js.map": "/static/js/main.1380d97c.js.map",
+    "393.63b4579b.chunk.css.map": "/static/css/393.63b4579b.chunk.css.map",
+    "393.168e11b6.chunk.js.map": "/static/js/393.168e11b6.chunk.js.map",
     "453.2c396120.chunk.js.map": "/static/js/453.2c396120.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.b81cc824.css",
-    "static/js/main.61ef94e9.js"
+    "static/css/main.66a6b681.css",
+    "static/js/main.1380d97c.js"
   ]
 }
