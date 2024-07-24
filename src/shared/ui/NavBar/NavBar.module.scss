@@ -15,6 +15,7 @@
 .root {
     position: absolute;
     width: wp(422);
+    height: hp(120);
     bottom: hp(50);
     left: 50%;
     transform: translateX(-50%);
@@ -33,8 +34,8 @@
     opacity: 0;
     height: lhp(127);
 
-    transition: 0.3s ease;
-    transition-property: transform, opcity;
+    //transition: 0.3s ease;
+    //transition-property: transform, opcity;
 
     &-main {
         left: lwp(5);
