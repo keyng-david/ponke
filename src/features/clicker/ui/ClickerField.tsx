@@ -9,6 +9,7 @@ import {clickerModel} from "../model";
 
 import styles from './ClickerField.module.scss'
 import {getRandomArbitrary, getRandomInt, toFormattedNumber} from "@/shared/lib/number";
+import {NavBar} from "@/shared/ui/NavBar";
 
 let timeout2: NodeJS.Timeout
 
@@ -35,9 +36,9 @@ export const ClickerField = React.memo(() => {
             pointParent.style.left = `${e.clientX}px`
             pointParent.className = styles.point
 
-            document.body.appendChild(pointParent)
+            document.querySelector('#clicker')!.appendChild(pointParent)
             const timeout1 = setTimeout(() => {
-                document.body.removeChild(pointParent)
+                document.querySelector('#clicker')!.removeChild(pointParent)
 
                 clearTimeout(timeout1)
             }, 500)
@@ -55,7 +56,7 @@ export const ClickerField = React.memo(() => {
         }
     }, [canBeClicked, leftClasses.length, rightClasses.length])
 
-    return <div className={styles.root} onClick={onClick}>
+    return <div id={'clicker'} className={styles.root} onClick={onClick}>
         <p className={styles.value}>{valueString}</p>
         <p className={styles.value}>{valueString}</p>
         <ProgressBar value={available}/>
