@@ -13,8 +13,7 @@ import {getRandomArbitrary, getRandomInt, toFormattedNumber} from "@/shared/lib/
 export const ClickerField = () => {
     const { value, available, canBeClicked } = clickerModel.useClickerState()
 
-    const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']])
-    const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']])
+    const [isAnimated, setIsAnimated] = useState(false)
 
     const valueString = useMemo(() => toFormattedNumber(value), [value])
 
@@ -40,26 +39,23 @@ export const ClickerField = () => {
                 clearTimeout(timeout)
             }, 500)
 
-            if (leftClasses.length === 1 && rightClasses.length === 1) {
-                setLeftClasses(prevState => [...prevState, styles['hand-animated']])
-                setRightClasses(prevState => [...prevState, styles['hand-animated']])
+            if (!isAnimated) {
+                setIsAnimated(true)
                 const timeout1 = setTimeout(() => {
-                    setRightClasses([styles['hand-right']])
-                    setLeftClasses([styles['hand-left']])
-
+                    setIsAnimated(false)
                     clearTimeout(timeout1)
                 }, 300)
             }
         }
-    }, [canBeClicked, leftClasses, rightClasses])
+    }, [canBeClicked, isAnimated])
 
     return <div className={styles.root} onClick={onClick}>
         <p className={styles.value}>{valueString}</p>
         <p className={styles.value}>{valueString}</p>
         <ProgressBar value={available}/>
         <div className={styles.hands}>
-            <img className={leftClasses.join(' ')} src={leftHand} alt={'left hand'}/>
-            <img className={rightClasses.join(' ')} src={rightHand} alt={'right hand'}/>
+            <img className={`${styles['hand-left']} ${isAnimated ? styles['hand-animated'] : undefined}`} src={leftHand} alt={'left hand'}/>
+            <img className={`${styles['hand-right']} ${isAnimated ? styles['hand-animated'] : undefined}`} src={rightHand} alt={'right hand'}/>
         </div>
     </div>
 }
