@@ -124,6 +124,7 @@
     width: wp(85);
     animation: point-animation 0.5s forwards linear;
     transform: translateY(0) translateX(0);
+    z-index: 5;
 
     img {
         width: 100%;
