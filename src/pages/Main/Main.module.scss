@@ -19,11 +19,18 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: hp(-74);
+    bottom: hp(-50);
     min-width: 100%;
     max-height: hp(614);
     height: 100%;
     object-fit: cover;
+}
+
+.cabel {
+    position: absolute;
+    left: wp(43);
+    bottom: hp(286);
+    width: wp(325);
 }
 
 .logo {
@@ -39,7 +46,7 @@
         position: absolute;
         width: wp(313);
         height: hp(189);
-        bottom: hp(545);
+        bottom: hp(539);
         left: wp(67);
     }
 
@@ -47,7 +54,7 @@
         position: absolute;
         width: wp(217);
         height: hp(175);
-        bottom: hp(335);
+        bottom: hp(333);
         left: wp(108);
     }
 
@@ -55,7 +62,7 @@
         position: absolute;
         width: wp(176);
         height: hp(230);
-        bottom: hp(302);
+        bottom: hp(300);
         right: wp(-82);
     }
 
@@ -63,7 +70,7 @@
         position: absolute;
         width: wp(176);
         height: hp(230);
-        bottom: hp(315);
+        bottom: hp(310);
         left: wp(-68);
     }
 }

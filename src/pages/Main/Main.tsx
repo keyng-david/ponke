@@ -3,6 +3,7 @@ import {useNavigate} from "react-router-dom";
 
 import backgroundImage from '@/shared/assets/images/main/background.svg'
 import tableImage from '@/shared/assets/images/main/table.svg'
+import cabelImage from '@/shared/assets/images/main/cabel.svg'
 import logo from '@/shared/assets/images/main/logo.png'
 
 import styles from './Main.module.scss'
@@ -24,6 +25,11 @@ const Main = React.memo(() => {
             className={styles.table}
             src={tableImage}
             alt={'table'}
+        />
+        <img
+            className={styles.cabel}
+            src={cabelImage}
+            alt={'cabel'}
         />
         <img
             className={styles.logo}
