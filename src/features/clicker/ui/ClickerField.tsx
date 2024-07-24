@@ -9,11 +9,14 @@ import {clickerModel} from "../model";
 
 import styles from './ClickerField.module.scss'
 import {getRandomArbitrary, getRandomInt, toFormattedNumber} from "@/shared/lib/number";
+import {useTelegram} from "@/shared/lib/hooks/useTelegram";
 
 let timeout2: NodeJS.Timeout
 
 export const ClickerField = () => {
     const { value, available, canBeClicked } = clickerModel.useClickerState()
+
+    const { haptic } = useTelegram()
 
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']])
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']])
@@ -36,6 +39,7 @@ export const ClickerField = () => {
             pointParent.className = styles.point
 
             document.querySelector('#clicker')!.appendChild(pointParent)
+            haptic()
             const timeout1 = setTimeout(() => {
                 document.querySelector('#clicker')!.removeChild(pointParent)
 
@@ -50,7 +54,7 @@ export const ClickerField = () => {
                     setLeftClasses([styles['hand-left']])
 
                     clearTimeout(timeout2)
-                }, 1000)
+                }, 350)
             }
         }
     }, [canBeClicked, leftClasses.length, rightClasses.length])
