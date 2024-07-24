@@ -17,10 +17,12 @@
 
 .table {
     position: absolute;
-    left: 0;
-    bottom: hp(-50);
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: hp(-74);
     min-width: 100%;
-    max-height: hp(591);
+    max-height: hp(614);
+    height: 100%;
     object-fit: cover;
 }
 
@@ -37,7 +39,7 @@
         position: absolute;
         width: wp(313);
         height: hp(189);
-        bottom: hp(541);
+        bottom: hp(545);
         left: wp(67);
     }
 
@@ -45,7 +47,7 @@
         position: absolute;
         width: wp(217);
         height: hp(175);
-        bottom: hp(334);
+        bottom: hp(335);
         left: wp(108);
     }
 
@@ -61,7 +63,7 @@
         position: absolute;
         width: wp(176);
         height: hp(230);
-        bottom: hp(309);
+        bottom: hp(315);
         left: wp(-68);
     }
 }

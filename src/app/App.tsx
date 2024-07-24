@@ -9,9 +9,9 @@ function App() {
 
     useEffect(() => {
         expand()
-        setTimeout(() => {
-            alert(`${window.innerWidth}-${window.innerHeight}`)
-        }, 500)
+        // setTimeout(() => {
+        //     alert(`${window.innerWidth}-${window.innerHeight}`)
+        // }, 500)
     }, [expand]);
 
   return (
