@@ -28,11 +28,11 @@
     width: wp(422);
     height: hp(120);
     bottom: hp(50);
-    left: 50%;
-    transform: translateY(200%) translateX(-50%);
+    left: 0;
+    //transform: translateY(200%) translateX(-50%);
     z-index: 1000;
 
-    animation: nav-bar-appear 0.3s forwards linear;
+    //animation: nav-bar-appear 0.3s forwards linear;
 }
 
 .background {
