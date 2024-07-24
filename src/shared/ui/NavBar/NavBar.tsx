@@ -10,7 +10,7 @@ import React, {useCallback, useEffect, useRef, useState} from "react";
 const pages = ['main', 'frens', 'board', 'earn'] as const
 type Page = typeof pages[number]
 
-export const NavBar = React.memo(() => {
+export const NavBar = () => {
     const [value, setValue] = useState<Page>('main')
     const [isInit, setIsInit] = useState(false)
 
@@ -56,4 +56,4 @@ export const NavBar = React.memo(() => {
             />
         </div>
     )
-})
+}
