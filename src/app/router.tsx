@@ -32,8 +32,8 @@ export const RouterView = () => {
 
 const Main = React.lazy(() => import('../pages/Main/Main'))
 
-const MainElement = () => {
+const MainElement = React.memo(() => {
     return <React.Suspense fallback={<></>}>
         <Main />
     </React.Suspense>
-}
+})
