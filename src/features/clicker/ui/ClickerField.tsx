@@ -10,7 +10,6 @@ import {clickerModel} from "../model";
 import styles from './ClickerField.module.scss'
 import {getRandomArbitrary, getRandomInt, toFormattedNumber} from "@/shared/lib/number";
 
-let timeout1: NodeJS.Timeout
 let timeout2: NodeJS.Timeout
 
 export const ClickerField = () => {
@@ -21,7 +20,7 @@ export const ClickerField = () => {
 
     const valueString = useMemo(() => toFormattedNumber(value), [value])
 
-    const onClick = useCallback((e: { clientX: number, clientY: number }) => {
+    const onClick = (e: { clientX: number, clientY: number }) => {
         if (canBeClicked) {
             clickerModel.clicked()
 
@@ -37,7 +36,7 @@ export const ClickerField = () => {
             pointParent.className = styles.point
 
             document.body.appendChild(pointParent)
-            timeout1 = setTimeout(() => {
+            const timeout1 = setTimeout(() => {
                 document.body.removeChild(pointParent)
 
                 clearTimeout(timeout1)
@@ -46,15 +45,15 @@ export const ClickerField = () => {
             if (leftClasses.length === 1 && rightClasses.length === 1) {
                 setLeftClasses(prevState => [...prevState, styles['hand-animated']])
                 setRightClasses(prevState => [...prevState, styles['hand-animated']])
-                timeout2 = setTimeout(() => {
-                    setRightClasses([styles['hand-right']])
-                    setLeftClasses([styles['hand-left']])
-
-                    clearTimeout(timeout2)
-                }, 300)
+                // timeout2 = setTimeout(() => {
+                //     setRightClasses([styles['hand-right']])
+                //     setLeftClasses([styles['hand-left']])
+                //
+                //     clearTimeout(timeout2)
+                // }, 300)
             }
         }
-    }, [canBeClicked, leftClasses, rightClasses])
+    }
 
     return <div className={styles.root} onClick={onClick}>
         <p className={styles.value}>{valueString}</p>
