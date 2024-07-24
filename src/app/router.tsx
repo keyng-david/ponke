@@ -1,6 +1,7 @@
 import {Route, Routes, useLocation} from "react-router-dom";
 import {Auth} from "@/pages/Auth/Auth";
-import React, {lazy, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
+import {Main} from "@/pages/Main/Main";
 
 export const RouterView = React.memo(() => {
     const location = useLocation();
@@ -24,16 +25,8 @@ export const RouterView = React.memo(() => {
         >
             <Routes location={displayLocation}>
                 <Route path={'/'} element={<Auth />} />
-                <Route path={'/main'} element={<MainElement />} />
+                <Route path={'/main'} element={<Main />} />
             </Routes>
         </div>
     )
-})
-
-const Main = React.lazy(() => import('../pages/Main/Main'))
-
-const MainElement = React.memo(() => {
-    return <React.Suspense fallback={<></>}>
-        <Main />
-    </React.Suspense>
 })

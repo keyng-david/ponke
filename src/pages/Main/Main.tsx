@@ -20,7 +20,7 @@ import {MonitorLeft} from "@/shared/ui/MonitorLeft";
 import {ClickerField} from "@/features/clicker/ui";
 import {NavBar} from "@/shared/ui/NavBar";
 
-const Main = React.memo(() => (
+export const Main = React.memo(() => (
     <div className={styles.root}>
         <img
             className={styles['general-button']}
@@ -91,5 +91,3 @@ const Background = () => (
         <MonitorLeft className={styles['monitor-left']}/>
     </div>
 )
-
-export default Main
