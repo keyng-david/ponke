@@ -3,7 +3,9 @@ type TelegramWindow = {
         WebApp: {
             expand: () => void
             ready: () => void
-            impactOccurred: (v: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void
+            HapticFeedback: {
+                impactOccurred: (v: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void
+            }
         }
     }
 }
@@ -22,7 +24,7 @@ export const useTelegram = () => {
 
     function haptic() {
         try {
-            tg.Telegram.WebApp.impactOccurred('light')
+            tg.Telegram.WebApp.HapticFeedback.impactOccurred('light')
         } catch (e) {
             console.log(e)
         }
