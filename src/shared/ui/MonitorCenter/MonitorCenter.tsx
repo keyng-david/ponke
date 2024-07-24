@@ -7,7 +7,7 @@ export const MonitorCenter = React.memo<{
     className: string
 }>(({ className }) => (
     <div className={className}>
-        <svg className={styles.main} width="231" height="189" viewBox="0 0 231 189" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className={styles.main} width="231" height="189" viewBox="0 0 231 189" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
             <path
                 d="M121.37 136.698H109.572V160.989C100.133 160.989 88.5198 164.69 83.8931 166.541C58.9086 180.421 85.9751 185.742 102.631 186.667C119.982 188.518 156.764 189.582 165.093 179.033C173.421 168.484 139.414 162.608 121.37 160.989V136.698Z"
                 fill="url(#paint0_linear_16_4064)"/>

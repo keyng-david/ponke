@@ -104,32 +104,32 @@
 .monitor {
     &-top {
         position: absolute;
-        width: wp(313);
-        height: hp(189);
-        bottom: hp(539);
-        left: wp(67);
+        width: wp(290);
+        height: hp(195);
+        bottom: hp(530);
+        left: wp(69);
     }
 
     &-center {
         position: absolute;
-        width: wp(217);
-        height: hp(175);
+        width: wp(240);
+        height: hp(190);
         bottom: hp(333);
-        left: wp(108);
+        left: wp(100);
     }
 
     &-right {
         position: absolute;
-        width: wp(176);
-        height: hp(230);
+        width: wp(180);
+        height: hp(240);
         bottom: hp(300);
         right: wp(-82);
     }
 
     &-left {
         position: absolute;
-        width: wp(176);
-        height: hp(230);
+        width: wp(180);
+        height: hp(240);
         bottom: hp(310);
         left: wp(-68);
     }

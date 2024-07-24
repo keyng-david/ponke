@@ -7,12 +7,12 @@
 
 .graphic {
     &:nth-child(1) {
-        animation: infinity-scroll 6s linear infinite;
+        animation: infinity-scroll 12s linear infinite;
         animation-delay: 0s;
     }
     &:nth-child(2) {
         transform: translateX(100%);
-        animation: infinity-scroll 6s linear infinite;
-        animation-delay: 3s;
+        animation: infinity-scroll 12s linear infinite;
+        animation-delay: 6s;
     }
 }

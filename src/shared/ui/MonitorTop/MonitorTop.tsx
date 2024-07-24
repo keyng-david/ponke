@@ -7,7 +7,7 @@ export const MonitorTop = React.memo<{
     className: string
 }>(({ className }) => (
     <div className={className}>
-        <svg className={styles.main} width="321" height="199" viewBox="0 0 321 199" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className={styles.main} width="321" height="199" viewBox="0 0 321 199" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
             <g filter="url(#filter0_f_24_4702)">
                 <path d="M21 46.5L4 52.5L269 191.5L317 46.5L201.5 48L205.5 4H120L116.5 7.5L124.5 46.5H21Z"
                       fill="#060000" fillOpacity="0.25"/>
