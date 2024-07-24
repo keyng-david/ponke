@@ -2,7 +2,7 @@ import {Route, Routes, useLocation} from "react-router-dom";
 import {Auth} from "@/pages/Auth/Auth";
 import React, {lazy, useEffect, useState} from "react";
 
-export const RouterView = () => {
+export const RouterView = React.memo(() => {
     const location = useLocation();
 
     const [displayLocation, setDisplayLocation] = useState(location);
@@ -28,7 +28,7 @@ export const RouterView = () => {
             </Routes>
         </div>
     )
-}
+})
 
 const Main = React.lazy(() => import('../pages/Main/Main'))
 

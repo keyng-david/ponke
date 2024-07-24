@@ -147,6 +147,8 @@
         left: wp(-20);
         bottom: hp(-100);
         width: wp(150);
+
+        will-change: transform;
     }
 
     &-right {
@@ -154,6 +156,8 @@
         right: wp(-20);
         bottom: hp(-100);
         width: wp(150);
+
+        will-change: transform;
     }
 }
 
