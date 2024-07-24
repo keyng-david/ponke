@@ -14,13 +14,6 @@ export const NavBar = React.memo(() => {
     const [value, setValue] = useState<Page>('main')
     const [isInit, setIsInit] = useState(false)
 
-    const activeStateImage: Record<Page, string> = {
-        main: home,
-        frens: frens,
-        board: board,
-        earn: earn,
-    }
-
     const getClasses = useCallback((page: Page) => {
         const classes = [
             styles.item,
@@ -34,27 +27,33 @@ export const NavBar = React.memo(() => {
         return classes.join(' ')
     }, [value])
 
-    useEffect(() => {
-        setIsInit(true)
-        alert('RENDER')
-    }, []);
-
     return (
-        <>
-            {isInit && (
-                <div className={styles.root}>
-                    <img className={styles.background} src={main} alt={'manu'}/>
-                    {pages.map(page => (
-                        <img
-                            className={getClasses(page)}
-                            key={page}
-                            src={activeStateImage[page]}
-                            alt={page}
-                            onClick={() => setValue(page)}
-                        />
-                    ))}
-                </div>
-            )}
-        </>
+        <div className={styles.root}>
+            <img className={styles.background} src={main} alt={'manu'}/>
+            <img
+                className={getClasses('main')}
+                src={home}
+                alt={'main'}
+                onClick={() => setValue('main')}
+            />
+            <img
+                className={getClasses('frens')}
+                src={frens}
+                alt={'frens'}
+                onClick={() => setValue('frens')}
+            />
+            <img
+                className={getClasses('board')}
+                src={board}
+                alt={'board'}
+                onClick={() => setValue('board')}
+            />
+            <img
+                className={getClasses('earn')}
+                src={earn}
+                alt={'earn'}
+                onClick={() => setValue('earn')}
+            />
+        </div>
     )
 })
