@@ -12,7 +12,7 @@ import {getRandomArbitrary, getRandomInt, toFormattedNumber} from "@/shared/lib/
 
 let timeout2: NodeJS.Timeout
 
-export const ClickerField = () => {
+export const ClickerField = React.memo(() => {
     const { value, available, canBeClicked } = clickerModel.useClickerState()
 
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']])
@@ -64,7 +64,7 @@ export const ClickerField = () => {
             <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'}/>
         </div>
     </div>
-}
+})
 
 const ProgressBar = React.memo<{
     value: number
