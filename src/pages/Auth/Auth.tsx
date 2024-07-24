@@ -3,6 +3,12 @@ import {useNavigate} from "react-router-dom";
 
 import ponkeImage from '@/shared/assets/images/auth/ponke.png'
 
+import main from '@/shared/assets/images/navbar/main.png'
+import home from '@/shared/assets/images/navbar/home.png'
+import frens from '@/shared/assets/images/navbar/frens.png'
+import board from '@/shared/assets/images/navbar/board.png'
+import earn from '@/shared/assets/images/navbar/earn.png'
+
 import styles from './Auth.module.scss'
 
 const ANIMATION_TIME = 500
@@ -12,7 +18,15 @@ export const Auth = () => {
     const navigate = useNavigate()
     const [isAnimationEnd, setIsAnimationEnd] = useState(false)
 
+    function preloadImages() {
+        return [main, home, frens, board, earn].forEach(image => {
+            const img = new Image()
+            img.src = image
+        })
+    }
+
     useEffect(() => {
+        preloadImages()
         const timeout = setTimeout(() => {
             setIsAnimationEnd(true)
             clearTimeout(timeout)
