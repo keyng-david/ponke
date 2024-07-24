@@ -50,7 +50,7 @@ export const ClickerField = React.memo(() => {
                     setLeftClasses([styles['hand-left']])
 
                     clearTimeout(timeout2)
-                }, 500)
+                }, 1000)
             }
         }
     }
