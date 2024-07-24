@@ -28,31 +28,30 @@ export const NavBar = () => {
 
     return (
         <div className={styles.root}>
-            {/*<img className={styles.background} src={main} alt={'menu'}/>*/}
-            {/*<img*/}
-            {/*    className={`${styles.item} ${styles['item-main']}`}*/}
-            {/*    src={home}*/}
-            {/*    alt={'main'}*/}
-            {/*    onClick={() => setValue('main')}*/}
-            {/*/>*/}
-            {/*<img*/}
-            {/*    className={`${styles.item} ${styles['item-frens']}`}*/}
-            {/*    src={frens}*/}
-            {/*    alt={'frens'}*/}
-            {/*    onClick={() => setValue('frens')}*/}
-            {/*/>*/}
-            {/*<img*/}
-            {/*    className={`${styles.item} ${styles['item-board']}`}*/}
-            {/*    src={board}*/}
-            {/*    alt={'board'}*/}
-            {/*    onClick={() => setValue('board')}*/}
-            {/*/>*/}
-            {/*<img*/}
-            {/*    className={`${styles.item} ${styles['item-earn']}`}*/}
-            {/*    src={earn}*/}
-            {/*    alt={'earn'}*/}
-            {/*    onClick={() => setValue('earn')}*/}
-            {/*/>*/}
+            <img
+                className={getClasses('main')}
+                src={home}
+                alt={'main'}
+                onClick={() => setValue('main')}
+            />
+            <img
+                className={getClasses('frens')}
+                src={frens}
+                alt={'frens'}
+                onClick={() => setValue('frens')}
+            />
+            <img
+                className={getClasses('board')}
+                src={board}
+                alt={'board'}
+                onClick={() => setValue('board')}
+            />
+            <img
+                className={getClasses('earn')}
+                src={earn}
+                alt={'earn'}
+                onClick={() => setValue('earn')}
+            />
         </div>
     )
 }
