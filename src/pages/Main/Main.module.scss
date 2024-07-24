@@ -85,6 +85,22 @@
     width: wp(151);
 }
 
+.general-button {
+    position: absolute;
+    z-index: 2;
+    bottom: hp(815);
+    left: wp(8);
+    width: wp(113);
+}
+
+.wallet-button {
+    position: absolute;
+    z-index: 2;
+    bottom: hp(815);
+    right: wp(8);
+    width: wp(113);
+}
+
 .monitor {
     &-top {
         position: absolute;

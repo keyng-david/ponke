@@ -9,6 +9,8 @@ import keyboardImage from '@/shared/assets/images/main/keyboard.svg'
 import bankaLeftImage from '@/shared/assets/images/main/banka-left.png'
 import bankaRightImage from '@/shared/assets/images/main/banka-right.png'
 import logo from '@/shared/assets/images/main/logo.png'
+import generalButton from '@/shared/assets/images/main/general-button.png'
+import walletButton from '@/shared/assets/images/main/wallet-button.png'
 
 import styles from './Main.module.scss'
 import {MonitorTop} from "@/shared/ui/MonitorTop";
@@ -20,21 +22,37 @@ import {NavBar} from "@/shared/ui/NavBar";
 
 const Main = () => (
     <div className={styles.root}>
-        <img
-            className={styles.logo}
-            src={logo}
-            alt={'logo'}
-        />
+        <Header />
         <Background/>
         <ClickerField/>
         <NavBar />
     </div>
 )
 
+const Header = () => (
+    <>
+            <img
+                className={styles['general-button']}
+                src={generalButton}
+                alt={'general'}
+            />
+            <img
+                className={styles.logo}
+                src={logo}
+                alt={'logo'}
+            />
+            <img
+                className={styles['wallet-button']}
+                src={walletButton}
+                alt={'wallet'}
+            />
+    </>
+)
+
 const Background = () => (
     <div className={styles.background}>
-        <img
-            className={styles['background-image']}
+            <img
+                className={styles['background-image']}
             src={backgroundImage}
             alt={'background'}
         />
