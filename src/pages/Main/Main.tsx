@@ -30,23 +30,23 @@ const Main = () => (
 )
 
 const Header = () => (
-    <>
-            <img
-                className={styles['general-button']}
-                src={generalButton}
-                alt={'general'}
-            />
-            <img
-                className={styles.logo}
-                src={logo}
-                alt={'logo'}
-            />
-            <img
-                className={styles['wallet-button']}
-                src={walletButton}
-                alt={'wallet'}
-            />
-    </>
+    <div>
+        <img
+            className={styles['general-button']}
+            src={generalButton}
+            alt={'general'}
+        />
+        <img
+            className={styles.logo}
+            src={logo}
+            alt={'logo'}
+        />
+        <img
+            className={styles['wallet-button']}
+            src={walletButton}
+            alt={'wallet'}
+        />
+    </div>
 )
 
 const Background = () => (
