@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 
 import backgroundImage from '@/shared/assets/images/main/background.svg'
 import tableImage from '@/shared/assets/images/main/table.svg'
@@ -20,28 +20,39 @@ import {MonitorLeft} from "@/shared/ui/MonitorLeft";
 import {ClickerField} from "@/features/clicker/ui";
 import {NavBar} from "@/shared/ui/NavBar";
 
-export const Main = () => (
-    <div className={styles.root}>
-        <img
-            className={styles['general-button']}
-            src={generalButton}
-            alt={'general'}
-        />
-        <img
-            className={styles.logo}
-            src={logo}
-            alt={'logo'}
-        />
-        <img
-            className={styles['wallet-button']}
-            src={walletButton}
-            alt={'wallet'}
-        />
-        <Background/>
-        <ClickerField/>
-        <NavBar/>
-    </div>
-)
+export const Main = () => {
+        const [isInit, setIsInit] = useState(false)
+
+        useEffect(() => {
+                const timeout = setTimeout(() => {
+                      setIsInit(true)
+                        clearTimeout(timeout)
+                }, 500)
+        }, []);
+
+        return (
+            <div className={styles.root}>
+                    <img
+                        className={styles['general-button']}
+                        src={generalButton}
+                        alt={'general'}
+                    />
+                    <img
+                        className={styles.logo}
+                        src={logo}
+                        alt={'logo'}
+                    />
+                    <img
+                        className={styles['wallet-button']}
+                        src={walletButton}
+                        alt={'wallet'}
+                    />
+                    <Background/>
+                    <ClickerField/>
+                    {isInit && <NavBar />}
+            </div>
+        )
+}
 
 const Background = () => (
     <div className={styles.background}>
