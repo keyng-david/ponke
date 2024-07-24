@@ -30,12 +30,9 @@
 .item {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%) scale(0.7);
+    transform: translateY(-50%);
     opacity: 0;
     height: lhp(127);
-
-    //transition: 0.3s ease;
-    //transition-property: transform, opcity;
 
     &-main {
         left: lwp(5);
@@ -58,7 +55,7 @@
     }
 
     &.is-active {
-        transform: translateY(-50%) scale(1);
+        transform: translateY(-50%);
         opacity: 1;
     }
 }
