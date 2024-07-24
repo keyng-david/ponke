@@ -5,14 +5,13 @@ import board from '@/shared/assets/images/navbar/board.png'
 import earn from '@/shared/assets/images/navbar/earn.png'
 
 import styles from './NavBar.module.scss'
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useCallback, useState} from "react";
 
 const pages = ['main', 'frens', 'board', 'earn'] as const
 type Page = typeof pages[number]
 
 export const NavBar = () => {
     const [value, setValue] = useState<Page>('main')
-    const [isInit, setIsInit] = useState(false)
 
     const getClasses = useCallback((page: Page) => {
         const classes = [

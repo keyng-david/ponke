@@ -13,7 +13,7 @@ import {NavBar} from "@/shared/ui/NavBar";
 
 let timeout2: NodeJS.Timeout
 
-export const ClickerField = React.memo(() => {
+export const ClickerField = () => {
     const { value, available, canBeClicked } = clickerModel.useClickerState()
 
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']])
@@ -65,7 +65,7 @@ export const ClickerField = React.memo(() => {
             <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'}/>
         </div>
     </div>
-})
+}
 
 const ProgressBar = React.memo<{
     value: number
