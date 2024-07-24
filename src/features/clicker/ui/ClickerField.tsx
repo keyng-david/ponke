@@ -39,10 +39,16 @@ export const ClickerField = () => {
                 clearTimeout(timeout)
             }, 500)
 
-            if (!isAnimated) {
-                setIsAnimated(true)
+            const handLeft = document.querySelector('#hand-left')
+            const handRight = document.querySelector('#hand-right')
+
+            if (handLeft!.classList.length === 1 && handRight!.classList.length === 1) {
+                handLeft!.classList.add(styles['hand-animated'])
+                handRight!.classList.add(styles['hand-animated'])
                 const timeout1 = setTimeout(() => {
-                    setIsAnimated(false)
+                    handLeft!.classList.remove(styles['hand-animated'])
+                    handRight!.classList.remove(styles['hand-animated'])
+
                     clearTimeout(timeout1)
                 }, 300)
             }
@@ -54,8 +60,8 @@ export const ClickerField = () => {
         <p className={styles.value}>{valueString}</p>
         <ProgressBar value={available}/>
         <div className={styles.hands}>
-            <img className={`${styles['hand-left']} ${isAnimated ? styles['hand-animated'] : undefined}`} src={leftHand} alt={'left hand'}/>
-            <img className={`${styles['hand-right']} ${isAnimated ? styles['hand-animated'] : undefined}`} src={rightHand} alt={'right hand'}/>
+            <img id={'hand-left'} className={styles['hand-left']} src={leftHand} alt={'left hand'}/>
+            <img id={'hand-right'} className={styles['hand-right']} src={rightHand} alt={'right hand'}/>
         </div>
     </div>
 }
