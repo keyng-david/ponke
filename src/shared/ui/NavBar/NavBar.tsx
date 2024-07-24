@@ -36,6 +36,7 @@ export const NavBar = React.memo(() => {
 
     useEffect(() => {
         setIsInit(true)
+        alert('RENDER')
     }, []);
 
     return (
