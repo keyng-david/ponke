@@ -22,37 +22,31 @@ import {NavBar} from "@/shared/ui/NavBar";
 
 const Main = () => (
     <div className={styles.root}>
-        <Header />
-        <Background/>
-        <ClickerField/>
-        <NavBar />
-    </div>
-)
-
-const Header = () => (
-    <div>
-        <img
-            className={styles['general-button']}
-            src={generalButton}
-            alt={'general'}
-        />
-        <img
-            className={styles.logo}
-            src={logo}
-            alt={'logo'}
-        />
-        <img
-            className={styles['wallet-button']}
-            src={walletButton}
-            alt={'wallet'}
-        />
+            <img
+                className={styles['general-button']}
+                src={generalButton}
+                alt={'general'}
+            />
+            <img
+                className={styles.logo}
+                src={logo}
+                alt={'logo'}
+            />
+            <img
+                className={styles['wallet-button']}
+                src={walletButton}
+                alt={'wallet'}
+            />
+            <Background/>
+            <ClickerField/>
+            <NavBar/>
     </div>
 )
 
 const Background = () => (
     <div className={styles.background}>
-            <img
-                className={styles['background-image']}
+        <img
+            className={styles['background-image']}
             src={backgroundImage}
             alt={'background'}
         />
