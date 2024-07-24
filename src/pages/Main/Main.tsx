@@ -4,7 +4,7 @@ import {useNavigate} from "react-router-dom";
 import backgroundImage from '@/shared/assets/images/main/background.svg'
 import tableImage from '@/shared/assets/images/main/table.svg'
 import cabelImage from '@/shared/assets/images/main/cabel.svg'
-import clockImage from '@/shared/assets/images/main/clock.svg'
+import clockImage from '@/shared/assets/images/main/clock.png'
 import pictureImage from '@/shared/assets/images/main/picture.png'
 import keyboardImage from '@/shared/assets/images/main/keyboard.svg'
 import bankaLeftImage from '@/shared/assets/images/main/banka-left.png'
