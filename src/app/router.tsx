@@ -31,8 +31,8 @@ export const RouterView = React.memo(() => {
     // )
     return (
         <Routes>
-            <Route path={'/'} element={<Auth />} />
-            <Route path={'/main'} element={<Main />} />
+            <Route path={'/'} Component={Auth} />
+            <Route path={'/main'} Component={Main} />
         </Routes>
     )
 })

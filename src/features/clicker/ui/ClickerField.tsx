@@ -9,7 +9,6 @@ import {clickerModel} from "../model";
 
 import styles from './ClickerField.module.scss'
 import {getRandomArbitrary, getRandomInt, toFormattedNumber} from "@/shared/lib/number";
-import {NavBar} from "@/shared/ui/NavBar";
 
 let timeout2: NodeJS.Timeout
 
