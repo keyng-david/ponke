@@ -22,24 +22,24 @@ import {NavBar} from "@/shared/ui/NavBar";
 
 export const Main = () => (
     <div className={styles.root}>
-            <img
-                className={styles['general-button']}
-                src={generalButton}
-                alt={'general'}
-            />
-            <img
-                className={styles.logo}
-                src={logo}
-                alt={'logo'}
-            />
-            <img
-                className={styles['wallet-button']}
-                src={walletButton}
-                alt={'wallet'}
-            />
-            <Background/>
-            <ClickerField/>
-            <NavBar/>
+        <img
+            className={styles['general-button']}
+            src={generalButton}
+            alt={'general'}
+        />
+        <img
+            className={styles.logo}
+            src={logo}
+            alt={'logo'}
+        />
+        <img
+            className={styles['wallet-button']}
+            src={walletButton}
+            alt={'wallet'}
+        />
+        <Background/>
+        <ClickerField/>
+        <NavBar/>
     </div>
 )
 
