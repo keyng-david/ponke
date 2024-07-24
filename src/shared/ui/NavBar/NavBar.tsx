@@ -1,12 +1,12 @@
 import main from '@/shared/assets/images/navbar/main.png'
 
 import styles from './NavBar.module.scss'
-import {useCallback, useState} from "react";
+import React, {useCallback, useState} from "react";
 
 const pages = ['main', 'frens', 'board', 'earn'] as const
 type Page = typeof pages[number]
 
-export const NavBar = () => {
+export const NavBar = React.memo(() => {
     const [value, setValue] = useState<Page>('main')
 
     const activeStateImage: Record<Page, string> = {
@@ -43,4 +43,4 @@ export const NavBar = () => {
             ))}
         </div>
     )
-}
+})

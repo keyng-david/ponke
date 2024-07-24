@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, {useCallback, useMemo, useState} from "react";
 
 import progress from '@/shared/assets/images/main/progress.png'
 import pointImage from '@/shared/assets/images/main/point.png'
@@ -10,8 +10,13 @@ import {clickerModel} from "../model";
 import styles from './ClickerField.module.scss'
 import {getRandomArbitrary, getRandomInt, toFormattedNumber} from "@/shared/lib/number";
 
+let timeout2: NodeJS.Timeout
+
 export const ClickerField = () => {
     const { value, available, canBeClicked } = clickerModel.useClickerState()
+
+    const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']])
+    const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']])
 
     const valueString = useMemo(() => toFormattedNumber(value), [value])
 
@@ -36,6 +41,17 @@ export const ClickerField = () => {
 
                 clearTimeout(timeout1)
             }, 500)
+
+            if (leftClasses.length === 1 && rightClasses.length === 1) {
+                setLeftClasses(prevState => [...prevState, styles['hand-animated']])
+                setRightClasses(prevState => [...prevState, styles['hand-animated']])
+                timeout2 = setTimeout(() => {
+                    setRightClasses([styles['hand-right']])
+                    setLeftClasses([styles['hand-left']])
+
+                    clearTimeout(timeout2)
+                }, 300)
+            }
         }
     }
 
@@ -44,8 +60,8 @@ export const ClickerField = () => {
         <p className={styles.value}>{valueString}</p>
         <ProgressBar value={available}/>
         <div className={styles.hands}>
-            <img id={'handLeft'} className={styles['hand-left']} src={leftHand} alt={'left hand'}/>
-            <img id={'handRight'} className={styles['hand-right']} src={rightHand} alt={'right hand'}/>
+            <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'}/>
+            <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'}/>
         </div>
     </div>
 }
