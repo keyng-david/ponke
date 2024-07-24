@@ -15,6 +15,14 @@
     object-fit: cover;
 }
 
+.table {
+    position: absolute;
+    left: 0;
+    bottom: hp(-50);
+    min-width: 100%;
+    height: hp(591);
+}
+
 .logo {
     position: absolute;
     bottom: hp(826);
@@ -27,6 +35,7 @@
     &-top {
         position: absolute;
         width: wp(313);
+        height: hp(189);
         bottom: hp(541);
         left: wp(67);
     }
@@ -34,6 +43,7 @@
     &-center {
         position: absolute;
         width: wp(217);
+        height: hp(175);
         bottom: hp(334);
         left: wp(108);
     }
@@ -41,6 +51,7 @@
     &-right {
         position: absolute;
         width: wp(176);
+        height: hp(230);
         bottom: hp(302);
         right: wp(-82);
     }
@@ -48,6 +59,7 @@
     &-left {
         position: absolute;
         width: wp(176);
+        height: hp(230);
         bottom: hp(309);
         left: wp(-68);
     }

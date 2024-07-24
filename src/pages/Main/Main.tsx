@@ -2,6 +2,7 @@ import React from "react";
 import {useNavigate} from "react-router-dom";
 
 import backgroundImage from '@/shared/assets/images/main/background.svg'
+import tableImage from '@/shared/assets/images/main/table.svg'
 import logo from '@/shared/assets/images/main/logo.png'
 
 import styles from './Main.module.scss'
@@ -20,14 +21,19 @@ const Main = React.memo(() => {
             alt={'background'}
         />
         <img
+            className={styles.table}
+            src={tableImage}
+            alt={'table'}
+        />
+        <img
             className={styles.logo}
             src={logo}
             alt={'logo'}
         />
-        <MonitorTop className={styles['monitor-top']} />
-        <MonitorCenter className={styles['monitor-center']} />
-        <MonitorRight className={styles['monitor-right']} />
-        <MonitorLeft className={styles['monitor-left']} />
+        <MonitorTop className={styles['monitor-top']}/>
+        <MonitorCenter className={styles['monitor-center']}/>
+        <MonitorRight className={styles['monitor-right']}/>
+        <MonitorLeft className={styles['monitor-left']}/>
     </div>
 })
 
