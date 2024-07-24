@@ -16,6 +16,7 @@ import {MonitorTop} from "@/shared/ui/MonitorTop";
 import {MonitorCenter} from "@/shared/ui/MonitorCenter";
 import {MonitorRight} from "@/shared/ui/MonitorRight";
 import {MonitorLeft} from "@/shared/ui/MonitorLeft";
+import {ClickerField} from "@/features/clicker/ui";
 
 const Main = React.memo(() => {
     const navigate = useNavigate()
@@ -27,6 +28,7 @@ const Main = React.memo(() => {
             alt={'logo'}
         />
         <Background />
+        <ClickerField />
     </div>
 })
 
