@@ -30,7 +30,7 @@ export const NavBar = React.memo(() => {
     }, [value])
 
     useEffect(() => {
-        console.log('render')
+        alert('render')
     })
 
     return (

@@ -20,7 +20,7 @@ export const ClickerField = React.memo(() => {
 
     const valueString = useMemo(() => toFormattedNumber(value), [value])
 
-    const onClick = (e: { clientX: number, clientY: number }) => {
+    const onClick = useCallback((e: { clientX: number, clientY: number }) => {
         if (canBeClicked) {
             clickerModel.clicked()
 
@@ -53,7 +53,7 @@ export const ClickerField = React.memo(() => {
                 }, 1000)
             }
         }
-    }
+    }, [canBeClicked, leftClasses.length, rightClasses.length])
 
     return <div className={styles.root} onClick={onClick}>
         <p className={styles.value}>{valueString}</p>
