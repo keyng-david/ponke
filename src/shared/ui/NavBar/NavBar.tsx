@@ -32,7 +32,7 @@ export const NavBar = () => {
 
     return (
         <div className={styles.root}>
-            <img className={styles.background} src={main} alt={'manu'}/>
+            <img className={styles.background} src={main} alt={'menu'}/>
             <img
                 className={`${styles.item} ${styles['item-main']}`}
                 src={home}
