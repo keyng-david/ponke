@@ -4,6 +4,11 @@ import {useNavigate} from "react-router-dom";
 import backgroundImage from '@/shared/assets/images/main/background.svg'
 import tableImage from '@/shared/assets/images/main/table.svg'
 import cabelImage from '@/shared/assets/images/main/cabel.svg'
+import clockImage from '@/shared/assets/images/main/clock.svg'
+import pictureImage from '@/shared/assets/images/main/picture.png'
+import keyboardImage from '@/shared/assets/images/main/keyboard.svg'
+import bankaLeftImage from '@/shared/assets/images/main/banka-left.svg'
+import bankaRightImage from '@/shared/assets/images/main/banka-right.svg'
 import logo from '@/shared/assets/images/main/logo.png'
 
 import styles from './Main.module.scss'
@@ -17,7 +22,18 @@ const Main = React.memo(() => {
 
     return <div className={styles.root}>
         <img
-            className={styles.background}
+            className={styles.logo}
+            src={logo}
+            alt={'logo'}
+        />
+        <Background />
+    </div>
+})
+
+const Background = () => (
+    <div className={styles.background}>
+        <img
+            className={styles['background-image']}
             src={backgroundImage}
             alt={'background'}
         />
@@ -32,15 +48,35 @@ const Main = React.memo(() => {
             alt={'cabel'}
         />
         <img
-            className={styles.logo}
-            src={logo}
-            alt={'logo'}
+            className={styles.clock}
+            src={clockImage}
+            alt={'clock'}
+        />
+        <img
+            className={styles.picture}
+            src={pictureImage}
+            alt={'picture'}
+        />
+        <img
+            className={styles.keyboard}
+            src={keyboardImage}
+            alt={'keyboard'}
+        />
+        <img
+            className={styles['banka-left']}
+            src={bankaLeftImage}
+            alt={'banka-left'}
+        />
+        <img
+            className={styles['banka-right']}
+            src={bankaRightImage}
+            alt={'banka-right'}
         />
         <MonitorTop className={styles['monitor-top']}/>
         <MonitorCenter className={styles['monitor-center']}/>
         <MonitorRight className={styles['monitor-right']}/>
         <MonitorLeft className={styles['monitor-left']}/>
     </div>
-})
+)
 
 export default Main

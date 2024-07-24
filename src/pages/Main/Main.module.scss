@@ -9,6 +9,13 @@
 }
 
 .background {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+}
+
+.background-image {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -33,8 +40,45 @@
     width: wp(325);
 }
 
+.clock {
+    position: absolute;
+    left: wp(348);
+    bottom: hp(538);
+    width: wp(81);
+}
+
+.picture {
+    position: absolute;
+    left: wp(-30);
+    bottom: hp(538);
+    width: wp(92.5);
+}
+
+.keyboard {
+    position: absolute;
+    left: wp(70);
+    bottom: hp(226);
+    width: wp(287.11);
+}
+
+.banka-left {
+    position: absolute;
+    left: wp(121);
+    bottom: hp(326.5);
+    width: wp(36.13);
+}
+
+.banka-right {
+    position: absolute;
+    left: wp(409);
+    bottom: hp(286);
+    width: wp(21);
+    z-index: 5;
+}
+
 .logo {
     position: absolute;
+    z-index: 2;
     bottom: hp(826);
     left: 50%;
     transform: translateX(-50%);
