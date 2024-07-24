@@ -40,16 +40,16 @@ export const ClickerField = () => {
                 clearTimeout(timeout)
             }, 500)
 
-            if (leftClasses.length === 1 && rightClasses.length === 1) {
-                setLeftClasses(prevState => [...prevState, styles['hand-animated']])
-                setRightClasses(prevState => [...prevState, styles['hand-animated']])
-                const timeout1 = setTimeout(() => {
-                    setRightClasses([styles['hand-right']])
-                    setLeftClasses([styles['hand-left']])
-
-                    clearTimeout(timeout1)
-                }, 300)
-            }
+            // if (leftClasses.length === 1 && rightClasses.length === 1) {
+            //     setLeftClasses(prevState => [...prevState, styles['hand-animated']])
+            //     setRightClasses(prevState => [...prevState, styles['hand-animated']])
+            //     const timeout1 = setTimeout(() => {
+            //         setRightClasses([styles['hand-right']])
+            //         setLeftClasses([styles['hand-left']])
+            //
+            //         clearTimeout(timeout1)
+            //     }, 300)
+            // }
         }
     }, [canBeClicked, leftClasses, rightClasses])
 
