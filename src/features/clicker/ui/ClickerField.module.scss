@@ -50,6 +50,16 @@
     top: 0;
     left: 0;
     z-index: 5;
+
+    &:active {
+        & .hand-left {
+            animation: hand-left-animation 0.3s linear;
+        }
+
+        & .hand-right {
+            animation: hand-right-animation 0.3s linear;
+        }
+    }
 }
 
 .value {
@@ -156,14 +166,12 @@
         width: wp(150);
     }
 }
-
-.hand-animated {
-    &.hand-left {
-        animation: hand-left-animation 0.3s linear;
-    }
-
-    &.hand-right {
-        animation: hand-right-animation 0.3s linear;
-    }
-}
+//
+//.hand-animated {
+//    &.hand-left {
+//    }
+//
+//    &.hand-right {
+//    }
+//}
 
