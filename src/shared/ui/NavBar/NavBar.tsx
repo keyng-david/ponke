@@ -30,25 +30,25 @@ export const NavBar = () => {
         <div className={styles.root}>
             <img className={styles.background} src={main} alt={'manu'}/>
             <img
-                className={getClasses('main')}
+                className={`${styles.item} ${styles['item-main']}`}
                 src={home}
                 alt={'main'}
                 onClick={() => setValue('main')}
             />
             <img
-                className={getClasses('frens')}
+                className={`${styles.item} ${styles['item-frens']}`}
                 src={frens}
                 alt={'frens'}
                 onClick={() => setValue('frens')}
             />
             <img
-                className={getClasses('board')}
+                className={`${styles.item} ${styles['item-board']}`}
                 src={board}
                 alt={'board'}
                 onClick={() => setValue('board')}
             />
             <img
-                className={getClasses('earn')}
+                className={`${styles.item} ${styles['item-earn']}`}
                 src={earn}
                 alt={'earn'}
                 onClick={() => setValue('earn')}
