@@ -1,9 +1,9 @@
 {
   "files": {
     "main.css": "/static/css/main.87ff3161.css",
-    "main.js": "/static/js/main.aa045699.js",
+    "main.js": "/static/js/main.da27d0c8.js",
     "static/css/724.ecb529e0.chunk.css": "/static/css/724.ecb529e0.chunk.css",
-    "static/js/724.af8c8aef.chunk.js": "/static/js/724.af8c8aef.chunk.js",
+    "static/js/724.70ad3825.chunk.js": "/static/js/724.70ad3825.chunk.js",
     "static/js/453.2c396120.chunk.js": "/static/js/453.2c396120.chunk.js",
     "static/js/212.ee2a4db7.chunk.js": "/static/js/212.ee2a4db7.chunk.js",
     "static/media/auth-background.png": "/static/media/auth-background.675a3c3e45a68b530f15.png",
@@ -32,14 +32,14 @@
     "static/media/cabel.svg": "/static/media/cabel.d5a67cb08cda4317d01498119d89920a.svg",
     "index.html": "/index.html",
     "main.87ff3161.css.map": "/static/css/main.87ff3161.css.map",
-    "main.aa045699.js.map": "/static/js/main.aa045699.js.map",
+    "main.da27d0c8.js.map": "/static/js/main.da27d0c8.js.map",
     "724.ecb529e0.chunk.css.map": "/static/css/724.ecb529e0.chunk.css.map",
-    "724.af8c8aef.chunk.js.map": "/static/js/724.af8c8aef.chunk.js.map",
+    "724.70ad3825.chunk.js.map": "/static/js/724.70ad3825.chunk.js.map",
     "453.2c396120.chunk.js.map": "/static/js/453.2c396120.chunk.js.map",
     "212.ee2a4db7.chunk.js.map": "/static/js/212.ee2a4db7.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.87ff3161.css",
-    "static/js/main.aa045699.js"
+    "static/js/main.da27d0c8.js"
   ]
 }
