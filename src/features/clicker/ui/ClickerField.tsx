@@ -60,7 +60,7 @@ export const ClickerField = () => {
                 }
             }
         }
-    }, [])
+    }, [canBeClicked, haptic, leftClasses.length, rightClasses.length])
 
     function handleTouchMove(event: TouchEvent<HTMLDivElement>) {
         event.preventDefault()
@@ -69,42 +69,6 @@ export const ClickerField = () => {
     function handleTouchEnd(event: TouchEvent<HTMLDivElement>) {
         event.preventDefault();
     }
-
-    const onClick = useCallback((e: { clientX: number, clientY: number }) => {
-        if (canBeClicked) {
-            clickerModel.clicked()
-
-            const point = document.createElement('img')
-            point.src = pointImage
-            point.alt = 'point'
-            point.style.transform = `rotate(${getRandomInt(-25, 25)}deg) scale(${getRandomArbitrary(0.8, 1.2)})`
-
-            const pointParent = document.createElement('div')
-            pointParent.appendChild(point)
-            pointParent.style.top = `${e.clientY}px`
-            pointParent.style.left = `${e.clientX}px`
-            pointParent.className = styles.point
-
-            document.querySelector('#clicker')!.appendChild(pointParent)
-            haptic()
-            const timeout1 = setTimeout(() => {
-                document.querySelector('#clicker')!.removeChild(pointParent)
-
-                clearTimeout(timeout1)
-            }, 500)
-
-            if (leftClasses.length === 1 && rightClasses.length === 1) {
-                setLeftClasses(prevState => [...prevState, styles['hand-animated']])
-                setRightClasses(prevState => [...prevState, styles['hand-animated']])
-                timeout2 = setTimeout(() => {
-                    setRightClasses([styles['hand-right']])
-                    setLeftClasses([styles['hand-left']])
-
-                    clearTimeout(timeout2)
-                }, 350)
-            }
-        }
-    }, [canBeClicked, leftClasses.length, rightClasses.length])
 
     return (
         <div
