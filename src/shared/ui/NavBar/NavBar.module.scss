@@ -27,7 +27,7 @@
     position: absolute;
     width: wp(422);
     height: hp(120);
-    bottom: hp(50);
+    top: hp(50);
     left: 0;
     //transform: translateY(200%) translateX(-50%);
     z-index: 1000;
@@ -49,6 +49,7 @@
     width: lwp(422);
     height: lhp(110);
     opacity: 1!important;
+    z-index: 1001;
 }
 
 .item {
