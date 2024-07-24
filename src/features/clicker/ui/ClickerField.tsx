@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 
 import progress from '@/shared/assets/images/main/progress.png'
 import pointImage from '@/shared/assets/images/main/point.png'
@@ -39,15 +39,15 @@ export const ClickerField = () => {
                 clearTimeout(timeout)
             }, 500)
 
-            const handLeft = document.querySelector('#hand-left')
-            const handRight = document.querySelector('#hand-right')
+            const handLeft = document.querySelector('#hand-left') as HTMLImageElement
+            const handRight = document.querySelector('#hand-right') as HTMLImageElement
 
-            if (handLeft!.classList.length === 1 && handRight!.classList.length === 1) {
-                handLeft!.classList.add(styles['hand-animated'])
-                handRight!.classList.add(styles['hand-animated'])
+            if (!isAnimated) {
+                handLeft.style.animation = `${styles['hand-left-animation']} 0.3s linear`
+                handRight.style.animation = `${styles['hand-right-animation']} 0.3s linear`
                 const timeout1 = setTimeout(() => {
-                    handLeft!.classList.remove(styles['hand-animated'])
-                    handRight!.classList.remove(styles['hand-animated'])
+                    handLeft.style.animation = ``
+                    handRight.style.animation = ``
 
                     clearTimeout(timeout1)
                 }, 300)

@@ -157,13 +157,3 @@
     }
 }
 
-.hand-animated {
-    &.hand-left {
-        animation: hand-left-animation 0.3s linear;
-    }
-
-    &.hand-right {
-        animation: hand-right-animation 0.3s linear;
-    }
-}
-
