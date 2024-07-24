@@ -26,10 +26,6 @@ export const NavBar = () => {
         return classes.join(' ')
     }, [value])
 
-    useEffect(() => {
-        alert('nav bar render')
-    }, []);
-
     return (
         <div className={styles.root}>
             {/*<img className={styles.background} src={main} alt={'menu'}/>*/}

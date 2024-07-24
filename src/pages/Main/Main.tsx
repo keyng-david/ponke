@@ -21,11 +21,6 @@ import {ClickerField} from "@/features/clicker/ui";
 import {NavBar} from "@/shared/ui/NavBar";
 
 export const Main = () => {
-
-        useEffect(() => {
-                alert('main render')
-        }, []);
-
     return (
         <div className={styles.root}>
             <img
@@ -52,49 +47,49 @@ export const Main = () => {
 
 const Background = () => (
     <div className={styles.background}>
-        <img
-            className={styles['background-image']}
-            src={backgroundImage}
-            alt={'background'}
-        />
-        <img
-            className={styles.table}
-            src={tableImage}
-            alt={'table'}
-        />
-        <img
-            className={styles.cabel}
-            src={cabelImage}
-            alt={'cabel'}
-        />
-        <img
-            className={styles.clock}
-            src={clockImage}
-            alt={'clock'}
-        />
-        <img
-            className={styles.picture}
-            src={pictureImage}
-            alt={'picture'}
-        />
-        <img
-            className={styles.keyboard}
-            src={keyboardImage}
-            alt={'keyboard'}
-        />
-        <img
-            className={styles['banka-left']}
-            src={bankaLeftImage}
-            alt={'banka-left'}
-        />
-        <img
-            className={styles['banka-right']}
-            src={bankaRightImage}
-            alt={'banka-right'}
-        />
-        <MonitorTop className={styles['monitor-top']}/>
-        <MonitorCenter className={styles['monitor-center']}/>
-        <MonitorRight className={styles['monitor-right']}/>
-        <MonitorLeft className={styles['monitor-left']}/>
+            <img
+                className={styles['background-image']}
+                src={backgroundImage}
+                alt={'background'}
+            />
+            <img
+                className={styles.table}
+                src={tableImage}
+                alt={'table'}
+            />
+            <img
+                className={styles.cabel}
+                src={cabelImage}
+                alt={'cabel'}
+            />
+            <img
+                className={styles.clock}
+                src={clockImage}
+                alt={'clock'}
+            />
+            <img
+                className={styles.picture}
+                src={pictureImage}
+                alt={'picture'}
+            />
+            <img
+                className={styles.keyboard}
+                src={keyboardImage}
+                alt={'keyboard'}
+            />
+            <img
+                className={styles['banka-left']}
+                src={bankaLeftImage}
+                alt={'banka-left'}
+            />
+            <img
+                className={styles['banka-right']}
+                src={bankaRightImage}
+                alt={'banka-right'}
+            />
+            <MonitorTop className={styles['monitor-top']}/>
+            <MonitorCenter className={styles['monitor-center']}/>
+            <MonitorRight className={styles['monitor-right']}/>
+            <MonitorLeft className={styles['monitor-left']}/>
     </div>
 )
