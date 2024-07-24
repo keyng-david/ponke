@@ -1,4 +1,8 @@
 import main from '@/shared/assets/images/navbar/main.png'
+import home from '@/shared/assets/images/navbar/home.png'
+import frens from '@/shared/assets/images/navbar/frens.png'
+import board from '@/shared/assets/images/navbar/board.png'
+import earn from '@/shared/assets/images/navbar/earn.png'
 
 import styles from './NavBar.module.scss'
 import React, {useCallback, useState} from "react";
@@ -10,10 +14,10 @@ export const NavBar = React.memo(() => {
     const [value, setValue] = useState<Page>('main')
 
     const activeStateImage: Record<Page, string> = {
-        main: require('@/shared/assets/images/navbar/home.png'),
-        frens: require('@/shared/assets/images/navbar/frens.png'),
-        board: require('@/shared/assets/images/navbar/board.png'),
-        earn: require('@/shared/assets/images/navbar/earn.png'),
+        main: home,
+        frens: frens,
+        board: board,
+        earn: earn,
     }
 
     const getClasses = useCallback((page: Page) => {
