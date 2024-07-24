@@ -2,6 +2,7 @@ type TelegramWindow = {
     Telegram: {
         WebApp: {
             expand: () => void
+            ready: () => void
         }
     }
 }
@@ -11,6 +12,7 @@ export const useTelegram = () => {
 
     function expand() {
         try {
+            tg.Telegram.WebApp.ready()
             tg.Telegram.WebApp.expand()
         } catch (e) {
             console.log(e)
