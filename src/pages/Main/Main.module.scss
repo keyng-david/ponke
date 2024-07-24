@@ -17,7 +17,7 @@
 
 .logo {
     position: absolute;
-    top: hp(72);
+    bottom: hp(826);
     left: 50%;
     transform: translateX(-50%);
     width: wp(151);
@@ -27,29 +27,28 @@
     &-top {
         position: absolute;
         width: wp(313);
-        top: hp(197);
+        bottom: hp(541);
         left: wp(67);
     }
 
     &-center {
         position: absolute;
         width: wp(217);
-        //top: hp(420);
-        bottom: 0;
+        bottom: hp(334);
         left: wp(108);
     }
 
     &-right {
         position: absolute;
         width: wp(176);
-        top: hp(400);
+        bottom: hp(302);
         right: wp(-82);
     }
 
     &-left {
         position: absolute;
         width: wp(176);
-        top: hp(393);
+        bottom: hp(309);
         left: wp(-68);
     }
 }
