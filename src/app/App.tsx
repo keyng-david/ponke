@@ -15,11 +15,9 @@ function App() {
     }, [expand]);
 
   return (
-    <React.StrictMode>
-        <BrowserRouter>
-            <RouterView />
-        </BrowserRouter>
-    </React.StrictMode>
+      <BrowserRouter>
+          <RouterView />
+      </BrowserRouter>
   );
 }
 
