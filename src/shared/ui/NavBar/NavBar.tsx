@@ -5,7 +5,7 @@ import board from '@/shared/assets/images/navbar/board.png'
 import earn from '@/shared/assets/images/navbar/earn.png'
 
 import styles from './NavBar.module.scss'
-import React, {useCallback, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 
 const pages = ['main', 'frens', 'board', 'earn'] as const
 type Page = typeof pages[number]
@@ -25,6 +25,10 @@ export const NavBar = () => {
 
         return classes.join(' ')
     }, [value])
+
+    useEffect(() => {
+        alert('nav bar render')
+    }, []);
 
     return (
         <div className={styles.root}>

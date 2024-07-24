@@ -21,37 +21,33 @@ import {ClickerField} from "@/features/clicker/ui";
 import {NavBar} from "@/shared/ui/NavBar";
 
 export const Main = () => {
-        const [isInit, setIsInit] = useState(false)
 
         useEffect(() => {
-                const timeout = setTimeout(() => {
-                      setIsInit(true)
-                        clearTimeout(timeout)
-                }, 500)
+                alert('main render')
         }, []);
 
-        return (
-            <div className={styles.root}>
-                    <img
-                        className={styles['general-button']}
-                        src={generalButton}
-                        alt={'general'}
-                    />
-                    <img
-                        className={styles.logo}
-                        src={logo}
-                        alt={'logo'}
-                    />
-                    <img
-                        className={styles['wallet-button']}
-                        src={walletButton}
-                        alt={'wallet'}
-                    />
-                    <Background/>
-                    <ClickerField/>
-                    {isInit && <NavBar />}
-            </div>
-        )
+    return (
+        <div className={styles.root}>
+            <img
+                className={styles['general-button']}
+                src={generalButton}
+                alt={'general'}
+            />
+            <img
+                className={styles.logo}
+                src={logo}
+                alt={'logo'}
+            />
+            <img
+                className={styles['wallet-button']}
+                src={walletButton}
+                alt={'wallet'}
+            />
+            <Background/>
+            <ClickerField/>
+            <NavBar />
+        </div>
+    )
 }
 
 const Background = () => (
