@@ -3,6 +3,7 @@ import './App.css';
 import { RouterView } from './router'
 import {BrowserRouter} from "react-router-dom";
 import {useTelegram} from "@/shared/lib/hooks/useTelegram";
+import {NavBar} from "@/shared/ui/NavBar";
 
 function App() {
     const { expand } = useTelegram()
@@ -19,6 +20,7 @@ function App() {
         <BrowserRouter>
             <RouterView />
         </BrowserRouter>
+        <NavBar />
     </React.StrictMode>
   );
 }

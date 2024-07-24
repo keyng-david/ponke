@@ -1,7 +1,7 @@
 import main from '@/shared/assets/images/navbar/main.png'
 
 import styles from './NavBar.module.scss'
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useState} from "react";
 
 const pages = ['main', 'frens', 'board', 'earn'] as const
 type Page = typeof pages[number]
@@ -28,10 +28,6 @@ export const NavBar = React.memo(() => {
 
         return classes.join(' ')
     }, [value])
-
-    useEffect(() => {
-        alert('render')
-    })
 
     return (
         <div className={styles.root}>
