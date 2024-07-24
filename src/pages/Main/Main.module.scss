@@ -20,7 +20,8 @@
     left: 0;
     bottom: hp(-50);
     min-width: 100%;
-    height: hp(591);
+    max-height: hp(591);
+    object-fit: cover;
 }
 
 .logo {
