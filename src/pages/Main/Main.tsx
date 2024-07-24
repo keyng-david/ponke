@@ -18,6 +18,7 @@ import {MonitorCenter} from "@/shared/ui/MonitorCenter";
 import {MonitorRight} from "@/shared/ui/MonitorRight";
 import {MonitorLeft} from "@/shared/ui/MonitorLeft";
 import {ClickerField} from "@/features/clicker/ui";
+import {NavBar} from "@/shared/ui/NavBar";
 
 const Main = React.memo(() => (
     <div className={styles.root}>
@@ -38,6 +39,7 @@ const Main = React.memo(() => (
         />
         <Background/>
         <ClickerField/>
+        <NavBar/>
     </div>
 ))
 
