@@ -1,5 +1,4 @@
 import React from "react";
-import {useNavigate} from "react-router-dom";
 
 import backgroundImage from '@/shared/assets/images/main/background.svg'
 import tableImage from '@/shared/assets/images/main/table.svg'
@@ -17,20 +16,20 @@ import {MonitorCenter} from "@/shared/ui/MonitorCenter";
 import {MonitorRight} from "@/shared/ui/MonitorRight";
 import {MonitorLeft} from "@/shared/ui/MonitorLeft";
 import {ClickerField} from "@/features/clicker/ui";
+import {NavBar} from "@/shared/ui/NavBar";
 
-const Main = React.memo(() => {
-    const navigate = useNavigate()
-
-    return <div className={styles.root}>
+const Main = () => (
+    <div className={styles.root}>
         <img
             className={styles.logo}
             src={logo}
             alt={'logo'}
         />
-        <Background />
-        <ClickerField />
+        <Background/>
+        <ClickerField/>
+        <NavBar />
     </div>
-})
+)
 
 const Background = () => (
     <div className={styles.background}>

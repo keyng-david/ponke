@@ -1,0 +1,62 @@
+@import "src/app/styles/index";
+
+@function lwp($size) {
+    $wpSize: $size / 422 * 100 * 1%;
+
+    @return $wpSize;
+}
+
+@function lhp($size) {
+    $wpSize: $size / 110 * 100 * 1%;
+
+    @return $wpSize;
+}
+
+.root {
+    position: absolute;
+    width: wp(422);
+    bottom: hp(50);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+}
+
+.background {
+    width: 100%;
+}
+
+.item {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) scale(0.7);
+    opacity: 0;
+    height: lhp(127);
+
+    transition: 0.3s ease;
+    transition-property: transform, opcity;
+
+    &-main {
+        left: lwp(5);
+        width: lwp(106);
+    }
+
+    &-frens {
+        width: lwp(106);
+        left: lwp(112);
+    }
+
+    &-board {
+        width: lwp(110);
+        left: lwp(208);
+    }
+
+    &-earn {
+        width: lwp(110);
+        left: lwp(300);
+    }
+
+    &.is-active {
+        transform: translateY(-50%) scale(1);
+        opacity: 1;
+    }
+}

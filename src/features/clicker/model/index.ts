@@ -19,7 +19,7 @@ const updateAvailableFx = createEffect(async () => {
 const clicked = createEvent()
 const availableUpdated = createEvent<number>()
 
-const $value = createStore(0)
+const $value = createStore(1000)
 const $available = createStore(5000)
 
 const $canBeClicked = $available.map(state => state >= 10)
