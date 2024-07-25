@@ -18,47 +18,56 @@ export const ClickerField = () => {
 
     const { haptic } = useTelegram()
 
+    const [isClickable, setIsClickable] = useState(true)
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']])
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']])
 
     const valueString = useMemo(() => toFormattedNumber(value), [value])
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
-        for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
-            const { clientX, clientY } = e.touches[i]
-            if (canBeClicked) {
-                clickerModel.clicked()
+        if (isClickable) {
+            for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
+                const { clientX, clientY } = e.touches[i]
+                if (canBeClicked) {
+                    clickerModel.clicked()
 
-                const point = document.createElement('img')
-                point.src = pointImage
-                point.alt = 'point'
-                point.style.transform = `rotate(${getRandomInt(-25, 25)}deg) scale(${getRandomArbitrary(0.8, 1.2)})`
+                    const point = document.createElement('img')
+                    point.src = pointImage
+                    point.alt = 'point'
+                    point.style.transform = `rotate(${getRandomInt(-25, 25)}deg) scale(${getRandomArbitrary(0.8, 1.2)})`
 
-                const pointParent = document.createElement('div')
-                pointParent.appendChild(point)
-                pointParent.style.top = `${clientY}px`
-                pointParent.style.left = `${clientX}px`
-                pointParent.className = styles.point
+                    const pointParent = document.createElement('div')
+                    pointParent.appendChild(point)
+                    pointParent.style.top = `${clientY}px`
+                    pointParent.style.left = `${clientX}px`
+                    pointParent.className = styles.point
 
-                document.querySelector('#clicker')!.appendChild(pointParent)
-                haptic()
-                const timeout1 = setTimeout(() => {
-                    document.querySelector('#clicker')!.removeChild(pointParent)
+                    document.querySelector('#clicker')!.appendChild(pointParent)
+                    haptic()
+                    const timeout1 = setTimeout(() => {
+                        document.querySelector('#clicker')!.removeChild(pointParent)
 
-                    clearTimeout(timeout1)
-                }, 500)
+                        clearTimeout(timeout1)
+                    }, 500)
 
-                if (leftClasses.length === 1 && rightClasses.length === 1) {
-                    setLeftClasses(prevState => [...prevState, styles['hand-animated']])
-                    setRightClasses(prevState => [...prevState, styles['hand-animated']])
-                    timeout2 = setTimeout(() => {
-                        setRightClasses([styles['hand-right']])
-                        setLeftClasses([styles['hand-left']])
+                    if (leftClasses.length === 1 && rightClasses.length === 1) {
+                        setLeftClasses(prevState => [...prevState, styles['hand-animated']])
+                        setRightClasses(prevState => [...prevState, styles['hand-animated']])
+                        timeout2 = setTimeout(() => {
+                            setRightClasses([styles['hand-right']])
+                            setLeftClasses([styles['hand-left']])
 
-                        clearTimeout(timeout2)
-                    }, 350)
+                            clearTimeout(timeout2)
+                        }, 350)
+                    }
                 }
             }
+            setIsClickable(false)
+            const timeout = setTimeout(() => {
+                setIsClickable(true)
+
+                clearTimeout(timeout)
+            }, 100)
         }
     }, [canBeClicked, haptic, leftClasses.length, rightClasses.length])
 
