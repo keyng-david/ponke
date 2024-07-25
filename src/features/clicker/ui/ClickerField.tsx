@@ -62,12 +62,14 @@ export const ClickerField = () => {
                     }
                 }
             }
-            setIsClickable(false)
-            const timeout = setTimeout(() => {
-                setIsClickable(true)
+            if (e.touches.length > 1) {
+                setIsClickable(false)
+                const timeout = setTimeout(() => {
+                    setIsClickable(true)
 
-                clearTimeout(timeout)
-            }, 100)
+                    clearTimeout(timeout)
+                }, 50)
+            }
         }
     }, [canBeClicked, haptic, leftClasses.length, rightClasses.length])
 
