@@ -11,6 +11,7 @@ import styles from './ClickerField.module.scss'
 import {getRandomArbitrary, getRandomInt, toFormattedNumber} from "@/shared/lib/number";
 import {useTelegram} from "@/shared/lib/hooks/useTelegram";
 
+let timeout1: NodeJS.Timeout
 let timeout2: NodeJS.Timeout
 
 export const ClickerField = () => {
@@ -64,10 +65,10 @@ export const ClickerField = () => {
             }
             if (e.touches.length > 1) {
                 setIsClickable(false)
-                const timeout = setTimeout(() => {
+                timeout1 = setTimeout(() => {
                     setIsClickable(true)
 
-                    clearTimeout(timeout)
+                    clearTimeout(timeout1)
                 }, 50)
             }
         }
