@@ -5,6 +5,7 @@ import statistic from '@/shared/assets/images/frens/statistic.png'
 import points from '@/shared/assets/images/frens/points.png'
 
 import styles from './Friends.module.scss'
+import {useTelegram} from "@/shared/lib/hooks/useTelegram";
 
 export const Friends = () => (
     <div className={styles.root}>
@@ -41,9 +42,18 @@ const Statistic = () => (
     </div>
 )
 
-const InviteButton = () => (
-    <img src={invite} className={styles['invite-button']} alt={'invite button'} onClick={() => console.log('test')}/>
-)
+const InviteButton = () => {
+    const { sendInviteLink } = useTelegram()
+
+    return (
+        <img
+            src={invite}
+            className={styles['invite-button']}
+            alt={'invite button'}
+            onClick={sendInviteLink}
+        />
+    )
+}
 
 const Decorations = () => (
     <>

@@ -1,10 +1,18 @@
+import {useMemo} from "react";
+
 type TelegramWindow = {
     Telegram: {
         WebApp: {
             expand: () => void
             ready: () => void
+            openTelegramLink: (data: string) => void
             HapticFeedback: {
                 impactOccurred: (v: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void
+            }
+        },
+        authData: {
+            user?: {
+                id: string
             }
         }
     }
@@ -12,6 +20,12 @@ type TelegramWindow = {
 
 export const useTelegram = () => {
     const tg = (window as unknown as TelegramWindow)
+
+    function sendInviteLink() {
+        tg.Telegram.WebApp.openTelegramLink(
+            `https://t.me/share/url?url=https://t.me/ponketon_bot?start=${tg.Telegram.authData.user?.id ?? 0}&text=`
+        )
+    }
 
     function expand() {
         try {
@@ -33,5 +47,6 @@ export const useTelegram = () => {
     return {
         expand,
         haptic,
+        sendInviteLink,
     }
 }
