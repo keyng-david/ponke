@@ -47,7 +47,7 @@ export const SliderNavigator = React.memo<NavigatorProps>(({ activeStep, mainCom
                 setNext(0)
 
                 clearTimeout(timeout1)
-            }, 50)
+            }, 300)
         }
     }, [activeStep, active, prev]);
 

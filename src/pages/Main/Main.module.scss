@@ -94,6 +94,7 @@
 
     transition: 0.3s ease;
     transition-property: transform;
+    transition-delay: 0.3s;
 }
 
 .wallet-button {
@@ -105,6 +106,7 @@
 
     transition: 0.3s ease;
     transition-property: transform;
+    transition-delay: 0.3s;
 }
 
 :global(.is-modal-page) {
