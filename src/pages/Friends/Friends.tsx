@@ -46,12 +46,14 @@ const InviteButton = () => {
     const { sendInviteLink } = useTelegram()
 
     return (
-        <img
-            src={invite}
-            className={styles['invite-button']}
-            alt={'invite button'}
-            onTouchStart={sendInviteLink}
-        />
+        <div
+            onTouchStart={sendInviteLink}>
+            <img
+                src={invite}
+                className={styles['invite-button']}
+                alt={'invite button'}
+            />
+        </div>
     )
 }
 
