@@ -22,9 +22,10 @@ export const useTelegram = () => {
     const tg = (window as unknown as TelegramWindow)
 
     function sendInviteLink() {
-        tg.Telegram.WebApp.openTelegramLink(
-            `https://t.me/share/url?url=https://t.me/ponketon_bot?start=${tg.Telegram.authData.user?.id ?? 0}&text=`
-        )
+        // tg.Telegram.WebApp.openTelegramLink(
+        //     `https://t.me/share/url?url=https://t.me/ponketon_bot?start=${tg.Telegram.authData.user?.id ?? 0}&text=`
+        // )
+        alert('test')
     }
 
     function expand() {
