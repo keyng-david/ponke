@@ -107,9 +107,9 @@ const ProgressBar = React.memo<{
         let count = 0;
         let curr = value
 
-        while (curr > 0) {
+        while (curr >= 0) {
             count += 1
-            curr = curr - 5000 / 11
+            curr = curr - 5000 / 12
         }
 
         return count

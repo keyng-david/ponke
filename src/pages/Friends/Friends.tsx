@@ -50,7 +50,7 @@ const InviteButton = () => {
             src={invite}
             className={styles['invite-button']}
             alt={'invite button'}
-            onClick={sendInviteLink}
+            onTouchStart={sendInviteLink}
         />
     )
 }
