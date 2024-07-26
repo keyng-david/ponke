@@ -23,8 +23,9 @@ export const useTelegram = () => {
 
     function sendInviteLink() {
         try {
+            const userId = tg.Telegram.authData.user ? tg.Telegram.authData.user.id : 0
             tg.Telegram.WebApp.openTelegramLink(
-                `https://t.me/share/url?url=https://t.me/ponketon_bot?start=${tg.Telegram.authData.user?.id || 0}&text=`
+                `https://t.me/share/url?url=https://t.me/ponketon_bot?start=${userId}&text=`
             )
         } catch (e) {
             alert(e)
