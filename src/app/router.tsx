@@ -37,14 +37,19 @@ export const RouterView = React.memo(() => {
 const Main = () => {
     const { step } = useNavigatorModel()
 
+    useEffect(() => {
+        if (step !== Steps.HOME) {
+            document.body.classList.add('is-modal-page')
+        } else {
+            document.body.classList.remove('is-modal-page')
+        }
+    }, [step]);
+
     return (
         <SliderNavigator
             activeStep={step}
-            components={[
-                {
-                    step: Steps.HOME,
-                    component: <Home />,
-                },
+            mainComponent={<Home />}
+            hiddenComponents={[
                 {
                     step: Steps.FRENS,
                     component: <Friends />,

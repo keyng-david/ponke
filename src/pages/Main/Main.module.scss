@@ -91,6 +91,9 @@
     bottom: hp(815);
     left: wp(8);
     width: wp(113);
+
+    transition: 0.3s ease;
+    transition-property: transform;
 }
 
 .wallet-button {
@@ -99,6 +102,16 @@
     bottom: hp(815);
     right: wp(8);
     width: wp(113);
+
+    transition: 0.3s ease;
+    transition-property: transform;
+}
+
+:global(.is-modal-page) {
+    & .wallet-button,
+    & .general-button {
+        transform: translateY(-100vh);
+    }
 }
 
 .monitor {

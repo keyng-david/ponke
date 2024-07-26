@@ -11,40 +11,23 @@
     width: 100vw;
     height: 100vh;
 
-    transform: translateX(100%);
+    transform: translateY(100%);
 
     transition: 0.3s ease;
     transition-property: transform;
 }
 
 .step-prev {
-    transform: translateX(0%);
-    z-index: 2;
-    opacity: 1!important;
+    transform: translateY(100%);
+    z-index: 998;
 }
 
-.step-prev-hidden {
-    transition: unset;
-
-    transform: translateX(0);
-    opacity: 0!important;
-    z-index: 1;
-}
-
-.step-next-right {
-    transform: translateX(100%);
-    opacity: 1!important;
-    z-index: 4;
-}
-
-.step-next-left {
-    transform: translateX(-100%);
-    opacity: 1!important;
-    z-index: 4;
+.step-next {
+    transform: translateY(100%);
+    z-index: 999;
 }
 
 .step-active {
-    transform: translateX(0);
-    opacity: 1!important;
-    z-index: 3;
+    transform: translateY(0);
+    z-index: 999;
 }

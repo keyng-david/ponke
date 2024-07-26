@@ -75,6 +75,9 @@
     &:nth-child(2) {
         -webkit-text-fill-color: transparent;
     }
+
+    transition: 0.3s ease;
+    transition-property: transform;
 }
 
 .progress-bar {
@@ -90,6 +93,16 @@
     border: 2px solid #000;
     overflow-y: hidden;
     overflow-x: hidden;
+
+    transition: 0.3s ease;
+    transition-property: transform;
+}
+
+:global(.is-modal-page) {
+    & .progress-bar,
+    & .value {
+        transform: translateY(-100vh) translateX(-50%);
+    }
 }
 
 .available {
