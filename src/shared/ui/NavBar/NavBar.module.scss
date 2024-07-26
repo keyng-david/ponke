@@ -62,22 +62,22 @@
     transition: 0.3s ease;
     transition-property: transform, opacity;
 
-    &-main {
+    &-1 {
         left: lwp(5);
         width: lwp(106);
     }
 
-    &-frens {
+    &-2 {
         width: lwp(106);
         left: lwp(112);
     }
 
-    &-board {
+    &-3 {
         width: lwp(110);
         left: lwp(208);
     }
 
-    &-earn {
+    &-4 {
         width: lwp(110);
         left: lwp(300);
     }

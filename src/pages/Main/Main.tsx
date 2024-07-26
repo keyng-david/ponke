@@ -18,7 +18,6 @@ import {MonitorCenter} from "@/shared/ui/MonitorCenter";
 import {MonitorRight} from "@/shared/ui/MonitorRight";
 import {MonitorLeft} from "@/shared/ui/MonitorLeft";
 import {ClickerField} from "@/features/clicker/ui";
-import {NavBar} from "@/shared/ui/NavBar";
 
 export const Main = () => {
     return (
@@ -40,7 +39,6 @@ export const Main = () => {
             />
             <Background/>
             <ClickerField/>
-            <NavBar />
         </div>
     )
 }
