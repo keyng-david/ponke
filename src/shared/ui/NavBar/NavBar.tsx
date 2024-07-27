@@ -1,5 +1,6 @@
 import home from '@/shared/assets/images/navbar/home.png'
 import frens from '@/shared/assets/images/navbar/frens.png'
+import board from '@/shared/assets/images/navbar/board.png'
 
 import styles from './NavBar.module.scss'
 import React, {useCallback} from "react";
@@ -35,12 +36,12 @@ export const NavBar = () => {
                 alt={'frens'}
                 onClick={() => stepChanged(Steps.FRENS)}
             />
-            {/*<img*/}
-            {/*    className={getClasses('board')}*/}
-            {/*    src={board}*/}
-            {/*    alt={'board'}*/}
-            {/*    onClick={() => setValue('board')}*/}
-            {/*/>*/}
+            <img
+                className={getClasses(Steps.BOARD)}
+                src={board}
+                alt={'board'}
+                onClick={() => stepChanged(Steps.BOARD)}
+            />
             {/*<img*/}
             {/*    className={getClasses('earn')}*/}
             {/*    src={earn}*/}

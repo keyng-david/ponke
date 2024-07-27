@@ -8,7 +8,7 @@ export function getRandomArbitrary(min: number, max: number) {
     return Math.random() * (max - min) + min;
 }
 
-export const toFormattedNumber = (value: number) => {
+export function toFormattedNumber(value: number) {
     let newValue = ''
 
     const removeSpaces = value!.toString().replace(/\s/g, '')
@@ -27,4 +27,12 @@ export const toFormattedNumber = (value: number) => {
     }
 
     return newValue
+}
+
+export function toFormattedIndex(value: number) {
+    if (value < 10) {
+        return `0${value}`
+    }
+
+    return value
 }

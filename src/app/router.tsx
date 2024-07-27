@@ -5,6 +5,7 @@ import {Main as Home} from "@/pages/Main/Main";
 import {Steps, useNavigatorModel} from "@/shared/model";
 import {SliderNavigator} from "@/shared/ui/Navigator";
 import {Friends} from "@/pages/Friends/Friends";
+import {Board} from "@/pages/Board/Board";
 
 export const RouterView = React.memo(() => {
     const location = useLocation();
@@ -53,6 +54,10 @@ const Main = () => {
                 {
                     step: Steps.FRENS,
                     component: <Friends />,
+                },
+                {
+                    step: Steps.BOARD,
+                    component: <Board />
                 }
             ]}
         />

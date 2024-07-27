@@ -3,44 +3,89 @@ import ponkes from '@/shared/assets/images/frens/ponkes.png'
 import invite from '@/shared/assets/images/frens/invite.png'
 import statistic from '@/shared/assets/images/frens/statistic.png'
 import points from '@/shared/assets/images/frens/points.png'
-
-import styles from './Friends.module.scss'
 import {useTelegram} from "@/shared/lib/hooks/useTelegram";
 
-export const Friends = () => (
-    <div className={styles.root}>
-        <Title />
+import styles from './Friends.module.scss'
+import { LoaderTemplate } from '@/shared/ui/LoaderTemplate'
+import { toFormattedNumber } from '@/shared/lib/number'
+import React from 'react'
+import { reflect } from '@effector/reflect'
+import { friendsModel } from '@/entities/friends/model'
 
-        <Points />
-        <Statistic />
+export const Friends = () => {
+    const { isLoading } = friendsModel.useFetchGate()
+
+    return (
+        <div className={styles.root}>
+            <TitleReflect />
+            <Main isLoading={isLoading} />
+            <Decorations />
+        </div>
+    )
+}
+
+const Main = React.memo<{
+    isLoading: boolean
+}>(({ isLoading }) => (
+    <LoaderTemplate className={styles.main} isLoading={isLoading}>
+        <PointsReflect />
+        <StatisticReflect />
         <InviteButton />
+        <img src={ponkes} className={styles.ponkes} alt={'decoration'}/>
+    </LoaderTemplate>
+))
 
-        <Decorations />
-    </div>
-)
-
-const Title = () => (
+const Title = React.memo<{
+    count: number
+}>(({ count }) => (
     <>
-        <h2 className={styles.title}>0 FRIENDS</h2>
-        <h2 className={styles.title}>0 FRIENDS</h2>
+        <h2 className={styles.title}>{count} FRIENDS</h2>
+        <h2 className={styles.title}>{count} FRIENDS</h2>
     </>
-)
+))
 
-const Points = () => (
+const TitleReflect = reflect({
+    view: Title,
+    bind: {
+        count: friendsModel.$data.map(state => state.friends)
+    }
+})
+
+const Points = React.memo<{
+    count: number
+}>(({ count }) => (
     <div className={styles.points}>
         <img src={points} alt={'points'} />
-        <p  className={styles['points-value']}>20050</p>
+        <p  className={styles['points-value']}>{count}</p>
         <p  className={styles['points-description']}>EARN POINTS</p>
     </div>
-)
+))
 
-const Statistic = () => (
+const PointsReflect = reflect({
+    view: Points,
+    bind: {
+        count: friendsModel.$data.map(state => state.points)
+    }
+})
+
+const Statistic = React.memo<{
+    tg: number,
+    premium: number
+}>(({ tg, premium }) => (
     <div className={styles.statistic}>
         <img src={statistic} className={styles['statistic-bg']} />
-        <p className={styles['tg-users']}>2.500</p>
-        <p className={styles['premium-users']}>2.500</p>
+        <p className={styles['tg-users']}>{toFormattedNumber(tg)}</p>
+        <p className={styles['premium-users']}>{toFormattedNumber(premium)}</p>
     </div>
-)
+))
+
+const StatisticReflect = reflect({
+    view: Statistic,
+    bind: {
+        tg: friendsModel.$data.map(state => state.tg),
+        premium: friendsModel.$data.map(state => state.premium),
+    }
+})
 
 const InviteButton = () => {
     const { sendInviteLink } = useTelegram()
@@ -60,6 +105,5 @@ const InviteButton = () => {
 const Decorations = () => (
     <>
         <img src={background} className={styles.background} alt={'background'}/>
-        <img src={ponkes} className={styles.ponkes} alt={'decoration'}/>
     </>
 )
