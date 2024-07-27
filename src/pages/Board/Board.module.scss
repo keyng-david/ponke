@@ -67,14 +67,14 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 45px;
-    height: 45px;
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
     border: 3px solid #060000;
     background: #E5CC6D;
     text-align: center;
-    font-size: 22px;
-    line-height: 45px;
+    font-size: 18px;
+    line-height: 35px;
 
     color: #E5CC6D;
     text-shadow: 3px 0 #000, -3px 0 #000, 0 3px #000, 0 -3px #000, 2px 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000
@@ -82,7 +82,7 @@
 
 .first-amount {
     position: absolute;
-    bottom: 17%;
+    bottom: 15%;
     right: 6.5%;
     max-width: 43.5%;
     text-overflow: ellipsis;
@@ -99,7 +99,7 @@
 
 .first-title {
     position: absolute;
-    bottom: 17%;
+    bottom: 15%;
     left: 6.5%;
     max-width: 43.5%;
     text-overflow: ellipsis;
@@ -171,7 +171,7 @@
 }
 
 .list-item-score {
-    margin-left: auto;
+    margin-left: auto!important;
     padding-right: 2%;
     max-width: 50%;
     text-overflow: ellipsis;
