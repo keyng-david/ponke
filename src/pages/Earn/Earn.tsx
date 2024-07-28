@@ -71,7 +71,7 @@ const List = React.memo<{
     <div className={styles['task-list-wrapper']}>
         <div className={styles['task-list']}>
             {list.map(item => (
-                <Task {...item} />
+                <Task key={item.name} {...item} />
             ))}
         </div>
     </div>

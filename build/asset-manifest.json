@@ -1,13 +1,14 @@
 {
   "files": {
-    "main.css": "/static/css/main.f286dbf1.css",
-    "main.js": "/static/js/main.e114bbfb.js",
+    "main.css": "/static/css/main.ddbbbc93.css",
+    "main.js": "/static/js/main.42845920.js",
     "static/js/453.2c396120.chunk.js": "/static/js/453.2c396120.chunk.js",
     "static/media/auth-background.png": "/static/media/auth-background.675a3c3e45a68b530f15.png",
     "static/media/background.png": "/static/media/background.03debc3e7fac9307f462.png",
     "static/media/ponke.png": "/static/media/ponke.bb2b494ef46323a34e34.png",
     "static/media/statistic.png": "/static/media/statistic.7037f558bdc152759323.png",
     "static/media/ponkes.png": "/static/media/ponkes.d315fdf523c06c4710c4.png",
+    "static/media/task_bg.png": "/static/media/task_bg.73deb74e3f84531f8b20.png",
     "static/media/grafic-top.svg": "/static/media/grafic-top.68a8cc681878622b4e6f0ae27e21a550.svg",
     "static/media/CCMaladroit-Bold.woff": "/static/media/CCMaladroit-Bold.72ed5d95d5f4b3d0b3fd.woff",
     "static/media/firstbg.png": "/static/media/firstbg.607fe9ebcc314d10672f.png",
@@ -34,12 +35,12 @@
     "static/media/keyboard.svg": "/static/media/keyboard.eafd0354d15d9f76d6377eddb8fcf562.svg",
     "static/media/cabel.svg": "/static/media/cabel.d5a67cb08cda4317d01498119d89920a.svg",
     "index.html": "/index.html",
-    "main.f286dbf1.css.map": "/static/css/main.f286dbf1.css.map",
-    "main.e114bbfb.js.map": "/static/js/main.e114bbfb.js.map",
+    "main.ddbbbc93.css.map": "/static/css/main.ddbbbc93.css.map",
+    "main.42845920.js.map": "/static/js/main.42845920.js.map",
     "453.2c396120.chunk.js.map": "/static/js/453.2c396120.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.f286dbf1.css",
-    "static/js/main.e114bbfb.js"
+    "static/css/main.ddbbbc93.css",
+    "static/js/main.42845920.js"
   ]
 }
