@@ -5,7 +5,7 @@ import pointImage from '@/shared/assets/images/main/point.png'
 import leftHand from '@/shared/assets/images/main/left-hand.png'
 import rightHand from '@/shared/assets/images/main/right-hand.png'
 
-import {clickerModel} from "../model";
+import {MAX_AVAILABLE, clickerModel} from "../model";
 
 import styles from './ClickerField.module.scss'
 import {getRandomArbitrary, getRandomInt, toFormattedNumber} from "@/shared/lib/number";
@@ -109,7 +109,7 @@ const ProgressBar = React.memo<{
 
         while (curr >= 0) {
             count += 1
-            curr = curr - 5000 / 12
+            curr = curr - MAX_AVAILABLE / 12
         }
 
         return count

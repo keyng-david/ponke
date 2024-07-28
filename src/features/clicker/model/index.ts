@@ -1,11 +1,17 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
 import {useUnit} from "effector-react";
 
+export const MAX_AVAILABLE = 500
+export const CLICK_STEP = 1
+
+let DELAY_TIMEOUT: NodeJS.Timeout
+
 async function delay() {
     return new Promise(resolve => {
-        const timeout = setTimeout(() => {
+        clearTimeout(DELAY_TIMEOUT)
+        DELAY_TIMEOUT = setTimeout(() => {
             resolve(null)
-            clearTimeout(timeout)
+            clearTimeout(DELAY_TIMEOUT)
         }, 2000)
     })
 }
@@ -13,17 +19,17 @@ async function delay() {
 const updateAvailableFx = createEffect(async () => {
     await delay()
 
-    return 10
+    return 1
 })
 
 const clicked = createEvent()
 const availableUpdated = createEvent<number>()
 
 const $value = createStore(1000)
-const $available = createStore(5000)
+const $available = createStore(MAX_AVAILABLE)
 
-const $canBeClicked = $available.map(state => state >= 10)
-const $isNotMax = $available.map(state => state < 5000)
+const $canBeClicked = $available.map(state => state >= CLICK_STEP)
+const $isNotMax = $available.map(state => state < MAX_AVAILABLE)
 
 sample({
     clock: updateAvailableFx.doneData,
@@ -41,14 +47,14 @@ sample({
 sample({
     source: $value,
     clock: clicked,
-    fn: v => v + 10,
+    fn: v => v + CLICK_STEP,
     target: $value
 })
 
 sample({
     source: $available,
     clock: clicked,
-    fn: v => v - 10,
+    fn: v => v - CLICK_STEP,
     target: $available
 })
 

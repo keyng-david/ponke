@@ -8,8 +8,8 @@ export const friendsApi: FriendsApi = {
             data: {
                 points: 20050,
                 friends: 10,
-                tg: 2500,
-                premium: 2500
+                tg: 1000,
+                premium: 2000
             }
         }
     }
