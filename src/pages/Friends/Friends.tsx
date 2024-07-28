@@ -56,8 +56,8 @@ const Points = React.memo<{
 }>(({ count }) => (
     <div className={styles.points}>
         <img src={points} alt={'points'} />
-        <p  className={styles['points-value']}>{count}</p>
-        <p  className={styles['points-description']}>EARN POINTS</p>
+        <p className={styles['points-value']}>{count}</p>
+        <p className={styles['points-description']}>EARN POINTS</p>
     </div>
 ))
 
