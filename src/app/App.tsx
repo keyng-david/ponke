@@ -1,8 +1,11 @@
 import React, {useEffect} from 'react';
-import './App.css';
-import { RouterView } from './router'
 import {BrowserRouter} from "react-router-dom";
+import { TonConnectUIProvider } from '@tonconnect/ui-react';
+
 import {useTelegram} from "@/shared/lib/hooks/useTelegram";
+
+import { RouterView } from './router'
+import './App.css';
 
 function App() {
     const { expand } = useTelegram()
@@ -15,9 +18,16 @@ function App() {
     }, [expand]);
 
   return (
-      <BrowserRouter>
-          <RouterView />
-      </BrowserRouter>
+    <TonConnectUIProvider 
+        manifestUrl='https://nftcollector.ru/tonconnect/tonconnect.json'
+        actionsConfiguration={{
+            twaReturnUrl: 'https://t.me/ponke_test_bot'
+        }}
+    >
+        <BrowserRouter>
+            <RouterView />
+        </BrowserRouter>
+    </TonConnectUIProvider>
   );
 }
 

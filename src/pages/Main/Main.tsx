@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import {TonConnectButton} from "@tonconnect/ui-react";
 
 import backgroundImage from '@/shared/assets/images/main/background.svg'
 import tableImage from '@/shared/assets/images/main/table.svg'
@@ -37,6 +37,7 @@ export const Main = () => {
                 src={walletButton}
                 alt={'wallet'}
             />
+            <TonConnectButton className={styles['ton-connect-button']} />
             <Background/>
             <ClickerField/>
         </div>
