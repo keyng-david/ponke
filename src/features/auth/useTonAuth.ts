@@ -20,7 +20,7 @@ export const useTonAuth = () => {
             }
 
             const response = await fetch(
-                'https://api.toptubereviews.buzz/proof/generatePayload',
+                '/proof/generatePayload',
                 {
                     method: 'GET',
                     mode: 'cors',
@@ -52,7 +52,7 @@ export const useTonAuth = () => {
 
             if (v?.connectItems?.tonProof && 'proof' in v.connectItems.tonProof) {
                 const checkResponse = await fetch(
-                    'https://api.toptubereviews.buzz/proof/checkProof',
+                    '/proof/checkProof',
                     {
                         method: 'POST',
                         mode: 'cors',
