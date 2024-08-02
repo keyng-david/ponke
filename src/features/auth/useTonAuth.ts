@@ -87,7 +87,9 @@ export const useTonAuth = () => {
 
     const initialize = useCallback(async () => {
         try {
-            alert('initialize')
+            if (wallet) {
+                await tonConnectUI.disconnect()
+            }
             if (firstProofLoading.current) {
                 await createProofPayload()
             }
