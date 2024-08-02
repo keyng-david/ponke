@@ -44,7 +44,7 @@ export const useTonAuth = () => {
 
     const updateStatusListener = useCallback(() => {
         tonConnectUI.onStatusChange(async v => {
-            alert(`tonConnectUI.onStatusChange ${JSON.stringify(v)}`)
+            alert(`tonConnectUI.onStatusChange ${v?.connectItems?.tonProof}`)
             if (!v) {
                 accessTokenStore.remove()
                 jwtTokenStore.remove()
