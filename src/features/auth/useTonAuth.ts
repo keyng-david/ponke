@@ -4,7 +4,7 @@ import {useAccessToken} from "@/shared/model/useAccessToken";
 import {useJWTToken} from "@/shared/model/jwt";
 
 export const useTonAuth = () => {
-    const firstProofLoading = useRef<boolean>(false)
+    const firstProofLoading = useRef<boolean>(true)
     const interval = useRef<NodeJS.Timer>()
     const wallet = useTonWallet()
     const [tonConnectUI] = useTonConnectUI()
@@ -36,7 +36,7 @@ export const useTonAuth = () => {
         }
     }, [tonConnectUI, firstProofLoading]);
 
-    async function initialize() {
+    const initialize = useCallback(async () => {
         try {
             if (wallet) {
                 if (firstProofLoading.current) {
@@ -87,7 +87,13 @@ export const useTonAuth = () => {
         } catch (e) {
             alert(e)
         }
-    }
+    }, [accessTokenStore, jwtTokenStore, recreateProofPayload, tonConnectUI, wallet])
+
+    useEffect(() => {
+        if (wallet && firstProofLoading.current) {
+            initialize().then()
+        }
+    }, [wallet, initialize]);
 
     useEffect(() => {
         return () => clearInterval(interval.current)

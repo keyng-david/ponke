@@ -43,7 +43,7 @@ export const Auth = () => {
         if (isAnimationEnd) {
             tonAuth.initialize().then()
         }
-    }, [isAnimationEnd, wallet]);
+    }, [isAnimationEnd]);
 
     return <div className={styles.root}>
         {!wallet && <TonConnectButton className={styles['ton-connect']} />}
