@@ -23,6 +23,7 @@ export const useTonAuth = () => {
                 'https://api.toptubereviews.buzz/proof/generatePayload',
                 {
                     method: 'GET',
+                    mode: 'cors',
                 }
             )
             const data = await response.json()
@@ -54,6 +55,7 @@ export const useTonAuth = () => {
                     'https://api.toptubereviews.buzz/proof/checkProof',
                     {
                         method: 'POST',
+                        mode: 'cors',
                         body: JSON.stringify({
                             address: v.account.address,
                             network: v.account.chain,
@@ -81,7 +83,7 @@ export const useTonAuth = () => {
         })
     }, [accessTokenStore, jwtTokenStore, tonConnectUI])
 
-    interval.current = setInterval(createProofPayload, 300)
+    interval.current = setInterval(createProofPayload, 10000)
 
     const initialize = useCallback(async () => {
         try {
