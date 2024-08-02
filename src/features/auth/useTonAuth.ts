@@ -26,14 +26,15 @@ export const useTonAuth = () => {
                     mode: 'cors',
                 }
             )
-            const data = await response.json()
-            alert(`createProofPayload ${response}`)
-            alert(`createProofPayload ${data}`)
 
-            // if (data.payload) {
+            const data = await response.text()
+            alert(`createProofPayload ${data}`)
+            alert(`createProofPayload ${response}`)
+
+            // if (data) {
             //     tonConnectUI.setConnectRequestParameters({
             //         state: "ready",
-            //         value: data.payload,
+            //         value: response,
             //     });
             // } else {
             //     tonConnectUI.setConnectRequestParameters(null);
