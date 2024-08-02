@@ -313,6 +313,16 @@ $animationTime: 0.5s;
     animation-name: image-animation;
 }
 
+.ton-connect {
+    position: absolute;
+    width: 100%!important;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    z-index: 100;
+}
+
 @media (max-height: 650px) {
     .ponke_letter {
         position: absolute;

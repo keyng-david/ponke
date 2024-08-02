@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {TonConnectButton, useTonWallet} from "@tonconnect/ui-react";
 
 import ponkeImage from '@/shared/assets/images/auth/ponke.png'
 
@@ -10,12 +11,17 @@ import board from '@/shared/assets/images/navbar/board.png'
 import earn from '@/shared/assets/images/navbar/earn.png'
 
 import styles from './Auth.module.scss'
+import {useTonAuth} from "@/features/auth/useTonAuth";
 
 const ANIMATION_TIME = 500
 const REDIRECT_DELAY = ANIMATION_TIME * 7
 
 export const Auth = () => {
     const navigate = useNavigate()
+
+    const tonAuth = useTonAuth()
+    const wallet = useTonWallet()
+
     const [isAnimationEnd, setIsAnimationEnd] = useState(false)
 
     function preloadImages() {
@@ -35,11 +41,12 @@ export const Auth = () => {
 
     useEffect(() => {
         if (isAnimationEnd) {
-            navigate('/main')
+            tonAuth.initialize().then()
         }
-    }, [isAnimationEnd, navigate]);
+    }, [isAnimationEnd, wallet]);
 
     return <div className={styles.root}>
+        {!wallet && <TonConnectButton className={styles['ton-connect']} />}
         <div className={styles.container}>
             <Ponke />
             <Ton />

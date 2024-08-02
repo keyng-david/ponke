@@ -1,8 +1,11 @@
 // import React, {useCallback, useEffect, useRef, useState, useLayoutEffect} from 'react';
 // import {useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
+import {useRef} from "react";
 
 export const useTonAuth = () => {
-    //
+    const firstProofLoading = useRef<boolean>(false)
+
+
 }
 
 // export const useTonAuth = () => {
