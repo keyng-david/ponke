@@ -13,27 +13,31 @@ export const useTonAuth = () => {
     const jwtTokenStore = useJWTToken()
 
     const createProofPayload = useCallback(async () => {
-        if (firstProofLoading.current) {
-            tonConnectUI.setConnectRequestParameters({ state: "loading" });
-            firstProofLoading.current = false;
-        }
-
-        const response = await fetch(
-            'https://api.toptubereviews.buzz/proof/generatePayload',
-            {
-                method: 'GET',
+        try {
+            if (firstProofLoading.current) {
+                tonConnectUI.setConnectRequestParameters({ state: "loading" });
+                firstProofLoading.current = false;
             }
-        )
-        const data = await response.json()
-        alert(`generatePayload ${data.payload}`)
 
-        if (data.payload) {
-            tonConnectUI.setConnectRequestParameters({
-                state: "ready",
-                value: data.payload,
-            });
-        } else {
-            tonConnectUI.setConnectRequestParameters(null);
+            const response = await fetch(
+                'https://api.toptubereviews.buzz/proof/generatePayload',
+                {
+                    method: 'GET',
+                }
+            )
+            const data = await response.json()
+            alert(`generatePayload ${data.payload}`)
+
+            if (data.payload) {
+                tonConnectUI.setConnectRequestParameters({
+                    state: "ready",
+                    value: data.payload,
+                });
+            } else {
+                tonConnectUI.setConnectRequestParameters(null);
+            }
+        } catch (e) {
+            alert(e)
         }
     }, [tonConnectUI, firstProofLoading]);
 
@@ -77,15 +81,14 @@ export const useTonAuth = () => {
         })
     }, [accessTokenStore, jwtTokenStore, tonConnectUI])
 
-    if (firstProofLoading.current) {
-        createProofPayload().then()
-    }
-
     interval.current = setInterval(createProofPayload, 300)
 
     const initialize = useCallback(async () => {
         try {
             alert('initialize')
+            if (firstProofLoading.current) {
+                await createProofPayload()
+            }
             updateStatusListener()
             if (!wallet) {
                 tonConnectUI.openModal().then()
