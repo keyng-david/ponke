@@ -27,18 +27,19 @@ export const useTonAuth = () => {
                 }
             )
             const data = await response.json()
-            alert(`generatePayload ${data.payload}`)
+            alert(`createProofPayload ${response}`)
+            alert(`createProofPayload ${data}`)
 
-            if (data.payload) {
-                tonConnectUI.setConnectRequestParameters({
-                    state: "ready",
-                    value: data.payload,
-                });
-            } else {
-                tonConnectUI.setConnectRequestParameters(null);
-            }
+            // if (data.payload) {
+            //     tonConnectUI.setConnectRequestParameters({
+            //         state: "ready",
+            //         value: data.payload,
+            //     });
+            // } else {
+            //     tonConnectUI.setConnectRequestParameters(null);
+            // }
         } catch (e) {
-            alert(e)
+            alert(`createProofPayload ${e}`)
         }
     }, [tonConnectUI, firstProofLoading]);
 
@@ -51,6 +52,7 @@ export const useTonAuth = () => {
             }
 
             if (v?.connectItems?.tonProof && 'proof' in v.connectItems.tonProof) {
+                alert('updateStatusListener')
                 const checkResponse = await fetch(
                     '/proof/checkProof',
                     {
