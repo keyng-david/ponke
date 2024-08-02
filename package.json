@@ -2,7 +2,6 @@
   "name": "ponke_clicker",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://api.toptubereviews.buzz",
   "dependencies": {
     "@effector/reflect": "^9.2.0",
     "@testing-library/jest-dom": "^5.17.0",
@@ -13,6 +12,7 @@
     "@types/node": "^16.18.103",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "axios": "^1.7.3",
     "effector": "^23.2.2",
     "effector-react": "^23.2.1",
     "react": "^18.3.1",

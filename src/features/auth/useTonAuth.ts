@@ -20,25 +20,23 @@ export const useTonAuth = () => {
             }
 
             const response = await fetch(
-                '/proof/generatePayload',
+                'https://api.toptubereviews.buzz/proof/generatePayload',
                 {
                     method: 'GET',
-                    mode: 'cors',
                 }
             )
 
-            const data = await response.text()
-            alert(`createProofPayload ${data}`)
-            alert(`createProofPayload ${response}`)
+            const data = await response.json()
+            alert(`createProofPayload ${data.payload}`)
 
-            // if (data) {
-            //     tonConnectUI.setConnectRequestParameters({
-            //         state: "ready",
-            //         value: response,
-            //     });
-            // } else {
-            //     tonConnectUI.setConnectRequestParameters(null);
-            // }
+            if (data.payload) {
+                tonConnectUI.setConnectRequestParameters({
+                    state: "ready",
+                    value: data.payload,
+                });
+            } else {
+                tonConnectUI.setConnectRequestParameters(null);
+            }
         } catch (e) {
             alert(`createProofPayload ${e}`)
         }
@@ -55,10 +53,9 @@ export const useTonAuth = () => {
             if (v?.connectItems?.tonProof && 'proof' in v.connectItems.tonProof) {
                 alert('updateStatusListener')
                 const checkResponse = await fetch(
-                    '/proof/checkProof',
+                    'https://api.toptubereviews.buzz/proof/checkProof',
                     {
                         method: 'POST',
-                        mode: 'cors',
                         body: JSON.stringify({
                             address: v.account.address,
                             network: v.account.chain,
@@ -86,7 +83,7 @@ export const useTonAuth = () => {
         })
     }, [accessTokenStore, jwtTokenStore, tonConnectUI])
 
-    interval.current = setInterval(createProofPayload, 10000)
+    interval.current = setInterval(createProofPayload, 100000)
 
     const initialize = useCallback(async () => {
         try {
