@@ -20,7 +20,7 @@ export const useAuth = () => {
                     'https://api.toptubereviews.buzz/game/validate',
                     {
                         headers: {
-                            'Authorization': `Bearer ${token}`,
+                            'Authorization': `Bearer {${token}}`,
                         },
                         method: 'POST'
                     }
