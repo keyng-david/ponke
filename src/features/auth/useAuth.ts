@@ -26,7 +26,10 @@ export const useAuth = () => {
                     }
                 )
 
-                if (response.status === 200) {
+                alert(response.ok)
+                alert(response.status)
+
+                if (response.ok) {
                     navigate('/main')
                     isInit.current = true
                     alert('SUCCESS')
