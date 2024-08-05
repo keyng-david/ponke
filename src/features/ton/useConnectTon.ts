@@ -1,9 +1,11 @@
 import {useCallback, useEffect, useRef} from "react";
-import {useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
+import {Account, TonProofItemReplySuccess, useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 import {useAccessToken} from "@/shared/model/useAccessToken";
 import {useJWTToken} from "@/shared/model/jwt";
 
-export const useTonAuth = () => {
+// TODO: remove jwt saving
+
+export const useConnectTon = () => {
     const firstProofLoading = useRef<boolean>(true)
     const interval = useRef<NodeJS.Timer>()
     const wallet = useTonWallet()
@@ -27,60 +29,68 @@ export const useTonAuth = () => {
             )
 
             const data = await response.json()
-            alert(`createProofPayload ${data.payload}`)
 
             if (data.payload) {
                 tonConnectUI.setConnectRequestParameters({
                     state: "ready",
-                    value: data.payload,
+                    value: {
+                        tonProof: data.payload,
+                    },
                 });
             } else {
                 tonConnectUI.setConnectRequestParameters(null);
             }
         } catch (e) {
-            alert(`createProofPayload ${e}`)
+            console.log(e)
         }
     }, [tonConnectUI, firstProofLoading]);
 
+    async function checkProof(
+        proof: TonProofItemReplySuccess["proof"],
+        account: Account
+    ) {
+        try {
+            const checkResponse = await fetch(
+                'https://api.toptubereviews.buzz/proof/checkProof',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        address: account.address,
+                        network: account.chain,
+                        publicKey: account.publicKey,
+                        proof: {
+                            ...proof,
+                            stateInit: account.walletStateInit,
+                        }
+                    })
+                }
+            )
+            const checkBody = await checkResponse.json()
+
+            if (checkResponse.ok && checkBody) {
+                await jwtTokenStore.set(checkBody.jwt as string)
+            } else {
+                jwtTokenStore.remove()
+                await tonConnectUI.disconnect()
+                return
+            }
+        } catch (e) {
+            console.log(`${e}`)
+        }
+    }
+
     const updateStatusListener = useCallback(() => {
         tonConnectUI.onStatusChange(async v => {
-            alert(`tonConnectUI.onStatusChange ${v}`)
-
             if (!v) {
                 accessTokenStore.remove()
                 jwtTokenStore.remove()
-                alert('disconnected')
             }
 
             if (v?.connectItems?.tonProof && 'proof' in v.connectItems.tonProof) {
-                alert('updateStatusListener')
-                const checkResponse = await fetch(
-                    'https://api.toptubereviews.buzz/proof/checkProof',
-                    {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            address: v.account.address,
-                            network: v.account.chain,
-                            public_key: v.account.publicKey,
-                            proof: {
-                                ...v.connectItems.tonProof.proof,
-                                state_init: v.account.walletStateInit,
-                            }
-                        })
-                    }
-                )
-                const checkBody = await checkResponse.json()
-                alert(`check body ${checkBody}`)
-
-                if (checkBody) {
-                    await jwtTokenStore.set(checkBody as string)
-                    alert('logged in')
-                } else {
-                    jwtTokenStore.remove()
-                    await tonConnectUI.disconnect()
-                    alert('disconnected')
-                    return
-                }
+                await checkProof(v.connectItems.tonProof.proof, v.account)
             }
         })
     }, [accessTokenStore, jwtTokenStore, tonConnectUI])
@@ -89,9 +99,9 @@ export const useTonAuth = () => {
 
     const initialize = useCallback(async () => {
         try {
-            if (wallet) {
-                await tonConnectUI.disconnect()
-            }
+            // if (wallet) {
+            //     await tonConnectUI.disconnect()
+            // }
             if (firstProofLoading.current) {
                 await createProofPayload()
             }
@@ -100,7 +110,7 @@ export const useTonAuth = () => {
                 tonConnectUI.openModal().then()
             }
         } catch (e) {
-            alert(e)
+            console.log(e)
         }
     }, [tonConnectUI, wallet])
 

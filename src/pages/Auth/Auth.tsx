@@ -11,18 +11,15 @@ import board from '@/shared/assets/images/navbar/board.png'
 import earn from '@/shared/assets/images/navbar/earn.png'
 
 import styles from './Auth.module.scss'
-import {useTonAuth} from "@/features/auth/useTonAuth";
+import {useAuth} from "@/features/auth/useAuth";
 
 const ANIMATION_TIME = 500
 const REDIRECT_DELAY = ANIMATION_TIME * 7
 
 export const Auth = () => {
-    const navigate = useNavigate()
-
-    const tonAuth = useTonAuth()
-    const wallet = useTonWallet()
-
     const [isAnimationEnd, setIsAnimationEnd] = useState(false)
+
+    const authModel = useAuth()
 
     function preloadImages() {
         return [main, home, frens, board, earn].forEach(image => {
@@ -41,12 +38,11 @@ export const Auth = () => {
 
     useEffect(() => {
         if (isAnimationEnd) {
-            tonAuth.initialize().then()
+            authModel.initialize().then()
         }
     }, [isAnimationEnd]);
 
     return <div className={styles.root}>
-        {!wallet && <TonConnectButton className={styles['ton-connect']} />}
         <div className={styles.container}>
             <Ponke />
             <Ton />
