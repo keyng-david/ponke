@@ -16,13 +16,14 @@ export const useAuth = () => {
                 const urlParams = new URLSearchParams(window.location.search);
                 const token = urlParams.get('token');
 
-                alert(token)
+                alert(`token ${token}`)
 
                 const response = await fetch(
                     'https://api.toptubereviews.buzz/game/validate',
                     {
                         headers: {
-                            'Authorization': `Bearer {${token}}`,
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`,
                         },
                         method: 'POST'
                     }
