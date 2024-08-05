@@ -34,6 +34,7 @@ export const useAuth = () => {
             }
         } catch (e) {
             console.log(e)
+            alert(e)
         }
     }, [jwtTokenStore, navigate])
 
