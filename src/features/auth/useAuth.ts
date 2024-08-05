@@ -16,6 +16,8 @@ export const useAuth = () => {
                 const urlParams = new URLSearchParams(window.location.search);
                 const token = urlParams.get('token');
 
+                alert(token)
+
                 const response = await fetch(
                     'https://api.toptubereviews.buzz/game/validate',
                     {
