@@ -3,6 +3,8 @@ import { combine, createStore, sample } from "effector";
 import { LeaderData } from './types'
 import { LeadersApi, leadersApi } from "@/shared/api/leaders";
 import { createFetch } from "@/shared/lib/effector/createGateHook";
+import {ResponseDefault} from "@/shared/lib/api/createRequest";
+import {GetLeaderListResponse} from "@/shared/api/leaders/types";
 
 const [ FetchGate, fetchFx, useFetchGate ] = createFetch<LeadersApi['getList']>(leadersApi.getList)
 
@@ -21,7 +23,7 @@ sample({
 
 sample({
     clock: fetchFx.doneData,
-    fn: ({ data }) => data.sort((a, b) => a.position > b.position ? 1 : -1),
+    fn: leadersToDomain,
     target: $data,
 })
 
@@ -29,4 +31,16 @@ export const leadersModel = {
     $list,
     $firstPosition,
     useFetchGate,
+}
+
+function leadersToDomain(data: ResponseDefault<GetLeaderListResponse>): LeaderData[] {
+    if (data.payload) {
+        return data.payload.leaders.map((item, key) => ({
+            position: key + 1,
+            name: item.username,
+            score: item.score,
+        }))
+    }
+
+    return []
 }

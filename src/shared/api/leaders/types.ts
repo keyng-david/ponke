@@ -1,11 +1,12 @@
+import {ResponseDefault} from "@/shared/lib/api/createRequest";
+
 export type GetLeaderListResponse = {
-    data: {
-        position: number
-        name: string
+    leaders: {
+        username: string
         score: number
     }[]
 }
 
 export type LeadersApi = {
-    getList: () => Promise<GetLeaderListResponse>
+    getList: () => Promise<ResponseDefault<GetLeaderListResponse>>
 }

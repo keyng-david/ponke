@@ -8,11 +8,13 @@ export type FailureResponse = {
     payload: null
 }
 
+export type ResponseDefault<T> = SuccessResponse<T> | FailureResponse
+
 export async function createRequest<T>(data: {
     url: string
     method: 'POST' | 'GET' | 'PUT' | 'DELETE',
     data?: Record<string, unknown>,
-}): Promise<SuccessResponse<T> | FailureResponse> {
+}): Promise<ResponseDefault<T>> {
     try {
         const token = await localStorage.getItem('jwt-token')
 

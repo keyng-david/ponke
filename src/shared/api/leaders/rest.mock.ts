@@ -5,11 +5,13 @@ export const leadersApi: LeadersApi = {
         await new Promise(resolve => setTimeout(resolve, 2000))
 
         return {
-            data: new Array(20).fill(1).map((_, key) => ({
-                position: key,
-                name: `username ${key}`,
-                score: 100_000_000 - key * 1000,
-            }))
+            error: false,
+            payload: {
+                leaders: new Array(20).fill(1).map((_, key) => ({
+                    username: `username ${key}`,
+                    score: 100_000_000 - key * 1000,
+                }))
+            }
         }
     },
 }
