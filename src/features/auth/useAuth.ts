@@ -17,10 +17,10 @@ export const useAuth = () => {
             if (!isInit.current) {
                 jwtTokenStore.remove()
 
-                // const urlParams = new URLSearchParams(window.location.search);
-                // const token = urlParams.get('token');
+                const urlParams = new URLSearchParams(window.location.search);
+                const token = urlParams.get('token') as string;
 
-                const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjMwMzAwNzUxIiwiZXhwIjoxNzIzNDgzNzk5LCJpc3MiOiJQb25rZSBBdXRoIn0.YzmAl7q6OBgXO_9HKVDy1rNPb9NU4UCbIvfTX8NWda8'
+                // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjMwMzAwNzUxIiwiZXhwIjoxNzIzNDgzNzk5LCJpc3MiOiJQb25rZSBBdXRoIn0.YzmAl7q6OBgXO_9HKVDy1rNPb9NU4UCbIvfTX8NWda8'
                 jwtTokenStore.set(token)
                 
                 const response = await createRequest<{
