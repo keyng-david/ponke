@@ -120,6 +120,12 @@
     transition-property: transform;
     transition-delay: 0.3s;
     opacity: 0;
+
+    & * {
+        width: 100%;
+        min-width: unset;
+        box-sizing: border-box;
+    }
 }
 
 :global(.is-modal-page) {

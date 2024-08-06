@@ -42,6 +42,7 @@ export const Main = () => {
                 alt={'wallet'}
                 onClick={!wallet ? initialize : undefined}
             />
+            {wallet && <TonConnectButton className={styles['ton-connect-button']} />}
             <Background/>
             <ClickerField/>
         </div>
