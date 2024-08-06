@@ -5,7 +5,7 @@ export const useSocket = () => {
         'wss://socket.toptubereviews.buzz',
         {
             shouldReconnect: () => true,
-            reconnectInterval: 100,
+            reconnectInterval: 0,
             onOpen: () => {
                 const token = localStorage.getItem('jwt-token')
                 sendMessage(`handshake:{"jwt_token":"${token}"}`)
