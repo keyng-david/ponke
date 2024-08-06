@@ -1,13 +1,13 @@
-import { combine, createStore, sample } from "effector";
+import {combine, createEffect, createEvent, createStore, sample} from "effector";
 
 import { LeaderData } from './types'
-import { LeadersApi, leadersApi } from "@/shared/api/leaders";
-import { createFetch } from "@/shared/lib/effector/createGateHook";
+import { leadersApi } from "@/shared/api/leaders";
 import {ResponseDefault} from "@/shared/lib/api/createRequest";
 import {GetLeaderListResponse} from "@/shared/api/leaders/types";
 
-const [ FetchGate, fetchFx, useFetchGate ] = createFetch<LeadersApi['getList']>(leadersApi.getList)
+const fetchFx = createEffect(leadersApi.getList)
 
+const leadersRequested = createEvent()
 const $data = createStore<LeaderData[]>([{
     position: 1,
     name: '',
@@ -15,9 +15,10 @@ const $data = createStore<LeaderData[]>([{
 }])
 const $firstPosition = combine($data, list => list[0])
 const $list = combine($data, list => list.slice(1))
+const $isLoading = fetchFx.pending
 
 sample({
-    clock: FetchGate.open,
+    clock: leadersRequested,
     target: fetchFx,
 })
 
@@ -30,7 +31,10 @@ sample({
 export const leadersModel = {
     $list,
     $firstPosition,
-    useFetchGate,
+
+    $isLoading,
+
+    leadersRequested,
 }
 
 function leadersToDomain(data: ResponseDefault<GetLeaderListResponse>): LeaderData[] {

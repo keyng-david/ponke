@@ -6,6 +6,7 @@ import earn from '@/shared/assets/images/navbar/earn.png'
 import styles from './NavBar.module.scss'
 import React, {useCallback} from "react";
 import {Steps, useNavigatorModel} from "@/shared/model";
+import {leadersModel} from "@/entities/leaders/model";
 
 export const NavBar = () => {
     const { step, stepChanged } = useNavigatorModel()
@@ -41,7 +42,10 @@ export const NavBar = () => {
                 className={getClasses(Steps.BOARD)}
                 src={board}
                 alt={'board'}
-                onClick={() => stepChanged(Steps.BOARD)}
+                onClick={() => {
+                    leadersModel.leadersRequested()
+                    stepChanged(Steps.BOARD)
+                }}
             />
             <img
                 className={getClasses(Steps.EARN)}

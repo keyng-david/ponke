@@ -10,12 +10,10 @@ import { reflect } from '@effector/reflect'
 import { toFormattedNumber, toFormattedIndex } from '@/shared/lib/number'
 
 export const Board = () => {
-    const { isLoading } = leadersModel.useFetchGate()
-
     return (
         <div className={styles.root}>
             <Title />
-            <MainReflect isLoading={isLoading} />
+            <MainReflect />
             <Decorations />
         </div>
     )
@@ -44,6 +42,7 @@ const MainReflect = reflect({
     bind: {
         list: leadersModel.$list,
         firstPosition: leadersModel.$firstPosition,
+        isLoading: leadersModel.$isLoading,
     }
 })
 
