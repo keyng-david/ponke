@@ -1,6 +1,10 @@
-import {useJWTToken} from "@/shared/model/jwt";
 import {useCallback, useRef} from "react";
 import {useNavigate} from "react-router-dom";
+
+import { clickerModel } from '../clicker/model'
+
+import {useJWTToken} from "@/shared/model/jwt";
+import { createRequest } from "@/shared/lib/api/createRequest";
 
 export const useAuth = () => {
     const isInit = useRef(false)
@@ -13,34 +17,30 @@ export const useAuth = () => {
             if (!isInit.current) {
                 jwtTokenStore.remove()
 
-                const urlParams = new URLSearchParams(window.location.search);
-                const token = urlParams.get('token');
+                // const urlParams = new URLSearchParams(window.location.search);
+                // const token = urlParams.get('token');
 
-                alert(`token ${token}`)
+                const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjMwMzAwNzUxIiwiZXhwIjoxNzIzNDgzNzk5LCJpc3MiOiJQb25rZSBBdXRoIn0.YzmAl7q6OBgXO_9HKVDy1rNPb9NU4UCbIvfTX8NWda8'
+                jwtTokenStore.set(token)
+                
+                const response = await createRequest<{
+                    score: number
+                }>({
+                    url: 'game/auth',
+                    method: 'POST',
+                })
 
-                const response = await fetch(
-                    'https://api.toptubereviews.buzz/game/validate',
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${token}`,
-                        },
-                        method: 'POST'
-                    }
-                )
-
-                alert(response.ok)
-                alert(response.status)
-
-                if (response.ok) {
+                if (!response.error) {
+                    clickerModel.valueInited(response.payload.score)
                     navigate('/main')
                     isInit.current = true
-                    alert('SUCCESS')
+                } else {
+                    jwtTokenStore.remove()
                 }
             }
         } catch (e) {
+            jwtTokenStore.remove()
             console.log(e)
-            alert(e)
         }
     }, [jwtTokenStore, navigate])
 

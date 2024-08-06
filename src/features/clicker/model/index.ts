@@ -1,4 +1,5 @@
-import { createEffect, createEvent, createStore, sample } from "effector";
+import { createRequest } from "@/shared/lib/api/createRequest";
+import { attach, createEffect, createEvent, createStore, sample } from "effector";
 import {useUnit} from "effector-react";
 
 export const MAX_AVAILABLE = 500
@@ -16,25 +17,42 @@ async function delay() {
     })
 }
 
-const updateAvailableFx = createEffect(async () => {
+const updateValueFx = createEffect(async () => {
+    return await createRequest<{
+        score: number,
+        click_score: number
+    }>({
+        url: 'game/click',
+        method: 'POST',
+    })
+})
+
+const $clickValue = createStore(1)
+const updateAvailableFx = createEffect(async (v: number) => {
     await delay()
 
-    return 1
+    return v
 })
+const attachUpdateAvailableFx = attach({
+    source: $clickValue,
+    effect: updateAvailableFx,
+})
+
+const valueInited = createEvent<number>()
 
 const clicked = createEvent()
 const availableUpdated = createEvent<number>()
 
-const $value = createStore(1000)
+const $value = createStore(0)
 const $available = createStore(MAX_AVAILABLE)
 
 const $canBeClicked = $available.map(state => state >= CLICK_STEP)
 const $isNotMax = $available.map(state => state < MAX_AVAILABLE)
 
 sample({
-    clock: updateAvailableFx.doneData,
+    clock: attachUpdateAvailableFx.doneData,
     filter: $isNotMax,
-    target: [availableUpdated, updateAvailableFx]
+    target: [availableUpdated, attachUpdateAvailableFx]
 })
 
 sample({
@@ -45,20 +63,35 @@ sample({
 })
 
 sample({
-    source: $value,
     clock: clicked,
-    fn: v => v + CLICK_STEP,
+    target: updateValueFx,
+})
+
+sample({
+    clock: updateValueFx.doneData,
+    fn: ({ payload }) => payload!.score,
     target: $value
 })
 
 sample({
     source: $available,
-    clock: clicked,
-    fn: v => v - CLICK_STEP,
+    clock: updateValueFx.doneData,
+    fn: (available, { payload }) =>available - payload!.click_score,
     target: $available
 })
 
-updateAvailableFx().then()
+sample({
+    clock: updateValueFx.doneData,
+    fn: ({ payload }) => payload!.click_score,
+    target: $clickValue
+})
+
+sample({
+    clock: valueInited,
+    target: $value,
+})
+
+attachUpdateAvailableFx().then()
 
 const useCanBeClicked = () => useUnit($canBeClicked)
 const useClickerState = () => ({
@@ -69,6 +102,7 @@ const useClickerState = () => ({
 
 export const clickerModel = {
     clicked,
+    valueInited,
     useCanBeClicked,
     useClickerState,
 }
