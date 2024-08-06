@@ -1,4 +1,4 @@
-import {useMemo} from "react";
+import {useEffect, useMemo} from "react";
 
 type TelegramWindow = {
     Telegram: {
@@ -8,7 +8,8 @@ type TelegramWindow = {
             openTelegramLink: (data: string) => void
             HapticFeedback: {
                 impactOccurred: (v: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void
-            }
+            },
+            platform: string
         },
         authData: {
             user?: {
@@ -47,6 +48,10 @@ export const useTelegram = () => {
             console.log(e)
         }
     }
+
+    useEffect(() => {
+        alert(tg.Telegram.WebApp.platform)
+    }, [tg.Telegram.WebApp.platform])
 
     return {
         expand,
