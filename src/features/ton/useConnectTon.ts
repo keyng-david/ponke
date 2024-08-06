@@ -62,7 +62,6 @@ export const useConnectTon = () => {
 
             if (checkResponse.error) {
                 await tonConnectUI.disconnect()
-                alert('NOT CONNECTED')
                 return
             }
         } catch (e) {
