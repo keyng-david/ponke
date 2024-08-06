@@ -1,6 +1,11 @@
 import { createRequest } from "@/shared/lib/api/createRequest";
 import { attach, createEffect, createEvent, createStore, sample } from "effector";
 import {useUnit} from "effector-react";
+import {Simulate} from "react-dom/test-utils";
+import click = Simulate.click;
+import {useSocket} from "@/shared/lib/hooks/useSocket";
+import {useEffect} from "react";
+import {type} from "@testing-library/user-event/dist/type";
 
 export const MAX_AVAILABLE = 500
 export const CLICK_STEP = 1
@@ -17,15 +22,15 @@ async function delay() {
     })
 }
 
-const updateValueFx = createEffect(async () => {
-    return await createRequest<{
-        score: number,
-        click_score: number
-    }>({
-        url: 'game/click',
-        method: 'POST',
-    })
-})
+// const updateValueFx = createEffect(async () => {
+//     return await createRequest<{
+//         score: number,
+//         click_score: number
+//     }>({
+//         url: 'game/click',
+//         method: 'POST',
+//     })
+// })
 
 const $clickValue = createStore(1)
 const updateAvailableFx = createEffect(async (v: number) => {
@@ -40,7 +45,10 @@ const attachUpdateAvailableFx = attach({
 
 const valueInited = createEvent<number>()
 
-const clicked = createEvent()
+const clicked = createEvent<{
+    score: number,
+    click_score: number
+}>()
 const availableUpdated = createEvent<number>()
 
 const $value = createStore(0)
@@ -64,26 +72,15 @@ sample({
 
 sample({
     clock: clicked,
-    target: updateValueFx,
-})
-
-sample({
-    clock: updateValueFx.doneData,
-    fn: ({ payload }) => payload!.score,
-    target: $value
+    fn: ({ score }) => score,
+    target: $value,
 })
 
 sample({
     source: $available,
-    clock: updateValueFx.doneData,
-    fn: (available, { payload }) =>available - payload!.click_score,
+    clock: clicked,
+    fn: (available, { click_score }) => available - click_score,
     target: $available
-})
-
-sample({
-    clock: updateValueFx.doneData,
-    fn: ({ payload }) => payload!.click_score,
-    target: $clickValue
 })
 
 sample({
@@ -94,15 +91,34 @@ sample({
 attachUpdateAvailableFx().then()
 
 const useCanBeClicked = () => useUnit($canBeClicked)
-const useClickerState = () => ({
-    value: useUnit($value),
-    available: useUnit($available),
-    canBeClicked: useUnit($canBeClicked)
-})
+
+const useClicker = () => {
+    const { sendMessage, lastMessage } = useSocket()
+
+    function onClick() {
+        sendMessage('click')
+    }
+
+    useEffect(() => {
+        if (lastMessage && typeof lastMessage.data === 'string' && lastMessage?.data.includes('click_response')) {
+            const splitIndex = (lastMessage.data as string).indexOf(':')
+            const stringify = lastMessage.data.slice(splitIndex + 1, lastMessage.data.length - 1)
+            const data = JSON.parse(stringify)
+            clicked(data)
+        }
+    }, [lastMessage]);
+
+    return {
+        value: useUnit($value),
+        available: useUnit($available),
+        canBeClicked: useUnit($canBeClicked),
+
+        onClick,
+    }
+}
 
 export const clickerModel = {
-    clicked,
     valueInited,
     useCanBeClicked,
-    useClickerState,
+    useClicker,
 }

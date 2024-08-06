@@ -15,7 +15,7 @@ let timeout1: NodeJS.Timeout
 let timeout2: NodeJS.Timeout
 
 export const ClickerField = () => {
-    const { value, available, canBeClicked } = clickerModel.useClickerState()
+    const { value, available, canBeClicked, onClick } = clickerModel.useClicker()
 
     const { haptic } = useTelegram()
 
@@ -30,7 +30,7 @@ export const ClickerField = () => {
             for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
                 const { clientX, clientY } = e.touches[i]
                 if (canBeClicked) {
-                    clickerModel.clicked()
+                    onClick()
 
                     const point = document.createElement('img')
                     point.src = pointImage

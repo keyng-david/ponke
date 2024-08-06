@@ -5,12 +5,14 @@ import { clickerModel } from '../clicker/model'
 
 import {useJWTToken} from "@/shared/model/jwt";
 import { createRequest } from "@/shared/lib/api/createRequest";
+import {useSocket} from "@/shared/lib/hooks/useSocket";
 
 export const useAuth = () => {
     const isInit = useRef(false)
     const navigate = useNavigate()
 
     const jwtTokenStore = useJWTToken()
+    const soket = useSocket()
 
     const initialize = useCallback(async () => {
         try {
@@ -31,6 +33,7 @@ export const useAuth = () => {
                 })
 
                 if (!response.error) {
+                    // soket.init(token)
                     clickerModel.valueInited(response.payload.score)
                     navigate('/main')
                     isInit.current = true
