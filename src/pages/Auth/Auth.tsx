@@ -12,6 +12,7 @@ import earn from '@/shared/assets/images/navbar/earn.png'
 
 import styles from './Auth.module.scss'
 import {useAuth} from "@/features/auth/useAuth";
+import { useTelegram } from "@/shared/lib/hooks/useTelegram";
 
 const ANIMATION_TIME = 500
 const REDIRECT_DELAY = ANIMATION_TIME * 7
@@ -19,6 +20,7 @@ const REDIRECT_DELAY = ANIMATION_TIME * 7
 export const Auth = () => {
     const [isAnimationEnd, setIsAnimationEnd] = useState(false)
 
+    const { isValidPlaform } = useTelegram()
     const authModel = useAuth()
 
     function preloadImages() {
@@ -37,21 +39,29 @@ export const Auth = () => {
     }, []);
 
     useEffect(() => {
-        if (isAnimationEnd) {
+        if (isAnimationEnd && isValidPlaform) {
             authModel.initialize().then()
         }
     }, [isAnimationEnd]);
 
     return <div className={styles.root}>
-        <div className={styles.container}>
-            <Ponke />
-            <Ton />
-            <img
-                className={styles['ponke_img']}
-                src={ponkeImage}
-                alt={'ponke'}
-            />
-        </div>
+        {isValidPlaform && (
+            <div className={styles.container}>
+                <Ponke />
+                <Ton />
+                <img
+                    className={styles['ponke_img']}
+                    src={ponkeImage}
+                    alt={'ponke'}
+                />
+            </div>
+        )}
+        {!isValidPlaform && (
+            <div className={styles['invalid-platform']}>
+                <h1>USE MOBILE DEVICE</h1>
+                <h1>USE MOBILE DEVICE</h1>
+            </div>
+        )}
     </div>
 }
 

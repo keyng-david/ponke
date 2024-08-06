@@ -49,11 +49,17 @@ export const useTelegram = () => {
         }
     }
 
-    useEffect(() => {
-        alert(tg.Telegram.WebApp.platform)
+    const isValidPlaform = useMemo(() => {
+        return (
+            tg.Telegram.WebApp.platform !== 'macos' && 
+            tg.Telegram.WebApp.platform !== 'windows' && 
+            tg.Telegram.WebApp.platform !== 'linux'
+        )
     }, [tg.Telegram.WebApp.platform])
 
     return {
+        isValidPlaform,
+
         expand,
         haptic,
         sendInviteLink,
