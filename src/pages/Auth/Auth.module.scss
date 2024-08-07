@@ -389,3 +389,37 @@ $animationTime: 0.5s;
         aspect-ratio: 1;
     }
 }
+
+.invalid-platform {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    z-index: 10;
+
+    h1 {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        line-height: 150%;
+        width: 100%;
+        text-align: center;
+        font-size: 40px;
+        background-image: url("../../shared/assets/images/auth/auth-background.png");
+        background-repeat: repeat;
+        background-size: cover;
+        -webkit-background-clip: text;
+        text-align: center;
+        margin: 0;
+
+        &:nth-child(1) {
+            text-shadow: 3px 0 #000, -3px 0 #000, 0 3px #000, 0 -3px #000, 2px 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000
+        }
+
+        &:nth-child(2) {
+            -webkit-text-fill-color: transparent;
+        }
+    }
+}
