@@ -15,7 +15,7 @@ function App() {
         // setTimeout(() => {
         //     alert(`${window.innerWidth}-${window.innerHeight}`)
         // }, 500)
-    }, [expand]);
+    });
 
   return (
     <TonConnectUIProvider 

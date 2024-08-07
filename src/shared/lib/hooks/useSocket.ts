@@ -18,6 +18,9 @@ export const useSocket = () => {
             },
             onClose: () => {
                 isFirstConnection = false
+            },
+            onReconnectStop: () => {
+                isFirstConnection = false
             }
         }
     )
