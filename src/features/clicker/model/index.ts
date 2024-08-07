@@ -1,7 +1,7 @@
 import { createEvent, createStore, sample } from "effector";
 import {useUnit} from "effector-react";
 import {useSocket} from "@/shared/lib/hooks/useSocket";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {socketResponseToJSON} from "@/shared/lib/utils/socketResponseToJSON";
 
 export const MAX_AVAILABLE = 500
@@ -16,7 +16,9 @@ const clicked = createEvent<{
     available_clicks: number,
 }>()
 const availableUpdated = createEvent<number>()
+const errorUpdated = createEvent<boolean>()
 
+const $isMultiAccount = createStore(false)
 const $value = createStore(0)
 const $available = createStore(MAX_AVAILABLE)
 
@@ -47,6 +49,11 @@ sample({
 sample({
     clock: availableInited,
     target: $available,
+})
+
+sample({
+    clock: errorUpdated,
+    target: $isMultiAccount
 })
 
 const useCanBeClicked = () => useUnit($canBeClicked)
@@ -81,12 +88,16 @@ const useClicker = () => {
 
             availableUpdated(data.available_clicks)
         }
+        if (lastMessage && typeof lastMessage.data === 'string' && lastMessage?.data.includes('CODE')) {
+            errorUpdated(lastMessage.data.includes('1001'))
+        }
     }, [lastMessage]);
 
     return {
         value: useUnit($value),
         available: useUnit($available),
         canBeClicked: useUnit($canBeClicked),
+        isMultiError: useUnit($isMultiAccount),
 
         onClick,
     }

@@ -1,9 +1,9 @@
 type GetEarnDataResponse = {
     collabs: number,
-    points: number
     list: {
         name: string
         amount: number
+        time: number
         description: string
         tasks: {
             name: string

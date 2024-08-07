@@ -6,10 +6,10 @@ export const earnApi: EarnApi = {
 
         return {
             collabs: 4,
-            points: 20050,
             list: new Array(10).fill(1).map((_, key) => ({
                 name: `name ${key}`,
                 amount: 150_000,
+                time: 5_205_705_000,
                 description: 'Addickted is the greatest meme coin on ton blockchain! Hold your dick! Don’t be a pussy! Buy Dick! Grow your dick!',
                 tasks: new Array(5).fill(1).map((_, index) => ({
                     name: `task ${index}`,
