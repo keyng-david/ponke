@@ -30,7 +30,7 @@ const Main = React.memo<{
     <LoaderTemplate className={styles.main} isLoading={isLoading}>
         <PointsReflect />
         <StatisticReflect />
-        <InviteButton />
+        <InviteButtonReflect />
         <img src={ponkes} className={styles.ponkes} alt={'decoration'}/>
     </LoaderTemplate>
 ))
@@ -87,12 +87,14 @@ const StatisticReflect = reflect({
     }
 })
 
-const InviteButton = () => {
+const InviteButton = React.memo<{
+    link: string
+}>(({ link }) => {
     const { sendInviteLink } = useTelegram()
 
     return (
         <div
-            onTouchStart={sendInviteLink}>
+            onTouchStart={() => sendInviteLink(link)}>
             <img
                 src={invite}
                 className={styles['invite-button']}
@@ -100,7 +102,14 @@ const InviteButton = () => {
             />
         </div>
     )
-}
+})
+
+const InviteButtonReflect = reflect({
+    view: InviteButton,
+    bind: {
+        link: friendsModel.$data.map(state => state.link)
+    }
+})
 
 const Decorations = () => (
     <>

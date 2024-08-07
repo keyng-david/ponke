@@ -21,10 +21,10 @@ type TelegramWindow = {
 export const useTelegram = () => {
     const tg = (window as unknown as TelegramWindow)
 
-    function sendInviteLink() {
+    function sendInviteLink(link: string) {
         try {
             tg.Telegram.WebApp.openTelegramLink(
-                `https://t.me/share/url?url=https://t.me/ponketon_bot?start=${tg.Telegram?.authData?.user?.id || 0}&text=`
+                `https://t.me/share/url?url=${link}&text=`
             )
         } catch (e) {
             alert(e)

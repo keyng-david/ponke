@@ -1,12 +1,13 @@
+import {ResponseDefault} from "@/shared/lib/api/createRequest";
+
 export type GetFriendsResponse = {
-    data: {
-        points: number
-        friends: number
-        tg: number
-        premium: number
-    }
+    link: string
+    friends: number
+    score: number
+    default_reward: number
+    premium_reward: number
 }
 
 export type FriendsApi = {
-    getFriends: () => Promise<GetFriendsResponse>
+    getFriends: () => Promise<ResponseDefault<GetFriendsResponse>>
 }

@@ -5,11 +5,13 @@ export const friendsApi: FriendsApi = {
         await new Promise(resolve => setTimeout(resolve, 2000))
 
         return {
-            data: {
-                points: 20050,
+            error: false,
+            payload: {
+                link: '',
+                score: 20050,
                 friends: 10,
-                tg: 1000,
-                premium: 2000
+                default_reward: 1000,
+                premium_reward: 2000
             }
         }
     }
