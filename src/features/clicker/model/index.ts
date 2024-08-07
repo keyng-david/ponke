@@ -1,8 +1,6 @@
 import { createEvent, createStore, sample } from "effector";
 import {useUnit} from "effector-react";
-import {useSocket} from "@/shared/lib/hooks/useSocket";
-import {useEffect, useState} from "react";
-import {socketResponseToJSON} from "@/shared/lib/utils/socketResponseToJSON";
+import { useSocket } from "@/app/socketProvider";
 
 export const MAX_AVAILABLE = 500
 export const CLICK_STEP = 1
@@ -59,39 +57,11 @@ sample({
 const useCanBeClicked = () => useUnit($canBeClicked)
 
 const useClicker = () => {
-    const { sendMessage, lastMessage } = useSocket()
+    const { sendMessage } = useSocket()
 
     function onClick() {
         sendMessage('click')
     }
-
-    useEffect(() => {
-        console.log(lastMessage?.data)
-
-        if (lastMessage && typeof lastMessage.data === 'string' && lastMessage?.data.includes('click_response')) {
-            const data = socketResponseToJSON<{
-                score: number,
-                click_score: number,
-                available_clicks: number
-            }>(lastMessage.data)
-
-            console.log(data)
-
-            clicked(data)
-        }
-        if (lastMessage && typeof lastMessage.data === 'string' && lastMessage?.data.includes('availableClicks')) {
-            const data = socketResponseToJSON<{
-                available_clicks: number,
-            }>(lastMessage.data)
-
-            console.log(data)
-
-            availableUpdated(data.available_clicks)
-        }
-        if (lastMessage && typeof lastMessage.data === 'string' && lastMessage?.data.includes('CODE')) {
-            errorUpdated(lastMessage.data.includes('1001'))
-        }
-    }, [lastMessage]);
 
     return {
         value: useUnit($value),
@@ -106,6 +76,11 @@ const useClicker = () => {
 export const clickerModel = {
     valueInited,
     availableInited,
+
+    availableUpdated,
+    clicked,
+    errorUpdated,
+
     useCanBeClicked,
     useClicker,
 }
