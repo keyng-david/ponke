@@ -1,8 +1,6 @@
 import { createEvent, createStore, sample } from "effector";
 import {useUnit} from "effector-react";
-import {useSocket} from "@/shared/lib/hooks/useSocket";
-import {useEffect} from "react";
-import {socketResponseToJSON} from "@/shared/lib/utils/socketResponseToJSON";
+import { useSocket } from "@/app/socketProvider";
 
 export const MAX_AVAILABLE = 500
 export const CLICK_STEP = 1
@@ -16,7 +14,9 @@ const clicked = createEvent<{
     available_clicks: number,
 }>()
 const availableUpdated = createEvent<number>()
+const errorUpdated = createEvent<boolean>()
 
+const $isMultiAccount = createStore(false)
 const $value = createStore(0)
 const $available = createStore(MAX_AVAILABLE)
 
@@ -49,44 +49,25 @@ sample({
     target: $available,
 })
 
+sample({
+    clock: errorUpdated,
+    target: $isMultiAccount
+})
+
 const useCanBeClicked = () => useUnit($canBeClicked)
 
 const useClicker = () => {
-    const { sendMessage, lastMessage } = useSocket()
+    const { sendMessage } = useSocket()
 
     function onClick() {
         sendMessage('click')
     }
 
-    useEffect(() => {
-        console.log(lastMessage?.data)
-
-        if (lastMessage && typeof lastMessage.data === 'string' && lastMessage?.data.includes('click_response')) {
-            const data = socketResponseToJSON<{
-                score: number,
-                click_score: number,
-                available_clicks: number
-            }>(lastMessage.data)
-
-            console.log(data)
-
-            clicked(data)
-        }
-        if (lastMessage && typeof lastMessage.data === 'string' && lastMessage?.data.includes('availableClicks')) {
-            const data = socketResponseToJSON<{
-                available_clicks: number,
-            }>(lastMessage.data)
-
-            console.log(data)
-
-            availableUpdated(data.available_clicks)
-        }
-    }, [lastMessage]);
-
     return {
         value: useUnit($value),
         available: useUnit($available),
         canBeClicked: useUnit($canBeClicked),
+        isMultiError: useUnit($isMultiAccount),
 
         onClick,
     }
@@ -95,6 +76,11 @@ const useClicker = () => {
 export const clickerModel = {
     valueInited,
     availableInited,
+
+    availableUpdated,
+    clicked,
+    errorUpdated,
+
     useCanBeClicked,
     useClicker,
 }

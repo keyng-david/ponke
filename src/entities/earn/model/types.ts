@@ -1,15 +1,17 @@
 export type EarnData = {
     collabs: number
-    points: number
     list: EarnItem[]
 }
 
 export type EarnItem = {
     name: string
     amount: number
+    time: number
     description: string
-    tasks: {
-        name: string
-        isDone: boolean
-    }[]
+    tasks: EarnItemTask[]
+}
+
+export type EarnItemTask = {
+    name: string
+    isDone: boolean
 }

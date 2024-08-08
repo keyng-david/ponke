@@ -5,6 +5,7 @@ import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import {useTelegram} from "@/shared/lib/hooks/useTelegram";
 
 import { RouterView } from './router'
+import { SocketProvider } from './socketProvider'
 import './App.css';
 
 function App() {
@@ -15,7 +16,7 @@ function App() {
         // setTimeout(() => {
         //     alert(`${window.innerWidth}-${window.innerHeight}`)
         // }, 500)
-    }, [expand]);
+    });
 
   return (
     <TonConnectUIProvider 
@@ -24,9 +25,11 @@ function App() {
             twaReturnUrl: 'https://t.me/ponke_test_bot'
         }}
     >
-        <BrowserRouter>
-            <RouterView />
-        </BrowserRouter>
+        <SocketProvider>
+            <BrowserRouter>
+                <RouterView />
+            </BrowserRouter>
+        </SocketProvider>
     </TonConnectUIProvider>
   );
 }

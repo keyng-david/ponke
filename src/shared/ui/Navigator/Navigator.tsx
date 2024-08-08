@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useState} from "react";
 
 import styles from './Navigator.module.scss'
 import {NavBar} from "@/shared/ui/NavBar";
+import { clickerModel } from "@/features/clicker/model";
 
 export type NavigatorProps = {
     activeStep: number
@@ -16,6 +17,8 @@ export const SliderNavigator = React.memo<NavigatorProps>(({ activeStep, mainCom
     const [ active, setActive ] = useState(activeStep)
     const [ prev, setPrev ] = useState<number[]>([])
     const [ next, setNext ] = useState(0)
+
+    const { isMultiError } = clickerModel.useClicker()
 
     const getClasses = useCallback((step: number) => {
         const classes = [styles.step]
@@ -66,6 +69,12 @@ export const SliderNavigator = React.memo<NavigatorProps>(({ activeStep, mainCom
                 return null
             })}
             <NavBar />
+            {isMultiError && (
+                <div className={styles['invalid-platform']}>
+                    <h1>YOUR CAN USE ONLY ONE DEVICE</h1>
+                    <h1>YOUR CAN USE ONLY ONE DEVICE</h1>
+                </div>
+            )}
         </div>
     )
 })
