@@ -36,13 +36,13 @@ export const Auth = () => {
             setIsAnimationEnd(true)
             clearTimeout(timeout)
         }, REDIRECT_DELAY)
-    }, []);
+    }, [])
 
     useEffect(() => {
         if (isAnimationEnd && isValidPlaform) {
             authModel.initialize().then()
         }
-    }, [isAnimationEnd]);
+    }, [isAnimationEnd])
 
     return <div className={styles.root}>
         {isValidPlaform && (

@@ -19,10 +19,22 @@ import {MonitorRight} from "@/shared/ui/MonitorRight";
 import {MonitorLeft} from "@/shared/ui/MonitorLeft";
 import {ClickerField} from "@/features/clicker/ui";
 import {useConnectTon} from "@/features/ton/useConnectTon";
+import {useAuth} from "@/features/auth/useAuth";
+import {useEffect} from "react";
+import {useTelegram} from "@/shared/lib/hooks/useTelegram";
 
 export const Main = () => {
     const { initialize } = useConnectTon()
     const wallet = useTonWallet()
+
+    const authModel = useAuth()
+    const { isValidPlaform } = useTelegram()
+
+    useEffect(() => {
+        if (isValidPlaform) {
+            authModel.initialize().then()
+        }
+    })
 
     return (
         <div className={styles.root}>

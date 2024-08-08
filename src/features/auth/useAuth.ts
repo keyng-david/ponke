@@ -5,16 +5,24 @@ import { clickerModel } from '../clicker/model'
 
 import {useJWTToken} from "@/shared/model/jwt";
 import { createRequest } from "@/shared/lib/api/createRequest";
+import {createEvent, createStore} from "effector";
+import {useUnit} from "effector-react";
+
+const setIsAuth = createEvent<boolean>()
+
+const $isAuth = createStore(false)
+    .on(setIsAuth, () => true)
 
 export const useAuth = () => {
-    const isInit = useRef(false)
     const navigate = useNavigate()
+
+    const isAuth = useUnit($isAuth)
 
     const jwtTokenStore = useJWTToken()
 
     const initialize = useCallback(async () => {
         try {
-            if (!isInit.current) {
+            if (!isAuth) {
                 // const urlParams = new URLSearchParams(window.location.search);
                 // const token = urlParams.get('token');
 
@@ -32,11 +40,10 @@ export const useAuth = () => {
                 })
 
                 if (!response.error) {
-                    // soket.init(token)
                     clickerModel.valueInited(response.payload.score)
                     clickerModel.availableInited(response.payload.available_clicks)
                     navigate('/main')
-                    isInit.current = true
+                    setIsAuth(true)
                 } else {
                     jwtTokenStore.remove()
                 }
@@ -45,7 +52,7 @@ export const useAuth = () => {
             jwtTokenStore.remove()
             console.log(e)
         }
-    }, [jwtTokenStore, navigate])
+    }, [jwtTokenStore, navigate, isAuth])
 
     return {
         initialize,
