@@ -5,17 +5,25 @@ export const earnApi: EarnApi = {
         await new Promise(resolve => setTimeout(resolve, 2000))
 
         return {
-            collabs: 4,
-            list: new Array(10).fill(1).map((_, key) => ({
-                name: `name ${key}`,
-                amount: 150_000,
-                time: 5_205_705_000,
-                description: 'Addickted is the greatest meme coin on ton blockchain! Hold your dick! Don’t be a pussy! Buy Dick! Grow your dick!',
-                tasks: new Array(5).fill(1).map((_, index) => ({
-                    name: `task ${index}`,
-                    isDone: index % 2 == 0,
-                }))
-            }))
+            error: false,
+            payload: {
+                tasks: new Array(10).fill(1).map((_, key) => ({
+                    name: `name ${key}`,
+                    description: 'Addickted is the greatest meme coin on ton blockchain! Hold your dick! Don’t be a pussy! Buy Dick! Grow your dick!',
+                    reward: '10000',
+                    reward1: '20000',
+                    reward2: '30000',
+                    reward3: '40000',
+                    reward_symbol: '$COIN',
+                    end_time: 5_205_705_000,
+                    id: key,
+                    total_clicks: 10000,
+                    link: 'https://www.google.ru/?hl=ru',
+                    image_link: '',
+                    task_list: new Array(5).fill(1).map((_, index) => `task ${index}`)
+                })),
+                user_level: 2,
+            }
         }
     }
 }

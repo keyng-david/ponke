@@ -10,7 +10,6 @@ import taskBg from '@/shared/assets/images/earn/task_bg.png'
 
 import styles from './Earn.module.scss'
 import { EarnItem } from '@/entities/earn/model/types'
-import { TaskExpandModal } from '@/widgets/TaskExpandModal'
 
 export const Earn = () => {
     const { isLoading } = earnModel.useFetchGate()
@@ -20,7 +19,6 @@ export const Earn = () => {
             <TitleReflect />
             <Main isLoading={isLoading} />
             <Decorations />
-            <TaskModalReflect />
         </div>
     )
 }
@@ -46,7 +44,7 @@ const Title = React.memo<{
 const TitleReflect = reflect({
     view: Title,
     bind: {
-        count: earnModel.$data.map(state => state.collabs)
+        count: earnModel.$collabs
     }
 })
 
@@ -73,7 +71,7 @@ const List = React.memo<{
 const ListReflect = reflect({
     view: List,
     bind: {
-        list: earnModel.$data.map(state => state.list)
+        list: earnModel.$list,
     }
 })
 
@@ -84,7 +82,7 @@ const Task = React.memo<EarnItem & {
         onClick(item)
         console.log('ON CLICK')
     }}>
-        <span className={styles['task-label']} />
+        <img src={item.avatar} className={styles['task-label']} />
         <p className={styles['task-title']}>{item.name}</p>
         <img className={styles['task-bg']} src={taskBg} />
     </div>
@@ -102,11 +100,3 @@ const Decorations = () => (
         <img src={background} className={styles.background} alt={'background'}/>
     </>
 )
-
-const TaskModalReflect = reflect({
-    view: TaskExpandModal,
-    bind: {
-        data: earnModel.$activeTask,
-        onClose: earnModel.taskClosed,
-    }
-})

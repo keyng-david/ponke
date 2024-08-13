@@ -7,6 +7,9 @@ import {SliderNavigator} from "@/shared/ui/Navigator";
 import {Friends} from "@/pages/Friends/Friends";
 import {Board} from "@/pages/Board/Board";
 import { Earn } from "@/pages/Earn/Earn";
+import { reflect } from "@effector/reflect";
+import { TaskExpandModal } from "@/widgets/TaskExpandModal";
+import { earnModel } from "@/entities/earn/model";
 
 export const RouterView = React.memo(() => {
     const location = useLocation();
@@ -48,23 +51,34 @@ const Main = () => {
     }, [step]);
 
     return (
-        <SliderNavigator
-            activeStep={step}
-            mainComponent={<Home />}
-            hiddenComponents={[
-                {
-                    step: Steps.FRENS,
-                    component: <Friends />,
-                },
-                {
-                    step: Steps.BOARD,
-                    component: <Board />
-                },
-                {
-                    step: Steps.EARN,
-                    component: <Earn />
-                }
-            ]}
-        />
+        <>
+            <SliderNavigator
+                activeStep={step}
+                mainComponent={<Home />}
+                hiddenComponents={[
+                    {
+                        step: Steps.FRENS,
+                        component: <Friends />,
+                    },
+                    {
+                        step: Steps.BOARD,
+                        component: <Board />
+                    },
+                    {
+                        step: Steps.EARN,
+                        component: <Earn />
+                    }
+                ]}
+            />
+            <TaskModalReflect />
+        </>
     )
 }
+
+const TaskModalReflect = reflect({
+    view: TaskExpandModal,
+    bind: {
+        data: earnModel.$activeTask,
+        onClose: earnModel.taskClosed,
+    }
+})

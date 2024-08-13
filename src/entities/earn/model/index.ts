@@ -2,6 +2,7 @@ import { createFetch } from '@/shared/lib/effector/createGateHook'
 import { EarnData, EarnItem } from './types'
 import { EarnApi, earnApi } from '@/shared/api/earn'
 import { createEvent, createStore, sample } from 'effector'
+import { GetEarnDataResponse, GetEarnDataResponseItem } from '@/shared/api/earn/types'
 
 const [ FetchGate, fetchFx, useFetchGate ] = createFetch<EarnApi['getData']>(earnApi.getData)
 
@@ -9,10 +10,8 @@ const taskSelected = createEvent<EarnItem>()
 const taskClosed = createEvent()
 
 const $activeTask = createStore<EarnItem | null>(null)
-const $data = createStore<EarnData>({
-    collabs: 0,
-    list: [],
-})
+const $list = createStore<EarnItem[]>([])
+const $collabs = createStore<number>(0)
 
 sample({
     clock: FetchGate.open,
@@ -21,7 +20,8 @@ sample({
 
 sample({
     clock: fetchFx.doneData,
-    target: $data,
+    fn: toDomain,
+    target: $list,
 })
 
 sample({
@@ -36,11 +36,37 @@ sample({
 })
 
 export const earnModel = {
-    $data,
+    $list,
     $activeTask,
+    $collabs,
 
     taskSelected,
     taskClosed,
 
     useFetchGate,
+}
+
+function toDomain(data: GetEarnDataResponse): EarnItem[] {
+    function getAmount(item: GetEarnDataResponseItem) {
+        const level = data.payload!.user_level as 1 | 2 | 3
+
+        const sum = level && item[`reward${level}`] ? item[`reward${level}`] : item.reward
+
+        return `${sum} ${item.reward_symbol}`
+    }
+
+    if (data.payload) {
+        return data.payload.tasks.map(item => ({
+            avatar: item.image_link,
+            name: item.name,
+            amount: getAmount(item),
+            description: item.description,
+            time: item.end_time,
+            tasks: item.task_list,
+            link: item.link,
+            participants: item.total_clicks,
+        }))
+    }
+
+    return []
 }

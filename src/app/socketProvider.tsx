@@ -22,6 +22,7 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
             shouldReconnect: () => true,
             reconnectInterval: 0,
             onOpen: () => {
+                console.log('on open')
                 const token = localStorage.getItem('jwt-token')
                 sendMessage(`handshake:{"jwt_token":"${token}"}`)
             },

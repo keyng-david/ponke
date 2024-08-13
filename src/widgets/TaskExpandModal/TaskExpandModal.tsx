@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react'
 
-import { EarnItem, EarnItemTask } from '@/entities/earn/model/types'
+import { EarnItem } from '@/entities/earn/model/types'
 
 import taskInfoBg from '@/shared/assets/images/earn/task_info.png'
-import item0 from '@/shared/assets/images/earn/item_0.png'
-import item1 from '@/shared/assets/images/earn/item_1.png'
-import checked from '@/shared/assets/images/earn/checked.png'
+import itemBg from '@/shared/assets/images/earn/task-list-bg.png'
+import joinButton from '@/shared/assets/images/earn/join-button.png'
 
 import styles from './TaskExpandModal.module.scss'
+import { toFormattedNumber } from '@/shared/lib/number'
+import { useTelegram } from '@/shared/lib/hooks/useTelegram'
 
 export type TaskExpandModalProps = {
     data: EarnItem | null
@@ -16,6 +17,8 @@ export type TaskExpandModalProps = {
 
 export const TaskExpandModal = React.memo<TaskExpandModalProps>(
     ({ data, onClose }) => {
+        const { openLink } = useTelegram()
+
         const rootClasses = useMemo(() => {
             const classes = [styles.root]
 
@@ -62,44 +65,39 @@ export const TaskExpandModal = React.memo<TaskExpandModalProps>(
                 <div className={styles.background} />
                 <div className={styles.container} >
                     <button className={styles['close-button']} onClick={onClose}>
-                        x CLOSE
+                        x
                     </button>
                     <div className={styles.header}>
-                        <div />
+                        <img className={styles['section-background']} src={taskInfoBg} alt='background' />
+                        <img className={styles.avatar} src={data?.avatar} />
                         <h2>{data?.name}</h2>
+                        <p>{data?.amount}</p>
                     </div>
                     <div className={styles.info}>
-                        <img src={taskInfoBg} alt='background' />
-                        <h3>{data?.amount}</h3>
+                        <img className={styles['section-background']} src={taskInfoBg} alt='background' />
                         <p>{data?.description}</p>
                     </div>
                     <p className={styles.timer}>
                         TIME - {timeBlocks.days}D {timeBlocks.hours}:{timeBlocks.minutes}:{timeBlocks.seconds}
                     </p>
-                    {data?.tasks.map((item, index) => (
-                        <Item {...item} index={index} />
-                    ))}
+                    <div className={styles.tasks}>
+                        <img className={styles['section-background']} src={itemBg} alt='background' />
+                        <p>TASK LIST:</p>
+                        {data?.tasks.map((item, key) => <p key={key}>{key + 1} {item}</p>)}
+                    </div>
+                    <img 
+                        className={styles['join-button']} 
+                        src={joinButton} 
+                        alt='join button' 
+                        onClick={data?.link ? () => openLink(data.link) : () => 0}
+                    />
+                    <p className={styles.participants}>
+                        PARTICIPANTS:
+                        <br />
+                        {toFormattedNumber(data?.participants ?? 0)}
+                    </p>
                 </div>
             </div>
         )
     }
 )
-
-const Item = React.memo<EarnItemTask & {
-    index: number
-}>(({ index, isDone, name }) => {
-    const image = useMemo(() => {
-        if ((index + 2) % 2 === 0) {
-            return item0
-        }
-
-        return item1
-    }, [index])
-
-    return <div className={styles.item}>
-        <img className={styles['item-background']} src={image} alt='background' />
-        {isDone && <img className={styles['item-checked']} src={checked} alt='checked' />}
-        <h4>TASK {index + 1}</h4>
-        <p>{name}</p>
-    </div>
-})

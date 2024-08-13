@@ -4,14 +4,12 @@ export type EarnData = {
 }
 
 export type EarnItem = {
+    avatar: string
     name: string
-    amount: number
-    time: number
+    amount: string
     description: string
-    tasks: EarnItemTask[]
-}
-
-export type EarnItemTask = {
-    name: string
-    isDone: boolean
+    time: number
+    tasks: string[]
+    link: string
+    participants: number
 }

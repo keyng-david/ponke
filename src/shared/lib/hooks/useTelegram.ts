@@ -6,6 +6,7 @@ type TelegramWindow = {
             expand: () => void
             ready: () => void
             openTelegramLink: (data: string) => void
+            openLink: (data: string) => void
             HapticFeedback: {
                 impactOccurred: (v: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void
             },
@@ -27,6 +28,14 @@ export const useTelegram = () => {
             tg.Telegram.WebApp.openTelegramLink(
                 `https://t.me/share/url?url=${link}&text=`
             )
+        } catch (e) {
+            alert(e)
+        }
+    }
+
+    function openLink(link: string) {
+        try {
+            tg.Telegram.WebApp.openLink(link)
         } catch (e) {
             alert(e)
         }
@@ -63,5 +72,6 @@ export const useTelegram = () => {
         expand,
         haptic,
         sendInviteLink,
+        openLink,
     }
 }
