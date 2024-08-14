@@ -1,8 +1,3 @@
-export type EarnData = {
-    collabs: number
-    list: EarnItem[]
-}
-
 export type EarnItem = {
     avatar: string
     name: string

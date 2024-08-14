@@ -1,5 +1,5 @@
 import { createFetch } from '@/shared/lib/effector/createGateHook'
-import { EarnData, EarnItem } from './types'
+import { EarnItem } from './types'
 import { EarnApi, earnApi } from '@/shared/api/earn'
 import { createEvent, createStore, sample } from 'effector'
 import { GetEarnDataResponse, GetEarnDataResponseItem } from '@/shared/api/earn/types'
@@ -11,7 +11,7 @@ const taskClosed = createEvent()
 
 const $activeTask = createStore<EarnItem | null>(null)
 const $list = createStore<EarnItem[]>([])
-const $collabs = createStore<number>(0)
+const $collabs = $list.map(item => item.length)
 
 sample({
     clock: FetchGate.open,
