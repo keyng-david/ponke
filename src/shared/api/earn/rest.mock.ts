@@ -25,5 +25,13 @@ export const earnApi: EarnApi = {
                 user_level: 2,
             }
         }
+    },
+    async taskJoined() {
+        await new Promise(resolve => setTimeout(resolve, 2000))
+
+        return {
+            error: false,
+            payload: null
+        }
     }
 }

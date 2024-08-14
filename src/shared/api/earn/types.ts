@@ -1,4 +1,4 @@
-import { ResponseDefault } from "@/shared/lib/api/createRequest"
+import {ResponseDefault} from "@/shared/lib/api/createRequest"
 
 export type GetEarnDataResponseItem = {
     name: string,
@@ -23,4 +23,7 @@ export type GetEarnDataResponse = ResponseDefault<{
 
 export type EarnApi = {
     getData: () => Promise<GetEarnDataResponse>
+    taskJoined: (data: {
+        id: number
+    }) => Promise<ResponseDefault<any>>
 }

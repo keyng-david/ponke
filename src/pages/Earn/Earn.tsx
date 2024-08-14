@@ -12,12 +12,10 @@ import styles from './Earn.module.scss'
 import { EarnItem } from '@/entities/earn/model/types'
 
 export const Earn = () => {
-    const { isLoading } = earnModel.useFetchGate()
-
     return (
         <div className={styles.root}>
             <TitleReflect />
-            <Main isLoading={isLoading} />
+            <MainReflect />
             <Decorations />
         </div>
     )
@@ -31,6 +29,13 @@ const Main = React.memo<{
         <ListReflect />
     </LoaderTemplate>
 ))
+
+const MainReflect = reflect({
+    view: Main,
+    bind: {
+        isLoading: earnModel.$isLoading,
+    }
+})
 
 const Title = React.memo<{
     count: number

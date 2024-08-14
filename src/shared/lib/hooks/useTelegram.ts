@@ -1,6 +1,6 @@
-import {useEffect, useMemo} from "react";
+import {useMemo} from "react";
 
-type TelegramWindow = {
+export type TelegramWindow = {
     Telegram: {
         WebApp: {
             expand: () => void

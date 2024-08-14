@@ -7,6 +7,7 @@ import styles from './NavBar.module.scss'
 import React, {useCallback} from "react";
 import {Steps, useNavigatorModel} from "@/shared/model";
 import {leadersModel} from "@/entities/leaders/model";
+import {earnModel} from "@/entities/earn/model";
 
 export const NavBar = () => {
     const { step, stepChanged } = useNavigatorModel()
@@ -51,7 +52,10 @@ export const NavBar = () => {
                 className={getClasses(Steps.EARN)}
                 src={earn}
                 alt={'earn'}
-                onClick={() => stepChanged(Steps.EARN)}
+                onClick={() => {
+                    earnModel.tasksRequested()
+                    stepChanged(Steps.EARN)
+                }}
             />
         </div>
     )

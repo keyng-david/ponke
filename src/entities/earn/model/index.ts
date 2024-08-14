@@ -1,10 +1,10 @@
-import { createFetch } from '@/shared/lib/effector/createGateHook'
 import { EarnItem } from './types'
-import { EarnApi, earnApi } from '@/shared/api/earn'
+import { earnApi } from '@/shared/api/earn'
 import { createEvent, createStore, sample, createEffect } from 'effector'
 import { GetEarnDataResponse, GetEarnDataResponseItem } from '@/shared/api/earn/types'
+import {TelegramWindow} from "@/shared/lib/hooks/useTelegram";
 
-const [ FetchGate, fetchFx, useFetchGate ] = createFetch<EarnApi['getData']>(earnApi.getData)
+const fetchFx = createEffect(earnApi.getData)
 
 const secondLeftedFx = createEffect(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000))
@@ -12,6 +12,20 @@ const secondLeftedFx = createEffect(async () => {
     return 60
 })
 
+const taskJoinedFx = createEffect(async (data: {
+    id: number,
+    link: string
+}) => {
+    const tg = (window as unknown as TelegramWindow)
+
+    await earnApi.taskJoined({
+        id: data.id
+    })
+
+    tg.Telegram.WebApp.openLink(data.link)
+})
+
+const tasksRequested = createEvent()
 const taskSelected = createEvent<EarnItem>()
 const taskClosed = createEvent()
 
@@ -20,6 +34,8 @@ const timeUpdated = createEvent<EarnItem>()
 const $activeTask = createStore<EarnItem | null>(null)
 const $list = createStore<EarnItem[]>([])
 const $collabs = $list.map(item => item.length)
+
+const $isLoading = fetchFx.pending
 
 secondLeftedFx().then()
 
@@ -49,7 +65,7 @@ sample({
 })
 
 sample({
-    clock: FetchGate.open,
+    clock: tasksRequested,
     target: fetchFx,
 })
 
@@ -75,10 +91,13 @@ export const earnModel = {
     $activeTask,
     $collabs,
 
+    $isLoading,
+
+    tasksRequested,
     taskSelected,
     taskClosed,
 
-    useFetchGate,
+    taskJoinedFx,
 }
 
 function toDomain(data: GetEarnDataResponse): EarnItem[] {

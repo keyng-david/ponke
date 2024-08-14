@@ -9,6 +9,7 @@ import joinButton from '@/shared/assets/images/earn/join-button.png'
 import styles from './TaskExpandModal.module.scss'
 import { toFormattedNumber } from '@/shared/lib/number'
 import { useTelegram } from '@/shared/lib/hooks/useTelegram'
+import {earnModel} from "@/entities/earn/model";
 
 export type TaskExpandModalProps = {
     data: EarnItem | null
@@ -89,7 +90,14 @@ export const TaskExpandModal = React.memo<TaskExpandModalProps>(
                         className={styles['join-button']} 
                         src={joinButton} 
                         alt='join button' 
-                        onClick={data?.link ? () => openLink(data.link) : () => 0}
+                        onClick={
+                            data?.link && data.id
+                                ? () => earnModel.taskJoinedFx({
+                                    id: data.id,
+                                    link: data.link,
+                                })
+                                : () => 0
+                        }
                     />
                     <p className={styles.participants}>
                         PARTICIPANTS:
