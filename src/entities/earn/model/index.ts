@@ -1,17 +1,52 @@
 import { createFetch } from '@/shared/lib/effector/createGateHook'
 import { EarnItem } from './types'
 import { EarnApi, earnApi } from '@/shared/api/earn'
-import { createEvent, createStore, sample } from 'effector'
+import { createEvent, createStore, sample, createEffect } from 'effector'
 import { GetEarnDataResponse, GetEarnDataResponseItem } from '@/shared/api/earn/types'
 
 const [ FetchGate, fetchFx, useFetchGate ] = createFetch<EarnApi['getData']>(earnApi.getData)
 
+const secondLeftedFx = createEffect(async () => {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    return 60
+})
+
 const taskSelected = createEvent<EarnItem>()
 const taskClosed = createEvent()
+
+const timeUpdated = createEvent<EarnItem>()
 
 const $activeTask = createStore<EarnItem | null>(null)
 const $list = createStore<EarnItem[]>([])
 const $collabs = $list.map(item => item.length)
+
+secondLeftedFx().then()
+
+sample({
+    source: $activeTask,
+    clock: secondLeftedFx.doneData,
+    filter: activeItem => !!activeItem,
+    fn: activeTask => ({
+        ...activeTask!,
+        time: activeTask!.time - 1000,
+    }),
+    target: [$activeTask, timeUpdated, secondLeftedFx],
+})
+
+sample({
+    source: $activeTask,
+    clock: secondLeftedFx.doneData,
+    filter: activeItem => !activeItem,
+    target: secondLeftedFx,
+})
+
+sample({
+    source: $list,
+    clock: timeUpdated,
+    fn: (list, updated) => list.map(item => item.id === updated.id ? updated : item),
+    target: $list,
+})
 
 sample({
     clock: FetchGate.open,
@@ -57,6 +92,7 @@ function toDomain(data: GetEarnDataResponse): EarnItem[] {
 
     if (data.payload) {
         return data.payload.tasks.map(item => ({
+            id: item.id,
             avatar: item.image_link,
             name: item.name,
             amount: getAmount(item),

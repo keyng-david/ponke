@@ -1,4 +1,5 @@
 export type EarnItem = {
+    id: number
     avatar: string
     name: string
     amount: string
