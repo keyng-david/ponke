@@ -1,5 +1,3 @@
-import {useTonWallet} from "@tonconnect/ui-react";
-
 import backgroundImage from '@/shared/assets/images/main/background.svg'
 import tableImage from '@/shared/assets/images/main/table.svg'
 import cabelImage from '@/shared/assets/images/main/cabel.svg'
@@ -22,10 +20,11 @@ import {useConnectTon} from "@/features/ton/useConnectTon";
 import {useAuth} from "@/features/auth/useAuth";
 import {useEffect} from "react";
 import {useTelegram} from "@/shared/lib/hooks/useTelegram";
+import {walletModel} from "@/shared/model/wallet";
 
 export const Main = () => {
     const { initialize } = useConnectTon()
-    const wallet = useTonWallet()
+    const { wallet } = walletModel.useWalletModel()
 
     const authModel = useAuth()
     const { isValidPlaform } = useTelegram()

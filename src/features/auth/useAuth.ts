@@ -1,4 +1,4 @@
-import {useCallback, useRef} from "react";
+import {useCallback} from "react";
 import {useNavigate} from "react-router-dom";
 
 import { clickerModel } from '../clicker/model'
@@ -7,6 +7,7 @@ import {useJWTToken} from "@/shared/model/jwt";
 import { createRequest } from "@/shared/lib/api/createRequest";
 import {createEvent, createStore} from "effector";
 import {useUnit} from "effector-react";
+import {walletModel} from "@/shared/model/wallet";
 
 const setIsAuth = createEvent<boolean>()
 
@@ -19,6 +20,7 @@ export const useAuth = () => {
     const isAuth = useUnit($isAuth)
 
     const jwtTokenStore = useJWTToken()
+    const wallet = walletModel.useWalletModel()
 
     const initialize = useCallback(async () => {
         try {
@@ -34,6 +36,7 @@ export const useAuth = () => {
                 const response = await createRequest<{
                     score: number
                     available_clicks: number,
+                    wallet: string
                 }>({
                     url: 'game/auth',
                     method: 'POST',
@@ -42,6 +45,7 @@ export const useAuth = () => {
                 if (!response.error) {
                     clickerModel.valueInited(response.payload.score)
                     clickerModel.availableInited(response.payload.available_clicks)
+                    wallet.updateWallet(response.payload.wallet)
                     navigate('/main')
                     setIsAuth(true)
                 } else {
