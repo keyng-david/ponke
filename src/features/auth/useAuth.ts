@@ -8,6 +8,7 @@ import { createRequest } from "@/shared/lib/api/createRequest";
 import {createEvent, createStore} from "effector";
 import {useUnit} from "effector-react";
 import {walletModel} from "@/shared/model/wallet";
+import {randModel} from "@/shared/model/rang";
 
 const setIsAuth = createEvent<boolean>()
 
@@ -21,6 +22,7 @@ export const useAuth = () => {
 
     const jwtTokenStore = useJWTToken()
     const wallet = walletModel.useWalletModel()
+    const rangModel = randModel.useRang()
 
     const initialize = useCallback(async () => {
         try {
@@ -37,6 +39,7 @@ export const useAuth = () => {
                     score: number
                     available_clicks: number,
                     wallet: string
+                    level: number
                 }>({
                     url: 'game/auth',
                     method: 'POST',
@@ -46,6 +49,7 @@ export const useAuth = () => {
                     clickerModel.valueInited(response.payload.score)
                     clickerModel.availableInited(response.payload.available_clicks)
                     wallet.updateWallet(response.payload.wallet)
+                    rangModel.update(response.payload.level)
                     navigate('/main')
                     setIsAuth(true)
                 } else {
@@ -56,7 +60,7 @@ export const useAuth = () => {
             jwtTokenStore.remove()
             console.log(e)
         }
-    }, [jwtTokenStore, navigate, isAuth])
+    }, [isAuth, jwtTokenStore, wallet, rangModel, navigate])
 
     return {
         initialize,

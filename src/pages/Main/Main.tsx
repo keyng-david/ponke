@@ -7,8 +7,12 @@ import keyboardImage from '@/shared/assets/images/main/keyboard.svg'
 import bankaLeftImage from '@/shared/assets/images/main/banka-left.png'
 import bankaRightImage from '@/shared/assets/images/main/banka-right.png'
 import logo from '@/shared/assets/images/main/logo.png'
-import generalButton from '@/shared/assets/images/main/general-button.png'
 import walletButton from '@/shared/assets/images/main/wallet-button.png'
+
+import noRang from '@/shared/assets/images/rangs/no-rang.png'
+import soldier from '@/shared/assets/images/rangs/soldier.png'
+import lieutenant from '@/shared/assets/images/rangs/lieutnent.png'
+import general from '@/shared/assets/images/rangs/general.png'
 
 import styles from './Main.module.scss'
 import {MonitorTop} from "@/shared/ui/MonitorTop";
@@ -18,16 +22,28 @@ import {MonitorLeft} from "@/shared/ui/MonitorLeft";
 import {ClickerField} from "@/features/clicker/ui";
 import {useConnectTon} from "@/features/ton/useConnectTon";
 import {useAuth} from "@/features/auth/useAuth";
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
 import {useTelegram} from "@/shared/lib/hooks/useTelegram";
 import {walletModel} from "@/shared/model/wallet";
+import {randModel} from "@/shared/model/rang";
 
 export const Main = () => {
     const { initialize } = useConnectTon()
     const { wallet } = walletModel.useWalletModel()
+    const { rang } = randModel.useRang()
 
     const authModel = useAuth()
     const { isValidPlaform } = useTelegram()
+
+    const rangImage = useMemo(() => {
+        switch (rang) {
+            case 0: return noRang
+            case 1: return soldier
+            case 2: return lieutenant
+            case 3: return general
+            default: return noRang
+        }
+    }, [rang])
 
     useEffect(() => {
         if (isValidPlaform) {
@@ -39,8 +55,8 @@ export const Main = () => {
         <div className={styles.root}>
             <img
                 className={styles['general-button']}
-                src={generalButton}
-                alt={'general'}
+                src={rangImage}
+                alt={'rang'}
             />
             <img
                 className={styles.logo}

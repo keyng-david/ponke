@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.b13ff38f.css",
-    "main.js": "/static/js/main.14a2bffe.js",
+    "main.js": "/static/js/main.7cdb5474.js",
     "static/js/453.70514826.chunk.js": "/static/js/453.70514826.chunk.js",
     "static/media/auth-background.png": "/static/media/auth-background.675a3c3e45a68b530f15.png",
     "static/media/background.png": "/static/media/background.03debc3e7fac9307f462.png",
@@ -30,20 +30,24 @@
     "static/media/point.png": "/static/media/point.cbd8e3a90189ba6d4f52.png",
     "static/media/join-button.png": "/static/media/join-button.706f6c1edd47794a20d9.png",
     "static/media/n.png": "/static/media/n.ba6fc72b265b42654c23.png",
+    "static/media/general.png": "/static/media/general.698aa3b103a0b3b2a5df.png",
     "static/media/clock.png": "/static/media/clock.2d2e66ae81b35cbafd0a.png",
+    "static/media/soldier.png": "/static/media/soldier.69bfa8b855fd8dc2f4e4.png",
+    "static/media/no-rang.png": "/static/media/no-rang.4458e6637c13048688f3.png",
     "static/media/o.png": "/static/media/o.06c189766c318fd8e689.png",
     "static/media/right-hand.png": "/static/media/right-hand.ac1efce01da429f37a1b.png",
+    "static/media/lieutnent.png": "/static/media/lieutnent.1c5742c494ef5b0360dd.png",
     "static/media/table.svg": "/static/media/table.04873837631c38f298dde2cf1ae18e19.svg",
     "static/media/background.svg": "/static/media/background.007cdb2d91ab4012847e766615ca949f.svg",
     "static/media/keyboard.svg": "/static/media/keyboard.eafd0354d15d9f76d6377eddb8fcf562.svg",
     "static/media/cabel.svg": "/static/media/cabel.d5a67cb08cda4317d01498119d89920a.svg",
     "index.html": "/index.html",
     "main.b13ff38f.css.map": "/static/css/main.b13ff38f.css.map",
-    "main.14a2bffe.js.map": "/static/js/main.14a2bffe.js.map",
+    "main.7cdb5474.js.map": "/static/js/main.7cdb5474.js.map",
     "453.70514826.chunk.js.map": "/static/js/453.70514826.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.b13ff38f.css",
-    "static/js/main.14a2bffe.js"
+    "static/js/main.7cdb5474.js"
   ]
 }
