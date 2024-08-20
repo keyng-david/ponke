@@ -67,7 +67,7 @@ export const Main = () => {
                 className={styles['wallet-button']}
                 src={walletButton}
                 alt={'wallet'}
-                onClick={!wallet ? initialize : undefined}
+                onClick={wallet === 'none' ? initialize : undefined}
             />
             <Background/>
             <ClickerField/>
