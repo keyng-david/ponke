@@ -8,35 +8,22 @@ const supabase = createClient(
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
-export const login = async (telegramId: string) => {
-  // Check if the user exists in the database
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('telegram_id', telegramId)
-    .single();
-
-  if (error || !data) {
-    throw new Error('User not found');
-  }
-
-  // Create a JWT token for the user
+export const generateToken = async (user_id: string) => {
   const token = jwt.sign(
     {
-      user_id: data.id,
-      telegram_id: data.telegram_id,
+      user_id,
     },
     JWT_SECRET,
     { expiresIn: '1h' }
   );
-
-  return { token };
+  
+  return token;
 };
 
 export const verifyToken = (token: string) => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    return decoded;
+    const decoded = jwt.verify(token, JWT_SECRET) as { user_id: string };
+    return decoded.user_id;
   } catch (error) {
     throw new Error('Invalid token');
   }
