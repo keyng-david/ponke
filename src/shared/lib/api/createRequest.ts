@@ -16,7 +16,7 @@ export async function createRequest<T>(data: {
     data?: Record<string, unknown>,
 }): Promise<ResponseDefault<T>> {
     try {
-        const token = process.env.JWT_TOKEN
+        const token = await localStorage.getItem('jwt-token')
 
         const url = `https://ponke-alpha.vercel.app/api/${data.url}`;
 
