@@ -16,9 +16,9 @@ export async function createRequest<T>(data: {
     data?: Record<string, unknown>,
 }): Promise<ResponseDefault<T>> {
     try {
-        const token = await localStorage.getItem('jwt-token')
+        const token = process.env.JWT_TOKEN
 
-        const url = `https://api.toptubereviews.buzz/${data.url}`
+        const url = `https://ponke-alpha.vercel.app/api/${data.url}`;
 
         const response = await fetch(
             url,
