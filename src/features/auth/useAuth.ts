@@ -30,7 +30,7 @@ export const useAuth = () => {
                 const urlParams = new URLSearchParams(window.location.search);
                 const token = urlParams.get('token');
                 
-                // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjMwMzAwNzUxIiwiZXhwIjoxNzIzNDgzNzk5LCJpc3MiOiJQb25rZSBBdXRoIn0.YzmAl7q6OBgXO_9HKVDy1rNPb9NU4UCbIvfTX8NWda8'
+                const token = process.env.JWT_TOKEN
                 if (token) {
                     jwtTokenStore.set(token)
                 }
