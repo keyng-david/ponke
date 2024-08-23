@@ -1,12 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken'; // Importing jsonwebtoken
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl: string = process.env.SUPABASE_URL || ''; // Ensure type is string
+const supabaseKey: string = process.env.SUPABASE_KEY || ''; // Ensure type is string
 const supabase = createClient(supabaseUrl, supabaseKey);
-const jwtSecret = process.env.JWT_SECRET;
+const jwtSecret: string = process.env.JWT_SECRET || ''; // Ensure type is string
 
-export default async function handler(req, res) {
+export default async function handler(req: any, res: any) { // Explicitly type req and res as 'any'
     const { method } = req;
 
     switch (method) {
