@@ -26,7 +26,8 @@ export default async function handler(req: any, res: any) {
     let decoded: string | JwtPayload;
 
     try {
-        decoded = jwt.verify(token, jwtSecret);
+        // Use non-null assertion to assure TypeScript that jwtSecret is defined
+        decoded = jwt.verify(token, jwtSecret!) as JwtPayload;
     } catch (err) {
         return res.status(401).json({ error: true, message: 'Invalid token' });
     }
