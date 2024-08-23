@@ -25,7 +25,8 @@
     "web-vitals": "^2.1.4",
     "@vercel/node": "^1.10.0",
     "@supabase/supabase-js": "^1.29.0",
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^8.5.1",
+    "uuid": "^9.0.0"
   },
   "scripts": {
     "start": "craco start",
@@ -52,6 +53,8 @@
     ]
   },
   "devDependencies": {
-    "@craco/craco": "^7.1.0"
+    "@craco/craco": "^7.1.0",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/uuid": "^9.0.3"
   }
 }
