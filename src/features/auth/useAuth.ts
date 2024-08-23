@@ -23,7 +23,7 @@ export const useAuth = () => {
         try {
             if (!isAuth) {
                 const urlParams = new URLSearchParams(window.location.search);
-                const token = urlParams.get('token') || process.env.JWT_TOKEN;
+                const token = urlParams.get('token')
 
                 if (token) {
                     jwtTokenStore.set(token);
