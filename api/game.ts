@@ -1,12 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken'; // Importing jsonwebtoken
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
-const supabaseUrl: string = process.env.SUPABASE_URL || ''; // Ensure type is string
-const supabaseKey: string = process.env.SUPABASE_KEY || ''; // Ensure type is string
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
-const jwtSecret: string = process.env.JWT_SECRET || ''; // Ensure type is string
+const jwtSecret = process.env.JWT_SECRET;
 
-export default async function handler(req: any, res: any) { // Explicitly type req and res as 'any'
+export default async function handler(req: any, res: any) {
     const { method } = req;
 
     // Validate JWT token
@@ -17,7 +17,7 @@ export default async function handler(req: any, res: any) { // Explicitly type r
     }
 
     const token = authorization.split(' ')[1];
-    let decoded;
+    let decoded: string | JwtPayload;
 
     try {
         decoded = jwt.verify(token, jwtSecret);
@@ -25,7 +25,14 @@ export default async function handler(req: any, res: any) { // Explicitly type r
         return res.status(401).json({ error: true, message: 'Invalid token' });
     }
 
-    const userId = decoded.id;
+    // Type guard to ensure `decoded` is of type `JwtPayload` and has an `id`
+    let userId: string | undefined;
+
+    if (typeof decoded !== 'string' && 'id' in decoded) {
+        userId = decoded.id as string;
+    } else {
+        return res.status(401).json({ error: true, message: 'Invalid token payload' });
+    }
 
     switch (method) {
         case 'GET':
