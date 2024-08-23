@@ -1,10 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
+// Ensure these environment variables are defined
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
 const jwtSecret = process.env.JWT_SECRET;
+
+if (!supabaseUrl || !supabaseKey || !jwtSecret) {
+    throw new Error('Environment variables SUPABASE_URL, SUPABASE_KEY, and JWT_SECRET must be defined');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req: any, res: any) {
     const { method } = req;
