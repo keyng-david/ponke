@@ -1,3 +1,15 @@
+export type SuccessResponse<T> = {
+    error: false,
+    payload: T
+}
+
+export type FailureResponse = {
+    error: true,
+    payload: null
+}
+
+export type ResponseDefault<T> = SuccessResponse<T> | FailureResponse;
+
 export async function createRequest<T>(data: {
     url: string
     method: 'POST' | 'GET' | 'PUT' | 'DELETE',
