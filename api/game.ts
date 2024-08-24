@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
-// Ensure these environment variables are defined
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const jwtSecret = process.env.JWT_SECRET;
@@ -26,13 +25,11 @@ export default async function handler(req: any, res: any) {
     let decoded: string | JwtPayload;
 
     try {
-        // Use non-null assertion to assure TypeScript that jwtSecret is defined
         decoded = jwt.verify(token, jwtSecret!) as JwtPayload;
     } catch (err) {
         return res.status(401).json({ error: true, message: 'Invalid token' });
     }
 
-    // Type guard to ensure `decoded` is of type `JwtPayload` and has an `id`
     let userId: string | undefined;
 
     if (typeof decoded !== 'string' && 'id' in decoded) {
@@ -81,7 +78,24 @@ export default async function handler(req: any, res: any) {
             break;
 
         case 'POST':
-            if (req.url.endsWith('/completeTask')) {
+            if (req.url.endsWith('/auth')) {
+                const { username, password } = req.body;
+
+                // Validate the user's credentials
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', username)
+                    .single();
+
+                if (error || !user || user.password !== password) {
+                    res.status(401).json({ error: true, message: 'Invalid credentials' });
+                } else {
+                    // Generate JWT token
+                    const token = jwt.sign({ id: user.id, username: user.username }, jwtSecret, { expiresIn: '1h' });
+                    res.status(200).json({ error: false, token });
+                }
+            } else if (req.url.endsWith('/completeTask')) {
                 const { id } = req.body;
 
                 const { data: task, error } = await supabase
