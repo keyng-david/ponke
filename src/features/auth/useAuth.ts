@@ -58,7 +58,11 @@ export const useAuth = () => {
       }
     } catch (e) {
       jwtTokenStore.remove();
-      setError(`Error during authentication: ${e.message}`);
+      if (e instanceof Error) {
+  setError(`Error during authentication: ${e.message}`);
+} else {
+  setError(`Error during authentication: ${String(e)}`);
+}
     }
   }, [isAuth, jwtTokenStore, wallet, rangModel, navigate, setError]);
 
