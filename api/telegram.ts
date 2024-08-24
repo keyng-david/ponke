@@ -14,16 +14,9 @@ function generateToken(userId) {
 // Function to handle the start command
 bot.start(async (ctx) => {
   try {
-    // Assuming the user ID is available in the ctx object
     const userId = ctx.from.id;
-    
-    // Generate JWT token for the user
     const token = generateToken(userId);
-
-    // Generate the frontend URL with the token
     const frontendUrl = `${process.env.FRONTEND_URL}/?token=${token}`;
-
-    // Prepare the inline keyboard with buttons
     const inlineKeyboard = {
       inline_keyboard: [
         [{ text: "💎 Play 💎", url: frontendUrl }],
@@ -33,7 +26,6 @@ bot.start(async (ctx) => {
       ],
     };
 
-    // Send the welcome message with the inline keyboard
     await ctx.replyWithPhoto(
       { url: "https://drive.google.com/file/d/1bhEIxgBy-mkLcSotD9f8xkdMJcnlgB_d/view?usp=drivesdk" },
       {
@@ -47,11 +39,16 @@ bot.start(async (ctx) => {
   }
 });
 
-// Set up the webhook
-bot.launch();
+// Adapt Telegraf for Vercel's serverless functions
+export default async function handler(req, res) {
+  try {
+    await bot.handleUpdate(req.body, res);
+  } catch (error) {
+    console.error('Error in handler:', error);
+    res.status(500).send('Internal Server Error');
+  }
+}
 
 // Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
-
-module.exports = bot;
