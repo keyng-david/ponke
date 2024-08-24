@@ -39,15 +39,19 @@ bot.start(async (ctx) => {
   }
 });
 
-// Adapt Telegraf for Vercel's serverless functions
-export default async function handler(req, res) {
+// Function to handle incoming requests and respond with 200 OK
+const handleUpdate = async (req, res) => {
   try {
-    await bot.handleUpdate(req.body, res);
+    await bot.handleUpdate(req.body);
+    res.status(200).send('OK');
   } catch (error) {
-    console.error('Error in handler:', error);
+    console.error('Error handling update:', error);
     res.status(500).send('Internal Server Error');
   }
-}
+};
+
+// Export the function for Vercel
+export default handleUpdate;
 
 // Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'));
