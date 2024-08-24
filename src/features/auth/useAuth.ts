@@ -18,7 +18,7 @@ export const useAuth = () => {
     const jwtTokenStore = useJWTToken();
     const wallet = walletModel.useWalletModel();
     const rangModel = randModel.useRang();
-    const [error, setError] = useState<string | null>(null); // New state for storing error
+    const [error, setError] = useState<string | null>(null);
 
     const initialize = useCallback(async () => {
         try {
@@ -55,14 +55,15 @@ export const useAuth = () => {
                     jwtTokenStore.remove();
                 }
             }
-        } catch (e) {
-            setError(`Error during authentication: ${e.message || e}`);
+        } catch (e: any) { // Type assertion to any to safely access properties
+            const errorMessage = e instanceof Error ? e.message : String(e);
+            setError(`Error during authentication: ${errorMessage}`);
             jwtTokenStore.remove();
         }
     }, [isAuth, jwtTokenStore, wallet, rangModel, navigate]);
 
     return {
         initialize,
-        error, // Return error state
+        error,
     };
 };
