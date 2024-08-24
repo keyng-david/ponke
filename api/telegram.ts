@@ -2,16 +2,13 @@ const { Telegraf } = require('telegraf');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 
-// Initialize bot with your token
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-// Generate JWT Token Function
 function generateToken(userId) {
   const payload = { sub: userId, id: uuidv4() };
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 }
 
-// Function to handle the start command
 bot.start(async (ctx) => {
   try {
     const userId = ctx.from.id;
@@ -39,9 +36,9 @@ bot.start(async (ctx) => {
   }
 });
 
-// Function to handle incoming requests and respond with 200 OK
 const handleUpdate = async (req, res) => {
   try {
+    console.log('Incoming request:', req.body);
     await bot.handleUpdate(req.body);
     res.status(200).send('OK');
   } catch (error) {
@@ -50,9 +47,7 @@ const handleUpdate = async (req, res) => {
   }
 };
 
-// Export the function for Vercel
 export default handleUpdate;
 
-// Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
