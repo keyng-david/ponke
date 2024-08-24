@@ -1,74 +1,62 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TonConnectButton, useTonWallet } from "@tonconnect/ui-react";
-
-import ponkeImage from '@/shared/assets/images/auth/ponke.png';
-
-import main from '@/shared/assets/images/navbar/main.png';
-import home from '@/shared/assets/images/navbar/home.png';
-import frens from '@/shared/assets/images/navbar/frens.png';
-import board from '@/shared/assets/images/navbar/board.png';
-import earn from '@/shared/assets/images/navbar/earn.png';
-
-import styles from './Auth.module.scss';
+import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
 import { useAuth } from "@/features/auth/useAuth";
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
+import ponkeImage from '@/shared/assets/images/auth/ponke.png';
+import styles from './Auth.module.scss';
 
 const ANIMATION_TIME = 500;
 const REDIRECT_DELAY = ANIMATION_TIME * 7;
 
 export const Auth = () => {
-    const [isAnimationEnd, setIsAnimationEnd] = useState(false);
+  const [isAnimationEnd, setIsAnimationEnd] = useState(false);
+  const { isValidPlaform } = useTelegram();
+  const authModel = useAuth();
+  const { errorMessage, setError } = useErrorHandler();
 
-    const { isValidPlaform } = useTelegram();
-    const authModel = useAuth();
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsAnimationEnd(true);
+      clearTimeout(timeout);
+    }, REDIRECT_DELAY);
+  }, []);
 
-    function preloadImages() {
-        return [main, home, frens, board, earn].forEach(image => {
-            const img = new Image();
-            img.src = image;
-        });
+  useEffect(() => {
+    if (isAnimationEnd && isValidPlaform) {
+      authModel.initialize().catch(err => setError(`Authentication failed: ${err.message}`));
     }
+  }, [isAnimationEnd]);
 
-    useEffect(() => {
-        preloadImages();
-        const timeout = setTimeout(() => {
-            setIsAnimationEnd(true);
-            clearTimeout(timeout);
-        }, REDIRECT_DELAY);
-    }, []);
-
-    useEffect(() => {
-        if (isAnimationEnd && isValidPlaform) {
-            authModel.initialize().then();
-        }
-    }, [isAnimationEnd]);
-
-    return <div className={styles.root}>
-        {isValidPlaform && (
-            <div className={styles.container}>
-                <Ponke />
-                <Ton />
-                <img
-                    className={styles['ponke_img']}
-                    src={ponkeImage}
-                    alt={'ponke'}
-                />
-                {authModel.error && ( // Display error message if any
-                    <div className={styles.error}>
-                        <p>{authModel.error}</p>
-                    </div>
-                )}
+  return (
+    <div className={styles.root}>
+      {isValidPlaform && (
+        <div className={styles.container}>
+          <Ponke />
+          <Ton />
+          <img
+            className={styles['ponke_img']}
+            src={ponkeImage}
+            alt={'ponke'}
+          />
+          {errorMessage && (
+            <div className={styles['error-message']}>
+              <h2>{errorMessage}</h2>
             </div>
-        )}
-        {!isValidPlaform && (
-            <div className={styles['invalid-platform']}>
-                <h1>USE MOBILE DEVICE</h1>
-                <h1>USE MOBILE DEVICE</h1>
-            </div>
-        )}
-    </div>;
+          )}
+        </div>
+      )}
+      {!isValidPlaform && (
+        <div className={styles['invalid-platform']}>
+          <h1>USE MOBILE DEVICE</h1>
+          <h1>USE MOBILE DEVICE</h1>
+        </div>
+      )}
+    </div>
+  );
 };
+
+// Ponke and Ton components remain the same
 
 const Ponke = () => {
     const images = {
