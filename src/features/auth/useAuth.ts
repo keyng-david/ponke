@@ -37,7 +37,7 @@ export const useAuth = () => {
         const response = await createRequest<{
           score: number;
           available_clicks: number;
-          wallet: string;
+          wallet: string | null;  // allow wallet to be null
           level: number;
         }>({
           url: "game/auth",
@@ -47,7 +47,12 @@ export const useAuth = () => {
         if (!response.error) {
           clickerModel.valueInited(response.payload.score);
           clickerModel.availableInited(response.payload.available_clicks);
-          wallet.updateWallet(response.payload.wallet);
+
+          // Check if wallet data is present, but don't block navigation if it's empty
+          if (response.payload.wallet) {
+            wallet.updateWallet(response.payload.wallet);
+          }
+
           rangModel.update(response.payload.level);
           navigate("/main");
           setIsAuth(true);
@@ -58,11 +63,7 @@ export const useAuth = () => {
       }
     } catch (e) {
       jwtTokenStore.remove();
-      if (e instanceof Error) {
-  setError(`Error during authentication: ${e.message}`);
-} else {
-  setError(`Error during authentication: ${String(e)}`);
-}
+      setError(`Error during authentication: ${e instanceof Error ? e.message : String(e)}`);
     }
   }, [isAuth, jwtTokenStore, wallet, rangModel, navigate, setError]);
 
