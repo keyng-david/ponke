@@ -1,14 +1,19 @@
-const { Telegraf } = require('telegraf');
-const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
+import { Telegraf } from 'telegraf';
+import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
+import express from 'express';
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
+const app = express();
 
 // JWT Token Generation
-function generateToken(userId) {
+function generateToken(userId: string): string {
   const payload = { sub: userId, id: uuidv4() };
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 }
+
+// Middleware to verify requests are from Telegram
+app.use(bot.webhookCallback('/telegram-bot-update'));
 
 // Handle the /start command
 bot.start(async (ctx) => {
@@ -39,7 +44,7 @@ bot.start(async (ctx) => {
 });
 
 // Handle incoming updates from Telegram
-const handleUpdate = async (req, res) => {
+app.post('/telegram-bot-update', async (req, res) => {
   try {
     console.log('Incoming request:', req.body);
 
@@ -51,10 +56,21 @@ const handleUpdate = async (req, res) => {
     console.error('Error handling update:', error);
     res.status(500).send('Internal Server Error');
   }
-};
+});
 
-export default handleUpdate;
+// Set Webhook with Express
+bot.telegram.setWebhook(`${process.env.SERVER_URL}/telegram-bot-update`)
+  .then(() => console.log('Webhook set successfully'))
+  .catch((error) => console.error('Error setting webhook:', error));
+
+// Start Express server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 // Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
+export default app;
