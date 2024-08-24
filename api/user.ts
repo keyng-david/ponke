@@ -15,38 +15,45 @@ const supabase = createClient(supabaseUrl, supabaseKey);
  * @returns {Promise<{ error?: string, data?: any }>} - The user data or an error message.
  */
 module.exports.createUserIfNotExists = async function (telegramId) {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('telegram_id', telegramId)
-    .single();
+  try {
+    // Fetch existing user
+    const { data: existingUser, error: fetchError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('telegram_id', telegramId)
+      .single();
 
-  if (fetchError && fetchError.code !== 'PGRST116') {
-    // If error is something other than user not found
-    return { error: fetchError.message };
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      // If error is something other than user not found
+      return { error: fetchError.message };
+    }
+
+    if (existingUser) {
+      // If the user already exists, return the existing data
+      return { data: existingUser };
+    }
+
+    // If user doesn't exist, create a new record
+    const { data: newUser, error: insertError } = await supabase
+      .from('users')
+      .insert({
+        telegram_id: telegramId,
+        score: 0, // default value
+        level: 0, // default value
+        wallet: '', // default value
+        available_clicks: 500, // default value as per model/index
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      return { error: insertError.message };
+    }
+
+    return { data: newUser };
+
+  } catch (err) {
+    console.error('Error handling user creation:', err);
+    return { error: 'An unexpected error occurred.' };
   }
-
-  if (existingUser) {
-    // If the user already exists, return the existing data
-    return { data: existingUser };
-  }
-
-  // If user doesn't exist, create a new record
-  const { data: newUser, error: insertError } = await supabase
-    .from('users')
-    .insert({
-      telegram_id: telegramId,
-      score: 0, // default value
-      level: 0, // default value
-      wallet: '', // default value
-      available_clicks: 500, // default value as per model/index
-    })
-    .select()
-    .single();
-
-  if (insertError) {
-    return { error: insertError.message };
-  }
-
-  return { data: newUser };
 }
