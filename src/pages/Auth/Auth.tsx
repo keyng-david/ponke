@@ -1,48 +1,48 @@
-import React, {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import {TonConnectButton, useTonWallet} from "@tonconnect/ui-react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { TonConnectButton, useTonWallet } from "@tonconnect/ui-react";
 
-import ponkeImage from '@/shared/assets/images/auth/ponke.png'
+import ponkeImage from '@/shared/assets/images/auth/ponke.png';
 
-import main from '@/shared/assets/images/navbar/main.png'
-import home from '@/shared/assets/images/navbar/home.png'
-import frens from '@/shared/assets/images/navbar/frens.png'
-import board from '@/shared/assets/images/navbar/board.png'
-import earn from '@/shared/assets/images/navbar/earn.png'
+import main from '@/shared/assets/images/navbar/main.png';
+import home from '@/shared/assets/images/navbar/home.png';
+import frens from '@/shared/assets/images/navbar/frens.png';
+import board from '@/shared/assets/images/navbar/board.png';
+import earn from '@/shared/assets/images/navbar/earn.png';
 
-import styles from './Auth.module.scss'
-import {useAuth} from "@/features/auth/useAuth";
+import styles from './Auth.module.scss';
+import { useAuth } from "@/features/auth/useAuth";
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
 
-const ANIMATION_TIME = 500
-const REDIRECT_DELAY = ANIMATION_TIME * 7
+const ANIMATION_TIME = 500;
+const REDIRECT_DELAY = ANIMATION_TIME * 7;
 
 export const Auth = () => {
-    const [isAnimationEnd, setIsAnimationEnd] = useState(false)
+    const [isAnimationEnd, setIsAnimationEnd] = useState(false);
 
-    const { isValidPlaform } = useTelegram()
-    const authModel = useAuth()
+    const { isValidPlaform } = useTelegram();
+    const authModel = useAuth();
 
     function preloadImages() {
         return [main, home, frens, board, earn].forEach(image => {
-            const img = new Image()
-            img.src = image
-        })
+            const img = new Image();
+            img.src = image;
+        });
     }
 
     useEffect(() => {
-        preloadImages()
+        preloadImages();
         const timeout = setTimeout(() => {
-            setIsAnimationEnd(true)
-            clearTimeout(timeout)
-        }, REDIRECT_DELAY)
-    }, [])
+            setIsAnimationEnd(true);
+            clearTimeout(timeout);
+        }, REDIRECT_DELAY);
+    }, []);
 
     useEffect(() => {
         if (isAnimationEnd && isValidPlaform) {
-            authModel.initialize().then()
+            authModel.initialize().then();
         }
-    }, [isAnimationEnd])
+    }, [isAnimationEnd]);
 
     return <div className={styles.root}>
         {isValidPlaform && (
@@ -54,6 +54,11 @@ export const Auth = () => {
                     src={ponkeImage}
                     alt={'ponke'}
                 />
+                {authModel.error && ( // Display error message if any
+                    <div className={styles.error}>
+                        <p>{authModel.error}</p>
+                    </div>
+                )}
             </div>
         )}
         {!isValidPlaform && (
@@ -62,8 +67,8 @@ export const Auth = () => {
                 <h1>USE MOBILE DEVICE</h1>
             </div>
         )}
-    </div>
-}
+    </div>;
+};
 
 const Ponke = () => {
     const images = {
