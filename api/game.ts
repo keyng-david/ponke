@@ -92,7 +92,11 @@ export default async function handler(req: any, res: any) {
                     res.status(401).json({ error: true, message: 'Invalid credentials' });
                 } else {
                     // Generate JWT token
-                    const token = jwt.sign({ id: user.id, username: user.username }, jwtSecret, { expiresIn: '1h' });
+                    const token = jwt.sign(
+                        { id: user.id, username: user.username },
+                        jwtSecret!, // Ensure jwtSecret is not undefined
+                        { expiresIn: '1h' }
+                    );
                     res.status(200).json({ error: false, token });
                 }
             } else if (req.url.endsWith('/completeTask')) {
