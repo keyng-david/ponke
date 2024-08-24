@@ -2,13 +2,16 @@ const { Telegraf } = require('telegraf');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 
+// Initialize bot with your token
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
+// JWT Token Generation
 function generateToken(userId) {
   const payload = { sub: userId, id: uuidv4() };
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 }
 
+// Handle the /start command
 bot.start(async (ctx) => {
   try {
     const userId = ctx.from.id;
@@ -36,10 +39,20 @@ bot.start(async (ctx) => {
   }
 });
 
+// Handle incoming updates from Telegram
 const handleUpdate = async (req, res) => {
   try {
     console.log('Incoming request:', req.body);
-    await bot.handleUpdate(req.body);
+
+    // Verify that the request is indeed coming from Telegram
+    const authHeader = req.headers['authorization'];
+    if (!authHeader || authHeader !== `Bearer ${process.env.BOT_TOKEN}`) {
+      return res.status(401).send('Unauthorized');
+    }
+
+    await bot.handleUpdate(req.body, res);
+
+    // Ensure the response is sent to Telegram
     res.status(200).send('OK');
   } catch (error) {
     console.error('Error handling update:', error);
@@ -49,5 +62,6 @@ const handleUpdate = async (req, res) => {
 
 export default handleUpdate;
 
+// Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
