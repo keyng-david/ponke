@@ -14,9 +14,8 @@ const supabase = createClient(supabaseUrl, supabaseKey);
  * @param {number} telegramId - The user's Telegram ID.
  * @returns {Promise<{ error?: string, data?: any }>} - The user data or an error message.
  */
-export async function createUserIfNotExists(telegramId: number) {
-  // Check if user already exists
-  const { data: existingUser, error: fetchError } = await supabase
+module.exports.createUserIfNotExists = async function (telegramId) {
+  const { data, error } = await supabase
     .from('users')
     .select('*')
     .eq('telegram_id', telegramId)
