@@ -2,7 +2,6 @@ const { Telegraf } = require('telegraf');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 
-// Initialize bot with your token
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 // JWT Token Generation
@@ -44,13 +43,7 @@ const handleUpdate = async (req, res) => {
   try {
     console.log('Incoming request:', req.body);
 
-    // Verify that the request is indeed coming from Telegram
-    const authHeader = req.headers['authorization'];
-    if (!authHeader || authHeader !== `Bearer ${process.env.BOT_TOKEN}`) {
-      return res.status(401).send('Unauthorized');
-    }
-
-    await bot.handleUpdate(req.body, res);
+    await bot.handleUpdate(req.body);
 
     // Ensure the response is sent to Telegram
     res.status(200).send('OK');
