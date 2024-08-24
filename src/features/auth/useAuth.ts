@@ -1,12 +1,12 @@
-import {useCallback} from "react";
-import {useNavigate} from "react-router-dom";
-import {clickerModel} from '../clicker/model';
-import {useJWTToken} from "@/shared/model/jwt";
-import {createRequest} from "@/shared/lib/api/createRequest";
-import {createEvent, createStore} from "effector";
-import {useUnit} from "effector-react";
-import {walletModel} from "@/shared/model/wallet";
-import {randModel} from "@/shared/model/rang";
+import { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { clickerModel } from '../clicker/model';
+import { useJWTToken } from "@/shared/model/jwt";
+import { createRequest } from "@/shared/lib/api/createRequest";
+import { createEvent, createStore } from "effector";
+import { useUnit } from "effector-react";
+import { walletModel } from "@/shared/model/wallet";
+import { randModel } from "@/shared/model/rang";
 
 const setIsAuth = createEvent<boolean>();
 
@@ -18,6 +18,7 @@ export const useAuth = () => {
     const jwtTokenStore = useJWTToken();
     const wallet = walletModel.useWalletModel();
     const rangModel = randModel.useRang();
+    const [error, setError] = useState<string | null>(null); // New state for storing error
 
     const initialize = useCallback(async () => {
         try {
@@ -28,11 +29,9 @@ export const useAuth = () => {
                 if (token) {
                     jwtTokenStore.set(token);
                 } else {
-                    console.log("No token found");
+                    setError("No token found");
                     return;
                 }
-
-                console.log("Token:", token); // Debugging token value
 
                 const response = await createRequest<{
                     score: number;
@@ -45,7 +44,6 @@ export const useAuth = () => {
                 });
 
                 if (!response.error) {
-                    console.log("Auth success, navigating to main");
                     clickerModel.valueInited(response.payload.score);
                     clickerModel.availableInited(response.payload.available_clicks);
                     wallet.updateWallet(response.payload.wallet);
@@ -53,17 +51,18 @@ export const useAuth = () => {
                     navigate('/main');
                     setIsAuth(true);
                 } else {
-                    console.log("Auth failed, removing token");
+                    setError("Authentication failed. Please try again.");
                     jwtTokenStore.remove();
                 }
             }
         } catch (e) {
+            setError(`Error during authentication: ${e.message || e}`);
             jwtTokenStore.remove();
-            console.log("Error during auth:", e);
         }
     }, [isAuth, jwtTokenStore, wallet, rangModel, navigate]);
 
     return {
         initialize,
+        error, // Return error state
     };
 };
