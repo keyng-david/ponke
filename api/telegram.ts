@@ -2,6 +2,7 @@ const { Telegraf } = require('telegraf');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
+const { createUserIfNotExists } = require('./user'); // Import the user module
 
 const BOT_TOKEN = process.env.BOT_TOKEN || '';
 const SERVER_URL = process.env.SERVER_URL || '';
@@ -22,6 +23,16 @@ function generateToken(userId) {
 bot.start(async (ctx) => {
   try {
     const userId = ctx.from?.id;
+    
+    // Create or fetch the user in the database
+    const { data: user, error } = await createUserIfNotExists(userId);
+
+    if (error) {
+      console.error("Error creating/fetching user:", error);
+      return ctx.reply("Sorry, something went wrong. Please try again later.");
+    }
+
+    // Generate token after ensuring user data is stored
     const token = generateToken(userId);
     const frontendUrl = `${FRONTEND_URL}/?token=${token}`;
     const inlineKeyboard = {
