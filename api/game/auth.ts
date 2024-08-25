@@ -31,7 +31,7 @@ module.exports = async function authHandler(req, res) {
     return res.status(401).json({ error: true, message: 'Invalid token' });
   }
 
-  const userId = decoded.id;
+  const telegramId = decoded.id;
 
   const { data: userData, error } = await supabase
     .from('users')
