@@ -36,7 +36,7 @@ module.exports = async function authHandler(req, res) {
   const { data: userData, error } = await supabase
     .from('users')
     .select('score, available_clicks, wallet, level')
-    .eq('user_id', userId)
+    .eq('telegram_id', telegramId)
     .single();  // Use single() to fetch a single record, assuming user_id is unique
 
   if (error || !userData) {
