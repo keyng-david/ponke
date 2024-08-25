@@ -3,7 +3,7 @@ import {createRequest} from "@/shared/lib/api/createRequest";
 
 export const leadersApi: LeadersApi = {
     getList: async () => await createRequest({
-        url: 'game/leaders',
+        endpoint: 'game/leaders',
         method: 'GET',
     })
 }
