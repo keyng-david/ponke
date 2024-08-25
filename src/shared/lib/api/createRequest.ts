@@ -33,7 +33,6 @@ export async function createRequest<T>({
       body: body ? JSON.stringify(body) : null,
     });
 
-    // Handle non-JSON responses and errors
     if (!response.ok) {
       const errorText = await response.text();
       if (onError) {
@@ -42,7 +41,6 @@ export async function createRequest<T>({
       return { error: true, payload: null };
     }
 
-    // Parse JSON response
     let data: T | null = null;
     try {
       data = await response.json();
