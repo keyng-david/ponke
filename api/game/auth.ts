@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
+const { createClient } = require('@supabase/supabase-js');
+const jwt = require('jsonwebtoken');
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -11,21 +11,32 @@ if (!supabaseUrl || !supabaseKey || !jwtSecret) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-export default async function authHandler(req: any, res: any) {
-  const { username, password } = req.body;
+module.exports = async function authHandler(req, res) {
+  const { authorization } = req.headers;
 
-  const { data: user, error } = await supabase.from('users').select('*').eq('username', username).single();
-
-  if (error || !user || user.password !== password) {
-    return res.status(401).json({ error: true, message: 'Invalid credentials' });
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    return res.status(401).json({ error: true, message: 'Unauthorized' });
   }
 
-  // Generate JWT token
-  const token = jwt.sign(
-    { id: user.id, username: user.username },
-    jwtSecret,
-    { expiresIn: '1h' }
-  );
+  const token = authorization.split(' ')[1];
+  let decoded;
 
-  return res.status(200).json({ error: false, token });
-}
+  try {
+    decoded = jwt.verify(token, jwtSecret);
+  } catch (err) {
+    return res.status(401).json({ error: true, message: 'Invalid token' });
+  }
+
+  const userId = decoded.id;
+
+  const { data: friendsData, error } = await supabase
+    .from('friends')
+    .select('*')
+    .eq('user_id', userId);
+
+  if (error) {
+    return res.status(500).json({ error: true, message: 'Database error', details: error.message });
+  }
+
+  return res.status(200).json({ error: false, payload: friendsData });
+};
