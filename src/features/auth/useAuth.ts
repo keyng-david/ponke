@@ -9,8 +9,9 @@ import { walletModel } from "@/shared/model/wallet";
 import { randModel } from "@/shared/model/rang";
 import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
 
-const setIsAuth = createEvent();
-const $isAuth = createStore(false).on(setIsAuth, () => true);
+// Event and store to manage authentication state, modified to use boolean
+const setIsAuth = createEvent<boolean>();
+const $isAuth = createStore(false).on(setIsAuth, (_, value) => value);
 
 export const useAuth = () => {
   const navigate = useNavigate();
@@ -29,38 +30,40 @@ export const useAuth = () => {
         if (token) {
           jwtTokenStore.set(token);
         } else {
-          throw new Error("No token found");
+          setError("No token found");
+          return;
         }
 
         const response = await createRequest<{
           score: number;
           available_clicks: number;
-          wallet: string | null;
+          wallet: string | null; // allow wallet to be null
           level: number;
         }>({
           endpoint: "game/auth",
           method: "POST",
         });
 
-        if (!response.error && response.payload) {
+        if (!response.error) {
           clickerModel.valueInited(response.payload.score);
           clickerModel.availableInited(response.payload.available_clicks);
 
+          // Check if wallet data is present, but don't block navigation if it's empty
           if (response.payload.wallet) {
             wallet.updateWallet(response.payload.wallet);
           }
 
           rangModel.update(response.payload.level);
           navigate("/main");
-          setIsAuth(true);
+          setIsAuth(true); // Pass boolean
         } else {
-          throw new Error("Authentication failed, invalid response");
+          jwtTokenStore.remove();
+          setError("Authentication failed, invalid response");
         }
       }
-    } catch (e: any) {
-      console.error(`Error during authentication: ${e.message || "Unknown error"}`);
+    } catch (e) {
       jwtTokenStore.remove();
-      setError(`Error during authentication: ${e.message || "Unknown error"}`);
+      setError(`Error during authentication: ${e instanceof Error ? e.message : String(e)}`);
     }
   }, [isAuth, jwtTokenStore, wallet, rangModel, navigate, setError]);
 
