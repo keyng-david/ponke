@@ -37,18 +37,18 @@ export const useAuth = () => {
         const response = await createRequest<{
           score: number;
           available_clicks: number;
-          wallet: string | null;  // allow wallet to be null
+          wallet: string | null;
           level: number;
         }>({
           url: "game/auth",
           method: "POST",
+          setLocalDebugMessage: setError,  // Pass setError for debugging
         });
 
         if (!response.error) {
           clickerModel.valueInited(response.payload.score);
           clickerModel.availableInited(response.payload.available_clicks);
 
-          // Check if wallet data is present, but don't block navigation if it's empty
           if (response.payload.wallet) {
             wallet.updateWallet(response.payload.wallet);
           }
