@@ -3,11 +3,11 @@ import {createRequest} from "@/shared/lib/api/createRequest";
 
 export const earnApi: EarnApi = {
     getData: async () => await createRequest({
-        url: 'game/tasks',
+        endpoint: 'game/tasks',
         method: 'GET',
     }),
     taskJoined: async data => await createRequest({
-        url: 'game/completeTask',
+        endpoint: 'game/completeTask',
         method: "POST",
         data,
     })
