@@ -1,0 +1,41 @@
+import { createClient } from '@supabase/supabase-js';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const jwtSecret = process.env.JWT_SECRET;
+
+if (!supabaseUrl || !supabaseKey || !jwtSecret) {
+  throw new Error('Environment variables SUPABASE_URL, SUPABASE_KEY, and JWT_SECRET must be defined');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+export default async function leadersHandler(req: any, res: any) {
+  const { authorization } = req.headers;
+
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    return res.status(401).json({ error: true, message: 'Unauthorized' });
+  }
+
+  const token = authorization.split(' ')[1];
+  let decoded: JwtPayload;
+
+  try {
+    decoded = jwt.verify(token, jwtSecret) as JwtPayload;
+  } catch (err) {
+    return res.status(401).json({ error: true, message: 'Invalid token' });
+  }
+
+  const { data: leaders, error } = await supabase
+    .from('leaders')
+    .select('*')
+    .order('score', { ascending: false })
+    .limit(10);
+
+  if (error) {
+    return res.status(500).json({ error: true, message: 'Database error', details: error.message });
+  }
+
+  return res.status(200).json({ error: false, payload: { leaders } });
+}
