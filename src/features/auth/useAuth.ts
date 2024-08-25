@@ -1,65 +1,38 @@
-import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { clickerModel } from "../clicker/model";
-import { useJWTToken } from "@/shared/model/jwt";
-import { createRequest } from "@/shared/lib/api/createRequest";
-import { createEvent, createStore } from "effector";
-import { useUnit } from "effector-react";
-import { walletModel } from "@/shared/model/wallet";
-import { randModel } from "@/shared/model/rang"; // Corrected import from rang to rand
-import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
-
-const setIsAuth = createEvent<boolean>();
-
-const $isAuth = createStore(false).on(setIsAuth, (_, isAuth) => isAuth);
-
-export const useAuth = () => {
-  const navigate = useNavigate();
-  const isAuth = useUnit($isAuth);
-  const jwtTokenStore = useJWTToken();
-  const wallet = walletModel.useWalletModel();
-  const rang = randModel.useRang(); // Corrected from rangModel to randModel
-  const { setError } = useErrorHandler();
-
-  const initialize = useCallback(async () => {
-    if (isAuth) {
-      return; // Exit early if already authenticated
+import { useCallback } from "react"; import { useNavigate } from "react-router-dom"; import { clickerModel } from "../clicker/model"; import { useJWTToken } from "@/shared/model/jwt"; import { createRequest } from "@/shared/lib/api/createRequest"; import { createEvent, createStore } from "effector"; import { useUnit } from "effector-react"; import { walletModel } from "@/shared/model/wallet"; import { randModel } from "@/shared/model/rang"; import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";const setIsAuth = createEvent();const $isAuth = createStore(false).on(setIsAuth, () => true);export const useAuth = () => { const navigate = useNavigate(); const isAuth = useUnit($isAuth); const jwtTokenStore = useJWTToken(); const wallet = walletModel.useWalletModel(); const rangModel = randModel.useRang(); const { setError } = useErrorHandler();const initialize = useCallback(async () => { try { if (!isAuth) { const urlParams = new URLSearchParams(window.location.search); const token = urlParams.get("token");if (token) {
+      jwtTokenStore.set(token);
+    } else {
+      setError("No token found");
+      return;
     }
 
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get("token");
+    const response = await createRequest<{
+      score: number;
+      available_clicks: number;
+      wallet: string | null;  // allow wallet to be null
+      level: number;
+    }>({
+      url: "game/auth",
+      method: "POST",
+    });
 
-      if (!token) {
-        throw new Error("Token is missing from URL parameters");
+    if (!response.error) {
+      clickerModel.valueInited(response.payload.score);
+      clickerModel.availableInited(response.payload.available_clicks);
+
+      // Check if wallet data is present, but don't block navigation if it's empty
+      if (response.payload.wallet) {
+        wallet.updateWallet(response.payload.wallet);
       }
 
-      const response = await createRequest({
-        endpoint: "game/auth",
-        method: "POST",
-        body: { token },
-        onError: setError, // Pass setError for debugging
-      });
-
-      if (response.error) {
-        throw new Error(response.error);
-      }
-
-      jwtTokenStore.setJWTToken(response.data.token);
-      wallet.setWallet(response.data.wallet);
-      rang.setRang(response.data.rang);
-      clickerModel.setClickerData(response.data.clickerData);
-
+      rangModel.update(response.payload.level);
+      navigate("/main");
       setIsAuth(true);
-      navigate("/home");
-    } catch (error: any) {
-      setError(error.message || "An unknown error occurred during authentication");
-      setIsAuth(false);
+    } else {
+      jwtTokenStore.remove();
+      setError("Authentication failed, invalid response");
     }
-  }, [isAuth, jwtTokenStore, wallet, rang, clickerModel, setError, navigate]);
-
-  return {
-    initialize,
-    isAuth,
-  };
-};
+  }
+} catch (e) {
+  jwtTokenStore.remove();
+  setError(`Error during authentication: ${e instanceof Error ? e.message : String(e)}`);
+}}, [isAuth, jwtTokenStore, wallet, rangModel, navigate, setError]);return { initialize, }; };
