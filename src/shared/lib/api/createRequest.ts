@@ -8,6 +8,8 @@ export type FailureResponse = {
   payload: null;
 };
 
+export type ResponseDefault<T> = SuccessResponse<T> | FailureResponse
+
 export async function createRequest<T>({
   endpoint,
   method = "GET",
