@@ -9,6 +9,6 @@ export const earnApi: EarnApi = {
     taskJoined: async data => await createRequest({
         endpoint: 'game/completeTask',
         method: "POST",
-        data,
+        body,
     })
 }
