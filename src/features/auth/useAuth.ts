@@ -6,12 +6,11 @@ import { createRequest } from "@/shared/lib/api/createRequest";
 import { createEvent, createStore } from "effector";
 import { useUnit } from "effector-react";
 import { walletModel } from "@/shared/model/wallet";
-import { rangModel } from "@/shared/model/rang"; // Fixed typo from randModel to rangModel
+import { rangModel } from "@/shared/model/rang"; // Ensure this is correctly exported from rang.ts
 import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
 
 const setIsAuth = createEvent<boolean>();
 
-// Updated to store and handle the actual authentication status
 const $isAuth = createStore(false).on(setIsAuth, (_, isAuth) => isAuth);
 
 export const useAuth = () => {
@@ -19,7 +18,7 @@ export const useAuth = () => {
   const isAuth = useUnit($isAuth);
   const jwtTokenStore = useJWTToken();
   const wallet = walletModel.useWalletModel();
-  const rang = rangModel.useRang(); // Updated to match the correct naming convention
+  const rang = rangModel.useRang();
   const { setError } = useErrorHandler();
 
   const initialize = useCallback(async () => {
