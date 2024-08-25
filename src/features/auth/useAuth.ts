@@ -39,11 +39,13 @@ export const useAuth = () => {
           available_clicks: number;
           wallet: string | null;
           level: number;
-        }>({
-          url: "game/auth",
-          method: "POST",
-          setLocalDebugMessage: setError,  // Pass setError for debugging
-        });
+        }>(
+          "game/auth",
+          {
+            method: "POST",
+          },
+          setError // Pass setError for debugging
+        );
 
         if (!response.error) {
           clickerModel.valueInited(response.payload.score);
