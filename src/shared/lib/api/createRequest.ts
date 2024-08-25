@@ -19,7 +19,7 @@ export async function createRequest<T>({
   endpoint: string;
   method?: string;
   body?: any;
-  onError?: (error: any) => void;
+  onError?: ((error: any) => void) | null;  // Allow onError to be null
 }): Promise<ResponseDefault<T>> {
   try {
     const response = await fetch(endpoint, {
