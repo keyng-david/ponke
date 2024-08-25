@@ -10,41 +10,37 @@ export type FailureResponse = {
 
 export type ResponseDefault<T> = SuccessResponse<T> | FailureResponse;
 
-export async function createRequest<T>(data: {
-  url: string;
-  method: "POST" | "GET" | "PUT" | "DELETE";
-  data?: Record<string, unknown>;
-}): Promise<ResponseDefault<T>> {
+export async function createRequest({
+  endpoint,
+  method = "GET",
+  body = null,
+  onError = null,
+}: {
+  endpoint: string;
+  method?: string;
+  body?: any;
+  onError?: (error: any) => void;
+}) {
   try {
-    const token = await localStorage.getItem("jwt-token");
-
-    const url = `/api/${data.url}`;
-
-    const response = await fetch(url, {
+    const response = await fetch(endpoint, {
+      method,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
-      method: data.method,
-      ...(data.data && {
-        body: JSON.stringify(data.data),
-      }),
+      body: body ? JSON.stringify(body) : null,
     });
 
-    const payload = await response.json() as T;
+    const data = await response.json();
 
-    if (response.ok) {
-      return {
-        error: false,
-        payload,
-      };
-    } else {
-      throw new Error(payload as any); // Replace with more descriptive error handling if needed
+    if (!response.ok) {
+      throw new Error(data.message || "API request failed");
     }
-  } catch (error) {
-    return {
-      error: true,
-      payload: null,
-    };
+
+    return { data };
+  } catch (error: any) {
+    if (onError) {
+      onError(error.message || "An unknown error occurred during the API request");
+    }
+    return { error: error.message || "An unknown error occurred" };
   }
 }
