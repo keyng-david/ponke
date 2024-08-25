@@ -33,14 +33,15 @@ module.exports = async function authHandler(req, res) {
 
   const userId = decoded.id;
 
-  const { data: friendsData, error } = await supabase
-    .from('friends')
-    .select('*')
-    .eq('user_id', userId);
+  const { data: userData, error } = await supabase
+    .from('users')
+    .select('score, available_clicks, wallet, level')
+    .eq('user_id', userId)
+    .single();  // Use single() to fetch a single record, assuming user_id is unique
 
-  if (error) {
-    return res.status(500).json({ error: true, message: 'Database error', details: error.message });
+  if (error || !userData) {
+    return res.status(500).json({ error: true, message: 'Database error', details: error ? error.message : 'User not found' });
   }
 
-  return res.status(200).json({ error: false, payload: friendsData });
+  return res.status(200).json({ error: false, payload: userData });
 };
