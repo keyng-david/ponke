@@ -37,9 +37,10 @@ module.exports = async function authHandler(req, res) {
     .from('users')
     .select('score, available_clicks, wallet, level')
     .eq('telegram_id', telegramId)
-    .single();  // Use single() to fetch a single record, assuming user_id is unique
+    .single();  // Use single() to fetch a single record, assuming telegram_id is unique
 
   if (error || !userData) {
+    console.error('Database error:', error.message);
     return res.status(500).json({ error: true, message: 'Database error', details: error ? error.message : 'User not found' });
   }
 
