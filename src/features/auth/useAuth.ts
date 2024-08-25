@@ -6,7 +6,7 @@ import { createRequest } from "@/shared/lib/api/createRequest";
 import { createEvent, createStore } from "effector";
 import { useUnit } from "effector-react";
 import { walletModel } from "@/shared/model/wallet";
-import { randModel } from "@/shared/model/rand"; // Corrected import from rang to rand
+import { randModel } from "@/shared/model/rang"; // Corrected import from rang to rand
 import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
 
 const setIsAuth = createEvent<boolean>();
