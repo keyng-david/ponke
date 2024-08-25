@@ -38,36 +38,36 @@ export const useConnectTon = () => {
     }, [tonConnectUI, firstProofLoading]);
 
     async function checkProof(
-        proof: TonProofItemReplySuccess["proof"],
-        account: Account
-    ) {
-        try {
-            const checkResponse = await createRequest({
-                endpoint: 'wallet/checkProof',
-                method: 'POST',
-                data: {
-                    address: account.address,
-                    network: account.chain,
-                    public_key: account.publicKey,
-                    proof: {
-                        ...proof,
-                        domain: {
-                            ...proof.domain,
-                            length_bytes: proof.domain.lengthBytes,
-                        },
-                        state_init: account.walletStateInit,
-                    }
+    proof: TonProofItemReplySuccess["proof"],
+    account: Account
+) {
+    try {
+        const checkResponse = await createRequest({
+            endpoint: 'wallet/checkProof',
+            method: 'POST',
+            body: {  // Change 'data' to 'body'
+                address: account.address,
+                network: account.chain,
+                public_key: account.publicKey,
+                proof: {
+                    ...proof,
+                    domain: {
+                        ...proof.domain,
+                        length_bytes: proof.domain.lengthBytes,
+                    },
+                    state_init: account.walletStateInit,
                 }
-            })
-
-            if (checkResponse.error) {
-                await tonConnectUI.disconnect()
-                return
             }
-        } catch (e) {
-            console.log(`${e}`)
+        });
+
+        if (checkResponse.error) {
+            await tonConnectUI.disconnect();
+            return;
         }
+    } catch (e) {
+        console.log(`${e}`);
     }
+}
 
     const updateStatusListener = useCallback(() => {
         tonConnectUI.onStatusChange(async v => {
