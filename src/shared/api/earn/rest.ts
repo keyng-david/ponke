@@ -10,5 +10,6 @@ export const earnApi: EarnApi = {
         endpoint: 'game/completeTask',
         method: "POST",
         body,
+        onError: undefined // or provide a function
     })
 }
