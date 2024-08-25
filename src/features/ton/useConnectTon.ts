@@ -18,7 +18,7 @@ export const useConnectTon = () => {
             const response = await createRequest<{
                 payload: string
             }>({
-                url: 'wallet/generatePayload',
+                endpoint: 'wallet/generatePayload',
                 method: 'GET'
             })
 
