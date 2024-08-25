@@ -19,10 +19,10 @@ function App() {
     });
 
   return (
-    <TonConnectUIProvider 
-        manifestUrl='https://nftcollector.ru/tonconnect/tonconnect.json'
+       <TonConnectUIProvider 
+        manifestUrl= 'https://ponke-alpha.vercel.app/tonconnet.json'
         actionsConfiguration={{
-            twaReturnUrl: 'https://t.me/ponke_test_bot'
+            twaReturnUrl: 'https://t.me/Keyng_test_bot'
         }}
     >
         <SocketProvider>
