@@ -9,7 +9,6 @@ import { walletModel } from "@/shared/model/wallet";
 import { randModel } from "@/shared/model/rang";
 import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
 
-// Event and store to manage authentication state, modified to use boolean
 const setIsAuth = createEvent<boolean>();
 const $isAuth = createStore(false).on(setIsAuth, (_, value) => value);
 
@@ -37,10 +36,10 @@ export const useAuth = () => {
         const response = await createRequest<{
           score: number;
           available_clicks: number;
-          wallet: string | null; // allow wallet to be null
+          wallet: string | null;
           level: number;
         }>({
-          endpoint: "game/auth",
+          endpoint: "/api/game/auth", // Use relative endpoint
           method: "POST",
         });
 
@@ -48,14 +47,13 @@ export const useAuth = () => {
           clickerModel.valueInited(response.payload.score);
           clickerModel.availableInited(response.payload.available_clicks);
 
-          // Check if wallet data is present, but don't block navigation if it's empty
           if (response.payload.wallet) {
             wallet.updateWallet(response.payload.wallet);
           }
 
           rangModel.update(response.payload.level);
           navigate("/main");
-          setIsAuth(true); // Pass boolean
+          setIsAuth(true);
         } else {
           jwtTokenStore.remove();
           setError("Authentication failed, invalid response");
