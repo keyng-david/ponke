@@ -6,7 +6,7 @@ import { createRequest } from "@/shared/lib/api/createRequest";
 import { createEvent, createStore } from "effector";
 import { useUnit } from "effector-react";
 import { walletModel } from "@/shared/model/wallet";
-import { rangModel } from "@/shared/model/rang"; // Ensure this is correctly exported from rang.ts
+import { randModel } from "@/shared/model/rang"; // Corrected import from rang to rand
 import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
 
 const setIsAuth = createEvent<boolean>();
@@ -18,7 +18,7 @@ export const useAuth = () => {
   const isAuth = useUnit($isAuth);
   const jwtTokenStore = useJWTToken();
   const wallet = walletModel.useWalletModel();
-  const rang = rangModel.useRang();
+  const rang = randModel.useRang(); // Corrected from rangModel to randModel
   const { setError } = useErrorHandler();
 
   const initialize = useCallback(async () => {
@@ -63,7 +63,7 @@ export const useAuth = () => {
         wallet.updateWallet(response.payload.wallet);
       }
 
-      rang.update(response.payload.level);
+      rang.update(response.payload.level); // Corrected usage of rang to rand
       setIsAuth(true);
       navigate("/main");
     } catch (e) {
