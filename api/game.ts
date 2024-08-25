@@ -25,7 +25,7 @@ export default async function handler(req: any, res: any) {
   let decoded: string | JwtPayload;
 
   try {
-    decoded = jwt.verify(token, jwtSecret!) as JwtPayload;
+    decoded = jwt.verify(token, jwtSecret) as JwtPayload;
   } catch (err) {
     return res.status(401).json({ error: true, message: 'Invalid token' });
   }
@@ -78,7 +78,7 @@ export default async function handler(req: any, res: any) {
           // Generate JWT token
           const token = jwt.sign(
             { id: user.id, username: user.username },
-            jwtSecret!,
+            jwtSecret,
             { expiresIn: '1h' }
           );
           return res.status(200).json({ error: false, token });
@@ -87,9 +87,9 @@ export default async function handler(req: any, res: any) {
           const { data: task, error } = await supabase.from('tasks').select('*').eq('id', id).eq('user_id', userId).single();
 
           if (error || !task) {
-            return res.status(500).json({ error: true, message: 'Task not found', details: error.message });
+            return res.status(500).json({ error: true, message: 'Task not found', details: error?.message || "Task not found" });
           }
-          
+
           // Task completion logic
           // Assuming there's a `completed` field in the task and we set it to true
           const { data: updatedTask, error: updateError } = await supabase
@@ -109,7 +109,7 @@ export default async function handler(req: any, res: any) {
       default:
         return res.status(405).json({ error: true, message: 'Method not allowed' });
     }
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({ error: true, message: 'Server error', details: error.message });
   }
 }
