@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+const { createClient } = require('@supabase/supabase-js');
+const jwt = require('jsonwebtoken');
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -11,7 +11,7 @@ if (!supabaseUrl || !supabaseKey || !jwtSecret) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-export default async function leadersHandler(req: any, res: any) {
+module.exports = async function leadersHandler(req, res) {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
@@ -19,10 +19,10 @@ export default async function leadersHandler(req: any, res: any) {
   }
 
   const token = authorization.split(' ')[1];
-  let decoded: JwtPayload;
+  let decoded;
 
   try {
-    decoded = jwt.verify(token, jwtSecret) as JwtPayload;
+    decoded = jwt.verify(token, jwtSecret);
   } catch (err) {
     return res.status(401).json({ error: true, message: 'Invalid token' });
   }
@@ -38,4 +38,4 @@ export default async function leadersHandler(req: any, res: any) {
   }
 
   return res.status(200).json({ error: false, payload: { leaders } });
-}
+};
