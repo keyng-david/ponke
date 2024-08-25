@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+const { createClient } = require('@supabase/supabase-js');
+const jwt = require('jsonwebtoken');
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -11,7 +11,7 @@ if (!supabaseUrl || !supabaseKey || !jwtSecret) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-export default async function tasksHandler(req: any, res: any) {
+module.exports = async function tasksHandler(req, res) {
   const { method, body } = req;
   const { id } = body;
 
@@ -22,10 +22,10 @@ export default async function tasksHandler(req: any, res: any) {
   }
 
   const token = authorization.split(' ')[1];
-  let decoded: JwtPayload;
+  let decoded;
 
   try {
-    decoded = jwt.verify(token, jwtSecret) as JwtPayload;
+    decoded = jwt.verify(token, jwtSecret);
   } catch (err) {
     return res.status(401).json({ error: true, message: 'Invalid token' });
   }
@@ -33,7 +33,10 @@ export default async function tasksHandler(req: any, res: any) {
   const userId = decoded.id;
 
   if (method === 'GET') {
-    const { data: tasks, error } = await supabase.from('tasks').select('*').eq('user_id', userId);
+    const { data: tasks, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('user_id', userId);
 
     if (error) {
       return res.status(500).json({ error: true, message: 'Database error', details: error.message });
@@ -41,10 +44,15 @@ export default async function tasksHandler(req: any, res: any) {
 
     return res.status(200).json({ error: false, payload: { tasks } });
   } else if (method === 'POST') {
-    const { data: task, error } = await supabase.from('tasks').select('*').eq('id', id).eq('user_id', userId).single();
+    const { data: task, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('id', id)
+      .eq('user_id', userId)
+      .single();
 
     if (error || !task) {
-      return res.status(500).json({ error: true, message: 'Task not found', details: error?.message || "Task not found" });
+      return res.status(500).json({ error: true, message: 'Task not found', details: error?.message || 'Task not found' });
     }
 
     const { data: updatedTask, error: updateError } = await supabase
@@ -59,4 +67,4 @@ export default async function tasksHandler(req: any, res: any) {
 
     return res.status(200).json({ error: false, payload: { message: 'Task completed' } });
   }
-}
+};
