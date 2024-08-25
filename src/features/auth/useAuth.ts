@@ -6,68 +6,72 @@ import { createRequest } from "@/shared/lib/api/createRequest";
 import { createEvent, createStore } from "effector";
 import { useUnit } from "effector-react";
 import { walletModel } from "@/shared/model/wallet";
-import { randModel } from "@/shared/model/rang";
+import { rangModel } from "@/shared/model/rang"; // Fixed typo from randModel to rangModel
 import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
 
 const setIsAuth = createEvent<boolean>();
 
-const $isAuth = createStore(false).on(setIsAuth, () => true);
+// Updated to store and handle the actual authentication status
+const $isAuth = createStore(false).on(setIsAuth, (_, isAuth) => isAuth);
 
 export const useAuth = () => {
   const navigate = useNavigate();
   const isAuth = useUnit($isAuth);
   const jwtTokenStore = useJWTToken();
   const wallet = walletModel.useWalletModel();
-  const rangModel = randModel.useRang();
+  const rang = rangModel.useRang(); // Updated to match the correct naming convention
   const { setError } = useErrorHandler();
 
   const initialize = useCallback(async () => {
-    try {
-      if (!isAuth) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get("token");
-
-        if (token) {
-          jwtTokenStore.set(token);
-        } else {
-          setError("No token found");
-          return;
-        }
-
-        const response = await createRequest<{
-          score: number;
-          available_clicks: number;
-          wallet: string | null;
-          level: number;
-        }>(
-          "game/auth",
-          {
-            method: "POST",
-          },
-          setError // Pass setError for debugging
-        );
-
-        if (!response.error) {
-          clickerModel.valueInited(response.payload.score);
-          clickerModel.availableInited(response.payload.available_clicks);
-
-          if (response.payload.wallet) {
-            wallet.updateWallet(response.payload.wallet);
-          }
-
-          rangModel.update(response.payload.level);
-          navigate("/main");
-          setIsAuth(true);
-        } else {
-          jwtTokenStore.remove();
-          setError("Authentication failed, invalid response");
-        }
-      }
-    } catch (e) {
-      jwtTokenStore.remove();
-      setError(`Error during authentication: ${e instanceof Error ? e.message : String(e)}`);
+    if (isAuth) {
+      return; // Exit early if already authenticated
     }
-  }, [isAuth, jwtTokenStore, wallet, rangModel, navigate, setError]);
+
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get("token");
+
+      if (!token) {
+        setError("No token found");
+        return;
+      }
+
+      jwtTokenStore.set(token);
+
+      const response = await createRequest<{
+        score: number;
+        available_clicks: number;
+        wallet: string | null;
+        level: number;
+      }>(
+        "game/auth",
+        {
+          method: "POST",
+        },
+        setError // Pass setError for debugging
+      );
+
+      if (response.error) {
+        setError("Authentication failed, invalid response");
+        jwtTokenStore.remove();
+        return;
+      }
+
+      clickerModel.valueInited(response.payload.score);
+      clickerModel.availableInited(response.payload.available_clicks);
+
+      if (response.payload.wallet) {
+        wallet.updateWallet(response.payload.wallet);
+      }
+
+      rang.update(response.payload.level);
+      setIsAuth(true);
+      navigate("/main");
+    } catch (e) {
+      setError(`Error during authentication: ${e instanceof Error ? e.message : String(e)}`);
+      jwtTokenStore.remove();
+    }
+  }, [isAuth, jwtTokenStore, wallet, rang, navigate, setError]);
 
   return {
     initialize,
