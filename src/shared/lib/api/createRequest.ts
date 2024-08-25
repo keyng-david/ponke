@@ -10,7 +10,7 @@ export type FailureResponse = {
 
 export type ResponseDefault<T> = SuccessResponse<T> | FailureResponse;
 
-export async function createRequest({
+export async function createRequest<T>({
   endpoint,
   method = "GET",
   body = null,
@@ -20,7 +20,7 @@ export async function createRequest({
   method?: string;
   body?: any;
   onError?: (error: any) => void;
-}) {
+}): Promise<ResponseDefault<T>> {
   try {
     const response = await fetch(endpoint, {
       method,
@@ -36,11 +36,15 @@ export async function createRequest({
       throw new Error(data.message || "API request failed");
     }
 
-    return { data };
+    return { error: false, payload: data };
   } catch (error: any) {
+    // Log the error to Vercel
+    console.error(`Error in createRequest: ${error.message || "Unknown error"}`);
+
     if (onError) {
       onError(error.message || "An unknown error occurred during the API request");
     }
-    return { error: error.message || "An unknown error occurred" };
+
+    return { error: true, payload: null };
   }
 }
