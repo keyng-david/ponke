@@ -18,7 +18,7 @@ export const useConnectTon = () => {
             const response = await createRequest<{
                 payload: string
             }>({
-                endpoint: 'wallet/generatePayload',
+                endpoint: '/api/wallet/generatePayload',
                 method: 'GET'
             })
 
@@ -43,7 +43,7 @@ export const useConnectTon = () => {
 ) {
     try {
         const checkResponse = await createRequest({
-            endpoint: 'wallet/checkProof',
+            endpoint: '/api/wallet/checkProof',
             method: 'POST',
             body: {  // Change 'data' to 'body'
                 address: account.address,
