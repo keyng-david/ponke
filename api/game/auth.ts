@@ -12,6 +12,10 @@ if (!supabaseUrl || !supabaseKey || !jwtSecret) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = async function authHandler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: true, message: 'Method Not Allowed' });
+  }
+
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
