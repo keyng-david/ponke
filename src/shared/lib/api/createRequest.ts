@@ -8,7 +8,7 @@ export type FailureResponse = {
   payload: null;
 };
 
-export type ResponseDefault<T> = SuccessResponse<T> | FailureResponse
+export type ResponseDefault<T> = SuccessResponse<T> | FailureResponse;
 
 export async function createRequest<T>({
   endpoint,
@@ -33,20 +33,23 @@ export async function createRequest<T>({
       body: body ? JSON.stringify(body) : null,
     });
 
+    // Handle non-JSON responses and errors
+    if (!response.ok) {
+      const errorText = await response.text();
+      if (onError) {
+        onError(errorText || "API request failed");
+      }
+      return { error: true, payload: null };
+    }
+
+    // Parse JSON response
     let data: T | null = null;
     try {
       data = await response.json();
     } catch (parseError) {
-      if (parseError instanceof Error) {
-        console.error(`Error parsing JSON response: ${parseError.message}`);
-      } else {
-        console.error("Error parsing JSON response: Unknown error");
-      }
-    }
-
-    if (!response.ok) {
+      console.error(`Error parsing JSON response: ${parseError instanceof Error ? parseError.message : "Unknown error"}`);
       if (onError) {
-        onError(data ? (data as any).message || "API request failed" : "API request failed");
+        onError("Failed to parse JSON response");
       }
       return { error: true, payload: null };
     }
@@ -54,11 +57,9 @@ export async function createRequest<T>({
     return { error: false, payload: data as T };
   } catch (error: any) {
     console.error(`Error in createRequest: ${error.message || "Unknown error"}`);
-
     if (onError) {
       onError(error.message || "An unknown error occurred during the API request");
     }
-
     return { error: true, payload: null };
   }
 }
