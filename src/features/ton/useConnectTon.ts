@@ -43,7 +43,7 @@ export const useConnectTon = () => {
     ) {
         try {
             const checkResponse = await createRequest({
-                url: 'wallet/checkProof',
+                endpoint: 'wallet/checkProof',
                 method: 'POST',
                 data: {
                     address: account.address,
