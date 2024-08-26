@@ -2,14 +2,20 @@ const { Telegraf } = require('telegraf');
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { createUserIfNotExists, updateSessionId } = require('./user'); // Import the user module
+const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 
 const BOT_TOKEN = process.env.BOT_TOKEN || '';
 const SERVER_URL = process.env.SERVER_URL || '';
 const FRONTEND_URL = process.env.FRONTEND_URL || '';
+const SUPABASE_URL = process.env.SUPABASE_URL || ''; // Add your Supabase URL
+const SUPABASE_KEY = process.env.SUPABASE_KEY || ''; // Add your Supabase Anon Key
 
-if (!BOT_TOKEN || !SERVER_URL || !FRONTEND_URL) {
-  throw new Error('BOT_TOKEN, SERVER_URL, and FRONTEND_URL must be set');
+if (!BOT_TOKEN || !SERVER_URL || !FRONTEND_URL || !SUPABASE_URL || !SUPABASE_KEY) {
+  throw new Error('BOT_TOKEN, SERVER_URL, FRONTEND_URL, SUPABASE_URL, and SUPABASE_KEY must be set');
 }
+
+// Initialize Supabase client
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const bot = new Telegraf(BOT_TOKEN);
 
@@ -29,10 +35,15 @@ bot.start(async (ctx) => {
     let sessionId = user.session_id;
     if (!sessionId) {
       sessionId = uuidv4();
-      await supabase
+      const { error: updateError } = await supabase
         .from('users')
         .update({ session_id: sessionId })
         .eq('telegram_id', userId);
+
+      if (updateError) {
+        console.error("Error updating session ID:", updateError);
+        return ctx.reply("Sorry, something went wrong. Please try again later.");
+      }
     }
 
     const frontendUrl = `${FRONTEND_URL}/?session_id=${sessionId}`;
