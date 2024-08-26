@@ -17,14 +17,14 @@ module.exports = async function authHandler(req, res) {
     return res.status(405).json({ error: true, message: 'Method Not Allowed' });
   }
 
-  const { authorization } = req.headers;
+  // Extract the session ID from the request body
+  const { sessionId } = req.body;
 
-  if (!authorization || !authorization.startsWith('Session ')) {
-    console.log('Unauthorized access attempt, missing or invalid Authorization header');  // Log unauthorized attempts
-    return res.status(401).json({ error: true, message: 'Unauthorized' });
+  if (!sessionId) {
+    console.log('Unauthorized access attempt, missing session ID in body');  // Log unauthorized attempts
+    return res.status(401).json({ error: true, message: 'Unauthorized, session ID is required' });
   }
 
-  const sessionId = authorization.split(' ')[1];
   console.log('Fetching data for session_id:', sessionId);  // Log the session ID being used in the query
 
   const { data: userData, error } = await supabase
