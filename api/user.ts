@@ -9,11 +9,6 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-/**
- * Create or fetch a user based on their Telegram ID.
- * @param {number} telegramId - The user's Telegram ID.
- * @returns {Promise<{ error?: string, data?: any }>} - The user data or an error message.
- */
 module.exports.createUserIfNotExists = async function (telegramId) {
   try {
     // Fetch existing user
@@ -56,4 +51,28 @@ module.exports.createUserIfNotExists = async function (telegramId) {
     console.error('Error handling user creation:', err);
     return { error: 'An unexpected error occurred.' };
   }
-}
+};
+
+/**
+ * Update the session ID for a given user.
+ * @param {number} telegramId - The user's Telegram ID.
+ * @param {string} sessionId - The new session ID.
+ * @returns {Promise<string | null>} - An error message or null if successful.
+ */
+module.exports.updateSessionId = async function (telegramId, sessionId) {
+  try {
+    const { error } = await supabase
+      .from('users')
+      .update({ session_id: sessionId })
+      .eq('telegram_id', telegramId);
+
+    if (error) {
+      return error.message;
+    }
+    
+    return null;
+  } catch (err) {
+    console.error('Error updating session ID:', err);
+    return 'An unexpected error occurred.';
+  }
+};
