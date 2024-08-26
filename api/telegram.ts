@@ -1,29 +1,22 @@
 const { Telegraf } = require('telegraf');
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-const { createUserIfNotExists } = require('./user'); // Import the user module
+const { createUserIfNotExists, updateSessionId } = require('./user'); // Import the user module
 
 const BOT_TOKEN = process.env.BOT_TOKEN || '';
 const SERVER_URL = process.env.SERVER_URL || '';
 const FRONTEND_URL = process.env.FRONTEND_URL || '';
-const JWT_SECRET = process.env.JWT_SECRET || '';
 
-if (!BOT_TOKEN || !SERVER_URL || !FRONTEND_URL || !JWT_SECRET) {
-  throw new Error('BOT_TOKEN, SERVER_URL, FRONTEND_URL, and JWT_SECRET must be set');
+if (!BOT_TOKEN || !SERVER_URL || !FRONTEND_URL) {
+  throw new Error('BOT_TOKEN, SERVER_URL, and FRONTEND_URL must be set');
 }
 
 const bot = new Telegraf(BOT_TOKEN);
 
-function generateToken(userId) {
-  const payload = { sub: userId, id: uuidv4() };
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
-}
-
 bot.start(async (ctx) => {
   try {
     const userId = ctx.from?.id;
-    
+
     // Create or fetch the user in the database
     const { data: user, error } = await createUserIfNotExists(userId);
 
@@ -32,9 +25,17 @@ bot.start(async (ctx) => {
       return ctx.reply("Sorry, something went wrong. Please try again later.");
     }
 
-    // Generate token after ensuring user data is stored
-    const token = generateToken(userId);
-    const frontendUrl = `${FRONTEND_URL}/?token=${token}`;
+    // Check if the user has a session ID, generate one if not
+    let sessionId = user.session_id;
+    if (!sessionId) {
+      sessionId = uuidv4();
+      await supabase
+        .from('users')
+        .update({ session_id: sessionId })
+        .eq('telegram_id', userId);
+    }
+
+    const frontendUrl = `${FRONTEND_URL}/?session_id=${sessionId}`;
     const inlineKeyboard = {
       inline_keyboard: [
         [{ text: "💎 Play 💎", url: frontendUrl }],
