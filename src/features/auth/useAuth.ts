@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { clickerModel } from "../clicker/model";
-import { useJWTToken } from "@/shared/model/jwt";
+import { useSessionId } from "@/shared/model/session"; // Replace useJWTToken with useSessionId
 import { createRequest } from "@/shared/lib/api/createRequest";
 import { createEvent, createStore } from "effector";
 import { useUnit } from "effector-react";
@@ -15,7 +15,7 @@ const $isAuth = createStore(false).on(setIsAuth, (_, value) => value);
 export const useAuth = () => {
   const navigate = useNavigate();
   const isAuth = useUnit($isAuth);
-  const jwtTokenStore = useJWTToken();
+  const sessionIdStore = useSessionId(); // Use session ID instead of JWT token
   const wallet = walletModel.useWalletModel();
   const rangModel = randModel.useRang();
   const { setError } = useErrorHandler();
@@ -24,12 +24,12 @@ export const useAuth = () => {
     try {
       if (!isAuth) {
         const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get("token");
+        const sessionId = urlParams.get("session_id"); // Look for session_id in the URL
 
-        if (token) {
-          jwtTokenStore.set(token);
+        if (sessionId) {
+          sessionIdStore.set(sessionId); // Store session ID
         } else {
-          setError("No token found");
+          setError("No session ID found");
           return;
         }
 
@@ -41,6 +41,7 @@ export const useAuth = () => {
         }>({
           endpoint: "/api/game/auth", // Use relative endpoint
           method: "POST",
+          body: { session_id: sessionId }, // Pass session ID in the request body
         });
 
         if (!response.error) {
@@ -55,15 +56,15 @@ export const useAuth = () => {
           navigate("/main");
           setIsAuth(true);
         } else {
-          jwtTokenStore.remove();
+          sessionIdStore.remove();
           setError("Authentication failed, invalid response");
         }
       }
     } catch (e) {
-      jwtTokenStore.remove();
+      sessionIdStore.remove();
       setError(`Error during authentication: ${e instanceof Error ? e.message : String(e)}`);
     }
-  }, [isAuth, jwtTokenStore, wallet, rangModel, navigate, setError]);
+  }, [isAuth, sessionIdStore, wallet, rangModel, navigate, setError]);
 
   return { initialize };
 };
