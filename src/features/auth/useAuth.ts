@@ -21,50 +21,52 @@ export const useAuth = () => {
   const { setError } = useErrorHandler();
 
   const initialize = useCallback(async () => {
-    try {
-      if (!isAuth) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const sessionId = urlParams.get("session_id"); // Look for session_id in the URL
+  try {
+    if (!isAuth) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get("session_id");
 
-        if (sessionId) {
-          sessionIdStore.set(sessionId); // Store session ID
-        } else {
-          setError("No session ID found");
-          return;
-        }
-
-        const response = await createRequest<{
-          score: number;
-          available_clicks: number;
-          wallet: string | null;
-          level: number;
-        }>({
-          endpoint: "/api/game/auth", // Use relative endpoint
-          method: "POST",
-          body: { session_id: sessionId }, // Pass session ID in the request body
-        });
-
-        if (!response.error) {
-          clickerModel.valueInited(response.payload.score);
-          clickerModel.availableInited(response.payload.available_clicks);
-
-          if (response.payload.wallet) {
-            wallet.updateWallet(response.payload.wallet);
-          }
-
-          rangModel.update(response.payload.level);
-          navigate("/main");
-          setIsAuth(true);
-        } else {
-          sessionIdStore.remove();
-          setError("Authentication failed, invalid response");
-        }
+      if (sessionId) {
+        sessionIdStore.set(sessionId);
+      } else {
+        setError("No session ID found");
+        return;
       }
-    } catch (e) {
-      sessionIdStore.remove();
-      setError(`Error during authentication: ${e instanceof Error ? e.message : String(e)}`);
+
+      const response = await createRequest<{
+        score: number;
+        available_clicks: number;
+        wallet: string | null;
+        level: number;
+      }>({
+        endpoint: "/api/game/auth",
+        method: "POST",
+        headers: {
+          Authorization: `Session ${sessionId}`,  // Send session ID in the Authorization header
+        },
+      });
+
+      if (!response.error) {
+        clickerModel.valueInited(response.payload.score);
+        clickerModel.availableInited(response.payload.available_clicks);
+
+        if (response.payload.wallet) {
+          wallet.updateWallet(response.payload.wallet);
+        }
+
+        rangModel.update(response.payload.level);
+        navigate("/main");
+        setIsAuth(true);
+      } else {
+        sessionIdStore.remove();
+        setError("Authentication failed, invalid response");
+      }
     }
-  }, [isAuth, sessionIdStore, wallet, rangModel, navigate, setError]);
+  } catch (e) {
+    sessionIdStore.remove();
+    setError(`Error during authentication: ${e instanceof Error ? e.message : String(e)}`);
+  }
+}, [isAuth, sessionIdStore, wallet, rangModel, navigate, setError]);
 
   return { initialize };
 };
