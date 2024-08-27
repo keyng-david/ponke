@@ -23,7 +23,7 @@ export const useAuth = () => {
   const wallet = walletModel.useWalletModel();
   const rangModel = randModel.useRang();
   const { setError } = useErrorHandler();
-  const telegramId = useUnit($telegramId);  // Hook to retrieve telegram_id
+  const telegramId = useUnit($telegramId);
 
   const initialize = useCallback(async () => {
     try {
@@ -43,12 +43,12 @@ export const useAuth = () => {
           available_clicks: number;
           wallet: string | null;
           level: number;
-          telegram_id: string;  // Include telegram_id in the response type
+          telegram_id: string;
         }>({
           endpoint: "/api/game/auth",
           method: "POST",
           body: {
-            sessionId  // Send session ID in the body instead of headers
+            sessionId,
           },
         });
 
@@ -78,6 +78,5 @@ export const useAuth = () => {
     }
   }, [isAuth, sessionIdStore, wallet, rangModel, navigate, setError]);
 
-  // Return both the initialize method and the telegram_id
   return { initialize, telegramId };
 };
