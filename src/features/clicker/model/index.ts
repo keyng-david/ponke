@@ -1,8 +1,9 @@
+import axios from 'axios';
 import { createEvent, createStore, sample } from "effector";
 import { useUnit } from "effector-react";
 import { useSocket } from "@/app/socketProvider";
 import { useAuth } from "@/features/auth/useAuth";
-import axios from 'axios';
+import { useSessionId } from "@/shared/model/session"; // Import the session management
 
 export const MAX_AVAILABLE = 500;
 export const CLICK_STEP = 1;
@@ -15,6 +16,7 @@ const clicked = createEvent<{
     click_score: number,
     available_clicks: number,
 }>();
+
 const availableUpdated = createEvent<number>();
 const errorUpdated = createEvent<boolean>();
 
@@ -60,49 +62,59 @@ const useCanBeClicked = () => useUnit($canBeClicked);
 
 const useClicker = () => {
     const { sendMessage } = useSocket();
-    const { sessionId } = useSessionId();  // Use sessionId from session management
+    const { initialize } = useAuth(); // Get the initialize function from useAuth
+    const sessionIdStore = useSessionId(); // Use the session management to get the session ID
 
-    const value = useUnit($value);
-    const available = useUnit($available);
-    const canBeClicked = useUnit($canBeClicked);
-    const isMultiError = useUnit($isMultiAccount);
+    const value = useUnit(clickerModel.$value);
+    const available = useUnit(clickerModel.$available);
+    const canBeClicked = useUnit(clickerModel.$canBeClicked);
+    const isMultiAccountError = useUnit(clickerModel.$isMultiAccount);
 
-    function onClick() {
+    const onClick = async () => {
         sendMessage('click');
 
-        if (sessionId) {
-            axios.post('/api/game/updatePoints', {
+        // Ensure session ID is initialized before making API calls
+        const sessionId = sessionIdStore.get();
+
+        if (!sessionId) {
+            console.error('Session ID not available');
+            await initialize(); // Attempt to initialize the session if not already done
+            return;
+        }
+
+        try {
+            const response = await axios.post('/api/game/updatePoints', {
                 sessionId,  // Send session ID instead of telegram ID
                 points: value,
-            }).then(response => {
-                if (response.data.success) {
-                    console.log('Points updated successfully');
-                }
-            }).catch(error => {
-                console.error('Failed to update points:', error);
             });
-        } else {
-            console.error('Session ID not available');
+
+            if (response.data.success) {
+                console.log('Points updated successfully');
+            } else {
+                console.error('Failed to update points:', response.data.message);
+            }
+        } catch (error) {
+            console.error('Failed to update points:', error);
         }
-    }
+    };
 
     return {
         value,
         available,
         canBeClicked,
-        isMultiError,
+        isMultiAccountError,
         onClick,
     };
 };
 
+export default useClicker;
+
 export const clickerModel = {
     valueInited,
     availableInited,
-
     availableUpdated,
     clicked,
     errorUpdated,
-
     useCanBeClicked,
     useClicker,
 };
