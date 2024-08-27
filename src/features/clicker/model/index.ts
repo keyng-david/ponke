@@ -60,7 +60,7 @@ const useCanBeClicked = () => useUnit($canBeClicked);
 
 const useClicker = () => {
     const { sendMessage } = useSocket();
-    const telegramId = useUnit(useAuth().telegramId);  // Ensure telegramId is retrieved correctly
+    const { telegramId } = useAuth();  // Get the telegramId directly from useAuth
 
     const value = useUnit($value);
     const available = useUnit($available);
@@ -73,7 +73,7 @@ const useClicker = () => {
         if (telegramId) {
             axios.post('/api/game/updatePoints', {
                 telegram_id: telegramId,
-                points: value,
+                points: value,  // Use the value directly here
             }).then(response => {
                 if (response.data.success) {
                     console.log('Points updated successfully');
@@ -98,9 +98,11 @@ const useClicker = () => {
 export const clickerModel = {
     valueInited,
     availableInited,
+
     availableUpdated,
     clicked,
     errorUpdated,
+
     useCanBeClicked,
     useClicker,
 };
