@@ -1,68 +1,67 @@
 import { createEvent, createStore, sample } from "effector";
-import {useUnit} from "effector-react";
+import { useUnit } from "effector-react";
 import { useSocket } from "@/app/socketProvider";
-import {useAuth} from "@/features/auth/useAuth";
+import { useAuth } from "@/features/auth/useAuth";
 import axios from 'axios';
 
-export const MAX_AVAILABLE = 500
-export const CLICK_STEP = 1
+export const MAX_AVAILABLE = 500;
+export const CLICK_STEP = 1;
 
-const valueInited = createEvent<number>()
-const availableInited = createEvent<number>()
+const valueInited = createEvent<number>();
+const availableInited = createEvent<number>();
 
 const clicked = createEvent<{
     score: number,
     click_score: number,
     available_clicks: number,
-}>()
-const availableUpdated = createEvent<number>()
-const errorUpdated = createEvent<boolean>()
+}>();
+const availableUpdated = createEvent<number>();
+const errorUpdated = createEvent<boolean>();
 
-const $isMultiAccount = createStore(false)
-const $value = createStore(0)
-const $available = createStore(MAX_AVAILABLE)
+const $isMultiAccount = createStore(false);
+const $value = createStore(0);
+const $available = createStore(MAX_AVAILABLE);
 
-const $canBeClicked = $available.map(state => state >= CLICK_STEP)
+const $canBeClicked = $available.map(state => state >= CLICK_STEP);
 
 sample({
     clock: availableUpdated,
     target: $available
-})
+});
 
 sample({
     clock: clicked,
     fn: ({ score }) => score,
     target: $value,
-})
+});
 
 sample({
     clock: clicked,
     fn: ({ available_clicks }) => available_clicks,
     target: $available
-})
+});
 
 sample({
     clock: valueInited,
     target: $value,
-})
+});
 
 sample({
     clock: availableInited,
     target: $available,
-})
+});
 
 sample({
     clock: errorUpdated,
     target: $isMultiAccount
-})
+});
 
-const useCanBeClicked = () => useUnit($canBeClicked)
+const useCanBeClicked = () => useUnit($canBeClicked);
 
 const useClicker = () => {
     const { sendMessage } = useSocket();
-    const { telegramId } = useAuth();
+    const telegramId = useUnit(useAuth().telegramId);  // Ensure telegramId is retrieved correctly
 
-    // Retrieve the state values outside of the onClick function
     const value = useUnit($value);
     const available = useUnit($available);
     const canBeClicked = useUnit($canBeClicked);
@@ -74,7 +73,7 @@ const useClicker = () => {
         if (telegramId) {
             axios.post('/api/game/updatePoints', {
                 telegram_id: telegramId,
-                points: value,  // Use the value directly here
+                points: value,
             }).then(response => {
                 if (response.data.success) {
                     console.log('Points updated successfully');
@@ -99,11 +98,9 @@ const useClicker = () => {
 export const clickerModel = {
     valueInited,
     availableInited,
-
     availableUpdated,
     clicked,
     errorUpdated,
-
     useCanBeClicked,
     useClicker,
-}
+};
