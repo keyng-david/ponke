@@ -1,13 +1,17 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { createEvent, createStore } from "effector";
+import { useUnit } from "effector-react";
 import { clickerModel } from "../clicker/model";
 import { useSessionId } from "@/shared/model/session";
 import { createRequest } from "@/shared/lib/api/createRequest";
-import { createEvent, createStore } from "effector";
-import { useUnit } from "effector-react";
 import { walletModel } from "@/shared/model/wallet";
 import { randModel } from "@/shared/model/rang";
 import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
+
+// New event and store to manage telegram_id
+const setTelegramId = createEvent<string>();
+const $telegramId = createStore<string | null>(null).on(setTelegramId, (_, id) => id);
 
 const setIsAuth = createEvent<boolean>();
 const $isAuth = createStore(false).on(setIsAuth, (_, value) => value);
@@ -19,6 +23,7 @@ export const useAuth = () => {
   const wallet = walletModel.useWalletModel();
   const rangModel = randModel.useRang();
   const { setError } = useErrorHandler();
+  const telegramId = useUnit($telegramId);  // Hook to retrieve telegram_id
 
   const initialize = useCallback(async () => {
     try {
@@ -38,6 +43,7 @@ export const useAuth = () => {
           available_clicks: number;
           wallet: string | null;
           level: number;
+          telegram_id: string;  // Include telegram_id in the response type
         }>({
           endpoint: "/api/game/auth",
           method: "POST",
@@ -55,6 +61,10 @@ export const useAuth = () => {
           }
 
           rangModel.update(response.payload.level);
+
+          // Set telegram_id for global access
+          setTelegramId(response.payload.telegram_id);
+
           navigate("/main");
           setIsAuth(true);
         } else {
@@ -68,5 +78,6 @@ export const useAuth = () => {
     }
   }, [isAuth, sessionIdStore, wallet, rangModel, navigate, setError]);
 
-  return { initialize };
+  // Return both the initialize method and the telegram_id
+  return { initialize, telegramId };
 };
