@@ -1,7 +1,7 @@
 import { createEvent, createStore, sample } from "effector";
 import {useUnit} from "effector-react";
 import { useSocket } from "@/app/socketProvider";
-import {useAuth} from "@/features/auth";
+import {useAuth} from "@/features/auth/useAuth";
 import axios from 'axios';
 
 export const MAX_AVAILABLE = 500
