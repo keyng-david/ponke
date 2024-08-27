@@ -11,40 +11,36 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const updatePointsHandler = async (req: VercelRequest, res: VercelResponse) => {
+  console.log('Incoming request:', req.method, req.url); // Log request method and URL
+
   if (req.method !== 'POST') {
+    console.log('Method not allowed:', req.method); // Log the method if it's not POST
     return res.status(405).json({ error: true, message: 'Method Not Allowed' });
   }
 
   const { sessionId, points } = req.body;
 
   if (!sessionId) {
+    console.log('Unauthorized access attempt, missing session ID in body'); // Log unauthorized attempts
     return res.status(401).json({ error: true, message: 'Unauthorized, session ID is required' });
   }
 
+  console.log('Fetching data for session_id:', sessionId); // Log the session ID being used in the query
+
   try {
-    // Retrieve session data to get the telegram_id
-    const { data: sessionData, error: sessionError } = await supabase
-      .from('sessions')
-      .select('telegram_id')
-      .eq('id', sessionId)
-      .single();
-
-    if (sessionError || !sessionData) {
-      return res.status(500).json({ error: true, message: 'Session not found or database error', details: sessionError ? sessionError.message : 'Session not found' });
-    }
-
-    const telegramId = sessionData.telegram_id;
-
-    // Query the users table using the telegram_id
-    const { data: userData, error: userError } = await supabase
+    // Query the users table using the session_id
+    const { data: userData, error } = await supabase
       .from('users')
       .select('id, score')
-      .eq('telegram_id', telegramId)
+      .eq('session_id', sessionId)
       .single();
 
-    if (userError || !userData) {
-      return res.status(500).json({ error: true, message: 'User not found or database error', details: userError ? userError.message : 'User not found' });
+    if (error || !userData) {
+      console.error('Database error:', error ? error.message : 'User not found'); // Log detailed database error or not found message
+      return res.status(500).json({ error: true, message: 'Database error', details: error ? error.message : 'User not found' });
     }
+
+    console.log('User data retrieved:', userData); // Log the retrieved user data
 
     // Update the user's score
     const updatedScore = userData.score + points;
@@ -55,9 +51,11 @@ const updatePointsHandler = async (req: VercelRequest, res: VercelResponse) => {
       .eq('id', userData.id);
 
     if (updateError) {
+      console.error('Failed to update score:', updateError.message); // Log update error
       return res.status(500).json({ error: true, message: 'Failed to update score', details: updateError.message });
     }
 
+    console.log('Score updated successfully to:', updatedScore); // Log successful update
     return res.status(200).json({ success: true, newScore: updatedScore });
   } catch (error) {
     console.error('Error processing request:', error);
