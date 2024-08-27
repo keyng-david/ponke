@@ -28,7 +28,7 @@ const $canBeClicked = $available.map(state => state >= CLICK_STEP);
 
 sample({
     clock: availableUpdated,
-    target: $available
+    target: $available,
 });
 
 sample({
@@ -40,7 +40,7 @@ sample({
 sample({
     clock: clicked,
     fn: ({ available_clicks }) => available_clicks,
-    target: $available
+    target: $available,
 });
 
 sample({
@@ -55,7 +55,7 @@ sample({
 
 sample({
     clock: errorUpdated,
-    target: $isMultiAccount
+    target: $isMultiAccount,
 });
 
 const useCanBeClicked = () => useUnit($canBeClicked);
@@ -73,10 +73,10 @@ const useClicker = (): UseClickerReturnType => {
     const { initialize } = useAuth(); // Get the initialize function from useAuth
     const sessionIdStore = useSessionId(); // Use the session management to get the session ID
 
-    const value = useUnit(clickerModel.$value);
-    const available = useUnit(clickerModel.$available);
-    const canBeClicked = useUnit(clickerModel.$canBeClicked);
-    const isMultiError = useUnit(clickerModel.$isMultiAccount);
+    const value = useUnit($value);
+    const available = useUnit($available);
+    const canBeClicked = useUnit($canBeClicked);
+    const isMultiError = useUnit($isMultiAccount);
 
     const onClick = async () => {
         sendMessage('click');
@@ -115,9 +115,11 @@ const useClicker = (): UseClickerReturnType => {
     };
 };
 
-export default useClicker;
-
 export const clickerModel = {
+    $value,
+    $available,
+    $canBeClicked,
+    $isMultiAccount,
     valueInited,
     availableInited,
     availableUpdated,
