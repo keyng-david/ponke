@@ -60,15 +60,21 @@ const useCanBeClicked = () => useUnit($canBeClicked)
 
 const useClicker = () => {
     const { sendMessage } = useSocket();
-    const { telegramId } = useAuth();  // Access telegramId here
+    const { telegramId } = useAuth();
+
+    // Retrieve the state values outside of the onClick function
+    const value = useUnit($value);
+    const available = useUnit($available);
+    const canBeClicked = useUnit($canBeClicked);
+    const isMultiError = useUnit($isMultiAccount);
 
     function onClick() {
         sendMessage('click');
 
-        if (telegramId) {  // Ensure telegramId is available
+        if (telegramId) {
             axios.post('/api/game/updatePoints', {
-                telegram_id: telegramId,  // Dynamically retrieve the telegram_id
-                points: useUnit($value), // Use the correct state management logic
+                telegram_id: telegramId,
+                points: value,  // Use the value directly here
             }).then(response => {
                 if (response.data.success) {
                     console.log('Points updated successfully');
@@ -82,10 +88,10 @@ const useClicker = () => {
     }
 
     return {
-        value: useUnit($value),
-        available: useUnit($available),
-        canBeClicked: useUnit($canBeClicked),
-        isMultiError: useUnit($isMultiAccount),
+        value,
+        available,
+        canBeClicked,
+        isMultiError,
         onClick,
     };
 };
