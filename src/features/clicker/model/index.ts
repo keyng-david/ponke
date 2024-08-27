@@ -60,7 +60,7 @@ const useCanBeClicked = () => useUnit($canBeClicked);
 
 const useClicker = () => {
     const { sendMessage } = useSocket();
-    const { telegramId } = useAuth();  // Get the telegramId directly from useAuth
+    const { sessionId } = useSessionId();  // Use sessionId from session management
 
     const value = useUnit($value);
     const available = useUnit($available);
@@ -70,10 +70,10 @@ const useClicker = () => {
     function onClick() {
         sendMessage('click');
 
-        if (telegramId) {
+        if (sessionId) {
             axios.post('/api/game/updatePoints', {
-                telegram_id: telegramId,
-                points: value,  // Use the value directly here
+                sessionId,  // Send session ID instead of telegram ID
+                points: value,
             }).then(response => {
                 if (response.data.success) {
                     console.log('Points updated successfully');
@@ -82,7 +82,7 @@ const useClicker = () => {
                 console.error('Failed to update points:', error);
             });
         } else {
-            console.error('Telegram ID not available');
+            console.error('Session ID not available');
         }
     }
 
