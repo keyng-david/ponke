@@ -1,6 +1,8 @@
 import { createEvent, createStore, sample } from "effector";
 import {useUnit} from "effector-react";
 import { useSocket } from "@/app/socketProvider";
+import {useAuth} from "@/features/auth";
+import axios from 'axios';
 
 export const MAX_AVAILABLE = 500
 export const CLICK_STEP = 1
@@ -58,9 +60,21 @@ const useCanBeClicked = () => useUnit($canBeClicked)
 
 const useClicker = () => {
     const { sendMessage } = useSocket()
+    const { telegram_id } = useAuth(); // Assuming useAuth provides the authenticated user's data
 
     function onClick() {
         sendMessage('click')
+
+        axios.post('/api/game/updatePoints', {
+            telegram_id,  // Dynamically retrieve the telegram_id
+            points: $value.getState(), // Use the correct state management logic
+        }).then(response => {
+            if (response.data.success) {
+                console.log('Points updated successfully');
+            }
+        }).catch(error => {
+            console.error('Failed to update points:', error);
+        });
     }
 
     return {
