@@ -1,40 +1,68 @@
-const { NextApiRequest, NextApiResponse } = require ('next');
-const { createClient } = require ('@supabase/supabase-js');
+import { VercelRequest, VercelResponse } from '@vercel/node';
+import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client with credentials from environment variables
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_KEY!;
 
 if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Environment variables SUPABASE_URL and SUPABASE_KEY must be defined');
+  throw new Error('Environment variables SUPABASE_URL and SUPABASE_KEY must be defined');
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-module.exports = async function handler(req: NextApiRequest, res: NextApiResponse) {
-    // Allow only POST method
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+const updatePointsHandler = async (req: VercelRequest, res: VercelResponse) => {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: true, message: 'Method Not Allowed' });
+  }
+
+  const { sessionId, points } = req.body;
+
+  if (!sessionId) {
+    return res.status(401).json({ error: true, message: 'Unauthorized, session ID is required' });
+  }
+
+  try {
+    // Retrieve user data based on session ID
+    const { data: sessionData, error: sessionError } = await supabase
+      .from('sessions')
+      .select('telegram_id')
+      .eq('id', sessionId)
+      .single();
+
+    if (sessionError || !sessionData) {
+      return res.status(500).json({ error: true, message: 'Session not found or database error', details: sessionError ? sessionError.message : 'Session not found' });
     }
 
-    const { telegram_id, points } = req.body;
+    const telegramId = sessionData.telegram_id;
 
-    // Validate request body
-    if (!telegram_id || typeof points !== 'number') {
-        return res.status(400).json({ error: 'Invalid request data' });
+    // Query the users table using the telegram_id
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id, score')
+      .eq('telegram_id', telegramId)
+      .single();
+
+    if (userError || !userData) {
+      return res.status(500).json({ error: true, message: 'User not found or database error', details: userError ? userError.message : 'User not found' });
     }
 
-    // Update the user's score in the database
-    const { data, error } = await supabase
-        .from('users')
-        .update({ score: points })
-        .eq('telegram_id', telegram_id);
+    // Update user score with the new points
+    const updatedScore = userData.score + points;
 
-    // Handle potential database errors
-    if (error) {
-        return res.status(500).json({ error: error.message });
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ score: updatedScore })
+      .eq('id', userData.id);
+
+    if (updateError) {
+      return res.status(500).json({ error: true, message: 'Failed to update score', details: updateError.message });
     }
 
-    // Return success response
-    return res.status(200).json({ success: true, data });
-}
+    return res.status(200).json({ success: true, newScore: updatedScore });
+  } catch (error) {
+    console.error('Error processing request:', error);
+    return res.status(500).json({ error: true, message: 'Internal server error' });
+  }
+};
+
+export default updatePointsHandler;
