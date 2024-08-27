@@ -60,7 +60,15 @@ sample({
 
 const useCanBeClicked = () => useUnit($canBeClicked);
 
-const useClicker = () => {
+type UseClickerReturnType = {
+    value: number;
+    available: number;
+    canBeClicked: boolean;
+    isMultiError: boolean;
+    onClick: () => Promise<void>;
+};
+
+const useClicker = (): UseClickerReturnType => {
     const { sendMessage } = useSocket();
     const { initialize } = useAuth(); // Get the initialize function from useAuth
     const sessionIdStore = useSessionId(); // Use the session management to get the session ID
@@ -68,7 +76,7 @@ const useClicker = () => {
     const value = useUnit(clickerModel.$value);
     const available = useUnit(clickerModel.$available);
     const canBeClicked = useUnit(clickerModel.$canBeClicked);
-    const isMultiAccountError = useUnit(clickerModel.$isMultiAccount);
+    const isMultiError = useUnit(clickerModel.$isMultiAccount);
 
     const onClick = async () => {
         sendMessage('click');
@@ -102,7 +110,7 @@ const useClicker = () => {
         value,
         available,
         canBeClicked,
-        isMultiAccountError,
+        isMultiError,
         onClick,
     };
 };
