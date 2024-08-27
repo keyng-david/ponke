@@ -22,7 +22,7 @@ const updatePointsHandler = async (req: VercelRequest, res: VercelResponse) => {
   }
 
   try {
-    // Retrieve user data based on session ID
+    // Retrieve session data to get the telegram_id
     const { data: sessionData, error: sessionError } = await supabase
       .from('sessions')
       .select('telegram_id')
@@ -46,7 +46,7 @@ const updatePointsHandler = async (req: VercelRequest, res: VercelResponse) => {
       return res.status(500).json({ error: true, message: 'User not found or database error', details: userError ? userError.message : 'User not found' });
     }
 
-    // Update user score with the new points
+    // Update the user's score
     const updatedScore = userData.score + points;
 
     const { error: updateError } = await supabase
