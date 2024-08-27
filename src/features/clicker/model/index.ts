@@ -71,7 +71,7 @@ type UseClickerReturnType = {
 const useClicker = (): UseClickerReturnType => {
     const { sendMessage } = useSocket();
     const { initialize } = useAuth(); // Get the initialize function from useAuth
-    const sessionIdStore = useSessionId(); // Use the session management to get the session ID
+    const { sessionId } = useSessionId(); // Destructure to get sessionId directly
 
     const value = useUnit($value);
     const available = useUnit($available);
@@ -82,8 +82,6 @@ const useClicker = (): UseClickerReturnType => {
         sendMessage('click');
 
         // Ensure session ID is initialized before making API calls
-        const sessionId = sessionIdStore.get();
-
         if (!sessionId) {
             console.error('Session ID not available');
             await initialize(); // Attempt to initialize the session if not already done
