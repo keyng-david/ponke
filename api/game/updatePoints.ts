@@ -18,32 +18,32 @@ const updatePointsHandler = async (req: VercelRequest, res: VercelResponse) => {
     return res.status(405).json({ error: true, message: 'Method Not Allowed' });
   }
 
-  const { sessionId, totalPoints } = req.body; // Expecting totalPoints from the request body
+  const { sessionId, points } = req.body; // Make sure to use `points` instead of `totalPoints` for consistency
 
-  if (!sessionId) {
-    console.log('Unauthorized access attempt, missing session ID in body'); // Log unauthorized attempts
-    return res.status(401).json({ error: true, message: 'Unauthorized, session ID is required' });
+  if (!sessionId || typeof points !== 'number') {
+    console.log('Unauthorized access attempt or invalid input:', { sessionId, points }); // Log unauthorized attempts or invalid input
+    return res.status(400).json({ error: true, message: 'Bad Request: sessionId and valid points are required' });
   }
 
   console.log('Fetching data for session_id:', sessionId); // Log the session ID being used in the query
 
   try {
     // Query the users table using the session_id
-    const { data: userData, error } = await supabase
+    const { data: userData, error: fetchError } = await supabase
       .from('users')
       .select('id, score')
       .eq('session_id', sessionId)
       .single();
 
-    if (error || !userData) {
-      console.error('Database error:', error ? error.message : 'User not found'); // Log detailed database error or not found message
-      return res.status(500).json({ error: true, message: 'Database error', details: error ? error.message : 'User not found' });
+    if (fetchError || !userData) {
+      console.error('Database error:', fetchError ? fetchError.message : 'User not found'); // Log detailed database error or not found message
+      return res.status(500).json({ error: true, message: 'Database error', details: fetchError ? fetchError.message : 'User not found' });
     }
 
     console.log('User data retrieved:', userData); // Log the retrieved user data
 
     // Update the user's score
-    const updatedScore = userData.score + totalPoints; // Add the total points to the current score
+    const updatedScore = userData.score + points; // Add the points to the current score
 
     const { error: updateError } = await supabase
       .from('users')
