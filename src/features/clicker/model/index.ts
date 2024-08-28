@@ -3,10 +3,13 @@ import { createEvent, createStore, sample } from "effector";
 import { useUnit } from "effector-react";
 import { useSocket } from "@/app/socketProvider";
 import { useAuth } from "@/features/auth/useAuth";
-import { useSessionId } from "@/shared/model/session"; // Import the session management
+import { useSessionId } from "@/shared/model/session";
 
 export const MAX_AVAILABLE = 500;
 export const CLICK_STEP = 1;
+
+// Debounce time for batching clicks (milliseconds)
+const DEBOUNCE_TIME = 1000;
 
 const valueInited = createEvent<number>();
 const availableInited = createEvent<number>();
@@ -17,14 +20,19 @@ const clicked = createEvent<{
     available_clicks: number,
 }>();
 
+const batchClicks = createEvent<number>();  // New event for batching clicks
 const availableUpdated = createEvent<number>();
 const errorUpdated = createEvent<boolean>();
 
 const $isMultiAccount = createStore(false);
 const $value = createStore(0);
 const $available = createStore(MAX_AVAILABLE);
+const $clickCount = createStore(0);  // Store to keep track of batched clicks
 
 const $canBeClicked = $available.map(state => state >= CLICK_STEP);
+
+// Store to keep track of local clicks before batch sending
+let localClicks = 0;
 
 sample({
     clock: availableUpdated,
@@ -41,6 +49,11 @@ sample({
     clock: clicked,
     fn: ({ available_clicks }) => available_clicks,
     target: $available,
+});
+
+sample({
+    clock: batchClicks,
+    target: $clickCount,
 });
 
 sample({
@@ -65,43 +78,51 @@ type UseClickerReturnType = {
     available: number;
     canBeClicked: boolean;
     isMultiError: boolean;
-    onClick: () => Promise<void>;
+    onClick: () => void;
 };
 
 const useClicker = (): UseClickerReturnType => {
     const { sendMessage } = useSocket();
-    const { initialize } = useAuth(); // Get the initialize function from useAuth
-    const { sessionId } = useSessionId(); // Destructure to get sessionId directly
+    const { initialize } = useAuth();
+    const { sessionId } = useSessionId();
 
     const value = useUnit($value);
     const available = useUnit($available);
     const canBeClicked = useUnit($canBeClicked);
     const isMultiError = useUnit($isMultiAccount);
+    const clickCount = useUnit($clickCount);
 
-    const onClick = async () => {
-        sendMessage('click');
+    // Function to send batched clicks to the server
+    const sendBatchedClicks = async () => {
+        if (localClicks > 0 && sessionId) {
+            try {
+                const response = await axios.post('/api/game/updatePoints', {
+                    sessionId,
+                    points: localClicks,
+                });
 
-        // Ensure session ID is initialized before making API calls
-        if (!sessionId) {
-            console.error('Session ID not available');
-            await initialize(); // Attempt to initialize the session if not already done
-            return;
-        }
-
-        try {
-            const response = await axios.post('/api/game/updatePoints', {
-                sessionId,  // Send session ID instead of telegram ID
-                points: value,
-            });
-
-            if (response.data.success) {
-                console.log('Points updated successfully');
-            } else {
-                console.error('Failed to update points:', response.data.message);
+                if (response.data.success) {
+                    console.log('Points updated successfully');
+                    // Reset local clicks after successful update
+                    localClicks = 0;
+                } else {
+                    console.error('Failed to update points:', response.data.message);
+                }
+            } catch (error) {
+                console.error('Failed to update points:', error);
             }
-        } catch (error) {
-            console.error('Failed to update points:', error);
         }
+    };
+
+    // Debounced function to send clicks
+    const debouncedSend = debounce(sendBatchedClicks, DEBOUNCE_TIME);
+
+    const onClick = () => {
+        sendMessage('click');
+        localClicks += CLICK_STEP; // Increment local clicks
+        batchClicks(clickCount + 1); // Increment the batched click count
+        $value.setState(value + CLICK_STEP); // Update local score immediately
+        debouncedSend(); // Trigger the debounced function to send clicks
     };
 
     return {
@@ -113,15 +134,26 @@ const useClicker = (): UseClickerReturnType => {
     };
 };
 
+// Utility function for debouncing
+function debounce(func: () => void, wait: number) {
+    let timeout: NodeJS.Timeout;
+    return function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(func, wait);
+    };
+}
+
 export const clickerModel = {
     $value,
     $available,
+    $clickCount,
     $canBeClicked,
     $isMultiAccount,
     valueInited,
     availableInited,
     availableUpdated,
     clicked,
+    batchClicks,
     errorUpdated,
     useCanBeClicked,
     useClicker,
