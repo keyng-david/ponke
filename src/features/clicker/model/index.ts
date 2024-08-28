@@ -121,7 +121,7 @@ const useClicker = (): UseClickerReturnType => {
         sendMessage('click');
         localClicks += CLICK_STEP; // Increment local clicks
         batchClicks(clickCount + 1); // Increment the batched click count
-        $value.setState(value + CLICK_STEP); // Update local score immediately
+        valueInited(value + CLICK_STEP); // Update local score immediately
         debouncedSend(); // Trigger the debounced function to send clicks
     };
 
