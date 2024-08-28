@@ -18,7 +18,7 @@ const updatePointsHandler = async (req: VercelRequest, res: VercelResponse) => {
     return res.status(405).json({ error: true, message: 'Method Not Allowed' });
   }
 
-  const { sessionId, points } = req.body;
+  const { sessionId, totalPoints } = req.body; // Expecting totalPoints from the request body
 
   if (!sessionId) {
     console.log('Unauthorized access attempt, missing session ID in body'); // Log unauthorized attempts
@@ -43,7 +43,7 @@ const updatePointsHandler = async (req: VercelRequest, res: VercelResponse) => {
     console.log('User data retrieved:', userData); // Log the retrieved user data
 
     // Update the user's score
-    const updatedScore = userData.score + points;
+    const updatedScore = userData.score + totalPoints; // Add the total points to the current score
 
     const { error: updateError } = await supabase
       .from('users')
