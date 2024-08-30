@@ -118,17 +118,15 @@ const useClicker = (): UseClickerReturnType => {
     const debouncedSend = debounce(sendBatchedClicks, DEBOUNCE_TIME);
 
     const onClick = () => {
-        if (canBeClicked) {
-            sendMessage('click');
-            localClicks += CLICK_STEP; // Increment local clicks
-            batchClicks(clickCount + 1); // Increment the batched click count
+        sendMessage('click');
+        localClicks += CLICK_STEP; // Increment local clicks
+        batchClicks(clickCount + 1); // Increment the batched click count
 
-            // Update local score and available immediately for a responsive UI
-            valueInited(value + CLICK_STEP); 
-            availableInited(available - CLICK_STEP);
+        // Update local score and available immediately for instant feedback
+        valueInited(value + CLICK_STEP); 
+        availableInited(available - CLICK_STEP);
 
-            debouncedSend(); // Trigger the debounced function to send clicks
-        }
+        debouncedSend(); // Trigger the debounced function to send clicks
     };
 
     return {
