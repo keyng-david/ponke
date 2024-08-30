@@ -15,18 +15,18 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Missing parameters' });
     }
 
-    // Use a single SQL transaction to update score and available clicks
+    // Calling the remote procedure 'increment_score'
     const { data, error } = await supabase
       .rpc('increment_score', { session_id, click_score });
 
     if (error) {
       console.error('Error updating score:', error);
-      return res.status(500).json({ error: 'Internal Server Error' });
+      return res.status(500).json({ error: 'Failed to update points', details: error.message });
     }
 
     res.status(200).json(data);
   } catch (err) {
     console.error('Unexpected error:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Unexpected error occurred', details: err.message });
   }
 };
