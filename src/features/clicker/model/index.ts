@@ -77,7 +77,11 @@ const useClicker = () => {
 
         console.log('Points updated:', data);
     } catch (error) {
-        console.error('Error updating points:', error.message);
+        if (error instanceof Error) {
+            console.error('Error updating points:', error.message);
+        } else {
+            console.error('Error updating points:', error);
+        }
     }
 }
 
