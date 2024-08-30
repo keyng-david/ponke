@@ -4,8 +4,7 @@ import progress from '@/shared/assets/images/main/progress.png';
 import pointImage from '@/shared/assets/images/main/point.png';
 import leftHand from '@/shared/assets/images/main/left-hand.png';
 import rightHand from '@/shared/assets/images/main/right-hand.png';
-
-import { MAX_AVAILABLE, clickerModel } from "../model";
+import { clickerModel, MAX_AVAILABLE } from "@/features/clicker/model";
 
 import styles from './ClickerField.module.scss';
 import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/lib/number";
