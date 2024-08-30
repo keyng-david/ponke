@@ -4,6 +4,7 @@ import { useUnit } from "effector-react";
 import { useSocket } from "@/app/socketProvider";
 import { useAuth } from "@/features/auth/useAuth";
 import { useSessionId } from "@/shared/model/session";
+import { useEffect } from 'react'; // Make sure to import useEffect for the initializer hook
 
 export const MAX_AVAILABLE = 500;
 export const CLICK_STEP = 1;
@@ -173,6 +174,7 @@ const useClickerInitializer = () => {
     }, [initialize, sendMessage, sessionId]);
 };
 
+// Correct the exports to ensure all necessary functions are available
 export {
     useClicker,
     initializeClicker,
