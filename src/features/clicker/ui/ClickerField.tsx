@@ -1,4 +1,4 @@
-import React, { TouchEvent, useCallback, useMemo, useState, useEffect } from "react";
+import React, { TouchEvent, useCallback, useMemo, useState } from "react";
 
 import progress from '@/shared/assets/images/main/progress.png';
 import pointImage from '@/shared/assets/images/main/point.png';
@@ -21,26 +21,15 @@ export const ClickerField = () => {
     const [isClickEnabled, setIsClickEnabled] = useState(true);
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
-    const [scoreUpdated, setScoreUpdated] = useState(false); // New state to handle score update flash effect
 
     const valueString = useMemo(() => toFormattedNumber(value), [value]);
-
-    // Effect to reset the score update state after a brief delay
-    useEffect(() => {
-        if (scoreUpdated) {
-            const resetTimeout = setTimeout(() => setScoreUpdated(false), 300); // Reset after 300ms
-            return () => clearTimeout(resetTimeout);
-        }
-    }, [scoreUpdated]);
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
             for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
                 const { clientX, clientY } = e.touches[i];
                 if (canBeClicked) {
-                    onClick();  // This now updates the backend and local points
-
-                    setScoreUpdated(true); // Set score update state for visual feedback
+                    onClick();
 
                     const point = document.createElement('img');
                     point.src = pointImage;
@@ -96,7 +85,7 @@ export const ClickerField = () => {
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
         >
-            <p className={`${styles.value} ${scoreUpdated ? styles['score-flash'] : ''}`}>{valueString}</p>
+            <p className={styles.value}>{valueString}</p>
             <ProgressBar value={available}/>
             <div className={styles.hands}>
                 <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'}/>
