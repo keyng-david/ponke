@@ -64,21 +64,25 @@
     background-image: url("../../../shared/assets/images/auth/auth-background.png");
     background-repeat: repeat;
     background-size: cover;
-    -webkit-background-clip: text;
+    -webkit-background-clip: text; /* Ensure this is properly applied */
+    -webkit-text-fill-color: transparent; /* Ensure text color is transparent */
     text-align: center;
     margin: 0;
 
-    &:nth-child(1) {
-        text-shadow: 3px 0 #000, -3px 0 #000, 0 3px #000, 0 -3px #000, 2px 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000
-    }
-
-    &:nth-child(2) {
-        -webkit-text-fill-color: transparent;
-    }
+    /* Text shadow to improve readability */
+    text-shadow: 3px 0 #000, -3px 0 #000, 0 3px #000, 0 -3px #000, 2px 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000;
 
     transition: 0.3s ease;
     transition-property: transform;
     transition-delay: 0.3s;
+}
+
+/* Remove any overriding or unnecessary nth-child styling */
+.value:nth-child(2) {
+    -webkit-text-fill-color: transparent; /* Ensures transparency */
+}
+
+/* Remove nth-child(1) styling if it causes conflict */-delay: 0.3s;
 }
 
 .progress-bar {
