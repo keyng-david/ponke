@@ -61,23 +61,25 @@ const useClicker = () => {
     const [clickBuffer, setClickBuffer] = useState(0);
 
     async function sendPointsUpdate(score: number) {
-        try {
-            const response = await fetch('/api/game/updatePoints', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ session_id: "SESSION_ID", click_score: score }),
-            });
+    try {
+        const response = await fetch('/api/game/updatePoints', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: "SESSION_ID", click_score: score }),
+        });
 
-            if (!response.ok) {
-                throw new Error('Failed to update points');
-            }
+        const data = await response.json();
 
-            const data = await response.json();
-            console.log('Points updated:', data);
-        } catch (error) {
-            console.error('Error updating points:', error);
+        if (!response.ok) {
+            console.error('Failed to update points:', data.error || 'Unknown error');
+            return; // Early return on error
         }
+
+        console.log('Points updated:', data);
+    } catch (error) {
+        console.error('Error updating points:', error.message);
     }
+}
 
     function onClick() {
         setClickBuffer((prev) => {
