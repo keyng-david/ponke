@@ -1,11 +1,10 @@
 import React, { TouchEvent, useCallback, useMemo, useState } from "react";
-
 import progress from '@/shared/assets/images/main/progress.png';
 import pointImage from '@/shared/assets/images/main/point.png';
 import leftHand from '@/shared/assets/images/main/left-hand.png';
 import rightHand from '@/shared/assets/images/main/right-hand.png';
-import { clickerModel, MAX_AVAILABLE } from "@/features/clicker/model";
 
+import { MAX_AVAILABLE, clickerModel } from "../model";
 import styles from './ClickerField.module.scss';
 import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/lib/number";
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
@@ -28,7 +27,7 @@ export const ClickerField = () => {
             for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
                 const { clientX, clientY } = e.touches[i];
                 if (canBeClicked) {
-                    onClick();
+                    onClick();  // Call onClick only if clicking is allowed
 
                     const point = document.createElement('img');
                     point.src = pointImage;
@@ -66,7 +65,7 @@ export const ClickerField = () => {
                 clearTimeout(timeout1);
             }, 150);
         }
-    }, [isClickEnabled, canBeClicked, haptic, leftClasses.length, rightClasses.length, onClick]);
+    }, [isClickEnabled, canBeClicked, onClick, haptic, leftClasses.length, rightClasses.length]);
 
     function handleTouchMove(event: TouchEvent<HTMLDivElement>) {
         event.preventDefault();
@@ -85,10 +84,10 @@ export const ClickerField = () => {
             onTouchEnd={handleTouchEnd}
         >
             <p className={styles.value}>{valueString}</p>
-            <ProgressBar value={available}/>
+            <ProgressBar value={available} />
             <div className={styles.hands}>
-                <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'}/>
-                <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'}/>
+                <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
+                <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
             </div>
         </div>
     );
@@ -96,7 +95,7 @@ export const ClickerField = () => {
 
 const ProgressBar = React.memo<{
     value: number
-}>(({value}) => {
+}>(({ value }) => {
     const list = useMemo(() => {
         let count = 0;
         let curr = value;
