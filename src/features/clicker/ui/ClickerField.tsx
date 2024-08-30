@@ -1,4 +1,4 @@
-import React, { TouchEvent, useCallback, useMemo, useState } from "react";
+import React, { TouchEvent, useCallback, useMemo, useState, useEffect } from "react";
 
 import progress from '@/shared/assets/images/main/progress.png';
 import pointImage from '@/shared/assets/images/main/point.png';
@@ -16,62 +16,69 @@ let timeout2: NodeJS.Timeout;
 
 export const ClickerField = () => {
     const { value, available, canBeClicked, onClick } = clickerModel.useClicker();
-
     const { haptic } = useTelegram();
 
     const [isClickEnabled, setIsClickEnabled] = useState(true);
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
+    const [scoreUpdated, setScoreUpdated] = useState(false); // New state to handle score update flash effect
 
     const valueString = useMemo(() => toFormattedNumber(value), [value]);
 
+    // Effect to reset the score update state after a brief delay
+    useEffect(() => {
+        if (scoreUpdated) {
+            const resetTimeout = setTimeout(() => setScoreUpdated(false), 300); // Reset after 300ms
+            return () => clearTimeout(resetTimeout);
+        }
+    }, [scoreUpdated]);
+
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
-    if (isClickEnabled) {
-        for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
-            const { clientX, clientY } = e.touches[i];
-            if (canBeClicked) {
-                onClick();  // This now updates the backend and local points
+        if (isClickEnabled) {
+            for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
+                const { clientX, clientY } = e.touches[i];
+                if (canBeClicked) {
+                    onClick();  // This now updates the backend and local points
 
-                const point = document.createElement('img');
-                point.src = pointImage;
-                point.alt = 'point';
-                point.style.transform = `rotate(${getRandomInt(-25, 25)}deg) scale(${getRandomArbitrary(0.8, 1.2)})`;
+                    setScoreUpdated(true); // Set score update state for visual feedback
 
-                const pointParent = document.createElement('div');
-                pointParent.appendChild(point);
-                pointParent.style.top = `${clientY}px`;
-                pointParent.style.left = `${clientX}px`;
-                pointParent.className = styles.point;
+                    const point = document.createElement('img');
+                    point.src = pointImage;
+                    point.alt = 'point';
+                    point.style.transform = `rotate(${getRandomInt(-25, 25)}deg) scale(${getRandomArbitrary(0.8, 1.2)})`;
 
-                document.querySelector('#clicker')!.appendChild(pointParent);
-                haptic();
-                const timeout1 = setTimeout(() => {
-                    document.querySelector('#clicker')!.removeChild(pointParent);
+                    const pointParent = document.createElement('div');
+                    pointParent.appendChild(point);
+                    pointParent.style.top = `${clientY}px`;
+                    pointParent.style.left = `${clientX}px`;
+                    pointParent.className = styles.point;
 
-                    clearTimeout(timeout1);
-                }, 500);
+                    document.querySelector('#clicker')!.appendChild(pointParent);
+                    haptic();
+                    const timeout1 = setTimeout(() => {
+                        document.querySelector('#clicker')!.removeChild(pointParent);
+                        clearTimeout(timeout1);
+                    }, 500);
 
-                if (leftClasses.length === 1 && rightClasses.length === 1) {
-                    setLeftClasses(prevState => [...prevState, styles['hand-animated']]);
-                    setRightClasses(prevState => [...prevState, styles['hand-animated']]);
-                    timeout2 = setTimeout(() => {
-                        setRightClasses([styles['hand-right']]);
-                        setLeftClasses([styles['hand-left']]);
-
-                        clearTimeout(timeout2);
-                    }, 350);
+                    if (leftClasses.length === 1 && rightClasses.length === 1) {
+                        setLeftClasses(prevState => [...prevState, styles['hand-animated']]);
+                        setRightClasses(prevState => [...prevState, styles['hand-animated']]);
+                        timeout2 = setTimeout(() => {
+                            setRightClasses([styles['hand-right']]);
+                            setLeftClasses([styles['hand-left']]);
+                            clearTimeout(timeout2);
+                        }, 350);
+                    }
                 }
             }
+
+            setIsClickEnabled(false);
+            timeout1 = setTimeout(() => {
+                setIsClickEnabled(true);
+                clearTimeout(timeout1);
+            }, 150);
         }
-
-        setIsClickEnabled(false);
-        timeout1 = setTimeout(() => {
-            setIsClickEnabled(true);
-
-            clearTimeout(timeout1);
-        }, 150);
-    }
-}, [isClickEnabled ,canBeClicked, haptic, leftClasses.length, rightClasses.length]);
+    }, [isClickEnabled, canBeClicked, haptic, leftClasses.length, rightClasses.length, onClick]);
 
     function handleTouchMove(event: TouchEvent<HTMLDivElement>) {
         event.preventDefault();
@@ -89,19 +96,19 @@ export const ClickerField = () => {
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
         >
-            <p className={styles.value}>{valueString}</p>
-            <ProgressBar value={available} />
+            <p className={`${styles.value} ${scoreUpdated ? styles['score-flash'] : ''}`}>{valueString}</p>
+            <ProgressBar value={available}/>
             <div className={styles.hands}>
-                <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
-                <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
+                <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'}/>
+                <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'}/>
             </div>
         </div>
     );
-};
+}
 
 const ProgressBar = React.memo<{
     value: number
-}>(({ value }) => {
+}>(({value}) => {
     const list = useMemo(() => {
         let count = 0;
         let curr = value;
