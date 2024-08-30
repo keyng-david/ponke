@@ -11,8 +11,9 @@ module.exports = async (req, res) => {
   try {
     const { session_id, click_score } = req.body;
 
-    if (!session_id || click_score === undefined) {
-      return res.status(400).json({ error: 'Missing parameters' });
+    // Check if session_id and click_score are valid
+    if (!session_id || typeof click_score !== 'number' || click_score <= 0) {
+      return res.status(400).json({ error: 'Invalid or missing parameters' });
     }
 
     // Calling the remote procedure 'increment_score'
@@ -21,6 +22,9 @@ module.exports = async (req, res) => {
 
     if (error) {
       console.error('Error updating score:', error);
+      if (error.details) {
+        return res.status(400).json({ error: 'Invalid parameters', details: error.details });
+      }
       return res.status(500).json({ error: 'Failed to update points', details: error.message });
     }
 
