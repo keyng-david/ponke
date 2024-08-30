@@ -61,6 +61,7 @@ const useClicker = () => {
     const [clickBuffer, setClickBuffer] = useState(0);
 
     async function sendPointsUpdate(score: number) {
+    console.log('Sending request:', { session_id: "SESSION_ID", click_score: score });
     try {
         const response = await fetch('/api/game/updatePoints', {
             method: 'POST',
