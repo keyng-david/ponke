@@ -181,4 +181,5 @@ export const clickerModel = {
     updateAvailableClicks,
     useClickerInitializer,
     useCanBeClicked,
+    clicked,
 };
