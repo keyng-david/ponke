@@ -175,10 +175,10 @@ const useClickerInitializer = () => {
 };
 
 // Correct the exports to ensure all necessary functions are available
-export {
+export const clickerModel = {
     useClicker,
     initializeClicker,
     updateAvailableClicks,
     useClickerInitializer,
-    useCanBeClicked
+    useCanBeClicked,
 };
