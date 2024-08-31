@@ -1,6 +1,6 @@
-import { v4 as uuidv4 } from 'uuid';
+const { v4: uuidv4 } = require('uuid');
 
-export default async function generatePayloadHandler(req: any, res: any) {
+module.exports = async function generatePayloadHandler(req, res) {
     if (req.method !== 'GET') {
         res.setHeader('Allow', ['GET']);
         return res.status(405).end(`Method ${req.method} Not Allowed`);
@@ -13,4 +13,4 @@ export default async function generatePayloadHandler(req: any, res: any) {
         console.error('Error generating payload:', error);
         res.status(500).json({ error: true, message: 'Internal Server Error' });
     }
-}
+};
