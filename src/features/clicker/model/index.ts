@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createEvent, createStore, sample } from "effector";
 import { useUnit } from "effector-react";
-import { useSessionId } from "@/shared/model/session"; // Import session hook or store
 import { useSocket } from "@/app/socketProvider";
 
 export const MAX_AVAILABLE = 500;
@@ -9,7 +8,6 @@ export const CLICK_STEP = 1;
 
 const valueInited = createEvent<number>();
 const availableInited = createEvent<number>();
-
 const clicked = createEvent<{
     score: number,
     click_score: number,
@@ -26,7 +24,7 @@ const $canBeClicked = $available.map(state => state >= CLICK_STEP);
 
 sample({
     clock: availableUpdated,
-    target: $available
+    target: $available,
 });
 
 sample({
@@ -38,7 +36,7 @@ sample({
 sample({
     clock: clicked,
     fn: ({ available_clicks }) => available_clicks,
-    target: $available
+    target: $available,
 });
 
 sample({
@@ -53,22 +51,25 @@ sample({
 
 sample({
     clock: errorUpdated,
-    target: $isMultiAccount
+    target: $isMultiAccount,
 });
 
 const useCanBeClicked = () => useUnit($canBeClicked);
 
 const useClicker = () => {
     const [clickBuffer, setClickBuffer] = useState(0);
-    const sessionId = useUnit(useSessionId); // Get the session ID from the session store
+
+    // Extract session ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get("session_id");
 
     async function sendPointsUpdate(score: number) {
         if (!sessionId) {
-            console.error('Session ID is not available');
-            return; // Ensure session_id is present
+            console.error('No session ID available');
+            return;
         }
-        console.log('Sending request:', { session_id: sessionId, click_score: score });
 
+        console.log('Sending request:', { session_id: sessionId, click_score: score });
         try {
             const response = await fetch('/api/game/updatePoints', {
                 method: 'POST',
