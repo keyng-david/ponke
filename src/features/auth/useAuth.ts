@@ -9,9 +9,12 @@ import { walletModel } from "@/shared/model/wallet";
 import { randModel } from "@/shared/model/rang";
 import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
 
-// New event and store to manage telegram_id
+// New events and stores to manage global state
 const setTelegramId = createEvent<string>();
 const $telegramId = createStore<string | null>(null).on(setTelegramId, (_, id) => id);
+
+const setSessionId = createEvent<string>();
+const $sessionId = createStore<string | null>(null).on(setSessionId, (_, id) => id);
 
 const setIsAuth = createEvent<boolean>();
 const $isAuth = createStore(false).on(setIsAuth, (_, value) => value);
@@ -24,6 +27,7 @@ export const useAuth = () => {
   const rangModel = randModel.useRang();
   const { setError } = useErrorHandler();
   const telegramId = useUnit($telegramId);
+  const sessionId = useUnit($sessionId);
 
   const initialize = useCallback(async () => {
     try {
@@ -33,6 +37,7 @@ export const useAuth = () => {
 
         if (sessionId) {
           sessionIdStore.set(sessionId);
+          setSessionId(sessionId); // Save sessionId to global state
         } else {
           setError("No session ID found");
           return;
@@ -78,5 +83,5 @@ export const useAuth = () => {
     }
   }, [isAuth, sessionIdStore, wallet, rangModel, navigate, setError]);
 
-  return { initialize, telegramId };
+  return { initialize, telegramId, sessionId };
 };
