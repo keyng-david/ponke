@@ -5,6 +5,9 @@ import { useUnit } from "effector-react";
 const setSessionId = createEvent<string | null>();
 const $sessionId = createStore<string | null>(null).on(setSessionId, (_, sessionId) => sessionId);
 
+// Export the store and other hooks/functions
+export { $sessionId }; // This line explicitly exports the $sessionId store
+
 export const useSessionId = () => {
   const sessionId = useUnit($sessionId);
 
