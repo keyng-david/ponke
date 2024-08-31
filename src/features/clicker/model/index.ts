@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { createEvent, createStore, sample } from "effector";
 import { useUnit } from "effector-react";
 import { useSocket } from "@/app/socketProvider";
-import { $sessionId } from "@/shared/model/session"; // Import the session ID store
+import { $sessionId } from "@/shared/model/session";
 
 export const MAX_AVAILABLE = 500;
 export const CLICK_STEP = 1;
