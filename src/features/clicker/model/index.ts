@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { createEvent, createStore, sample } from "effector";
 import { useUnit } from "effector-react";
-import { useSocket } from "@/app/socketProvider";
 import { $sessionId } from "@/shared/model/session";
 
 export const MAX_AVAILABLE = 500;
@@ -67,7 +66,6 @@ const useClicker = () => {
       return;
     }
 
-    console.log("Sending request:", { session_id: sessionId, click_score: score });
     try {
       const response = await fetch("/api/game/updatePoints", {
         method: "POST",
@@ -79,23 +77,42 @@ const useClicker = () => {
 
       if (!response.ok) {
         console.error("Failed to update points:", data.error || "Unknown error");
-        return; // Early return on error
+        return;
       }
 
-      console.log("Points updated:", data);
-
-      // Update the score and available clicks based on the backend response
       clickerModel.valueInited(data.currentScore);
-      // Assuming available clicks are also updated in the backend and returned
-      // Replace with actual available clicks if returned from backend
       clickerModel.availableInited(MAX_AVAILABLE - data.currentScore);
 
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error updating points:", error.message);
-      } else {
-        console.error("Error updating points:", error);
+      console.error("Error updating points:", error);
+    }
+  }
+
+  async function syncWithBackend() {
+    if (!sessionId) {
+      console.error("No session ID available for syncing");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/game/getUserScore", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Failed to sync with backend:", data.error || "Unknown error");
+        return;
       }
+
+      clickerModel.valueInited(data.currentScore);
+      clickerModel.availableInited(data.availableClicks);
+
+    } catch (error) {
+      console.error("Error syncing with backend:", error);
     }
   }
 
@@ -103,7 +120,7 @@ const useClicker = () => {
     setClickBuffer((prev) => {
       const newBuffer = prev + CLICK_STEP;
       if (newBuffer >= 10) {
-        sendPointsUpdate(newBuffer); // Send a batch update every 10 clicks
+        sendPointsUpdate(newBuffer);
         return 0;
       }
       return newBuffer;
@@ -116,7 +133,7 @@ const useClicker = () => {
         sendPointsUpdate(clickBuffer);
         setClickBuffer(0);
       }
-    }, 1000); // Send updates every second if clicks are buffered
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [clickBuffer]);
@@ -127,6 +144,7 @@ const useClicker = () => {
     canBeClicked: useUnit($canBeClicked),
     isMultiError: useUnit($isMultiAccount),
     onClick,
+    syncWithBackend,  // Expose sync method
   };
 };
 
@@ -138,4 +156,5 @@ export const clickerModel = {
   errorUpdated,
   useCanBeClicked,
   useClicker,
+  syncWithBackend,  // Add sync method here
 };
