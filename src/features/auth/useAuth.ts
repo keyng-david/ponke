@@ -6,7 +6,7 @@ import { clickerModel } from "../clicker/model";
 import { useSessionId } from "@/shared/model/session";
 import { createRequest } from "@/shared/lib/api/createRequest";
 import { walletModel } from "@/shared/model/wallet";
-import { randModel } from "@/shared/model/rang";
+import { randModel } from "@/shared/model/rang"; 
 import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
 
 // New events and stores to manage global state
@@ -24,7 +24,7 @@ export const useAuth = () => {
   const isAuth = useUnit($isAuth);
   const sessionIdStore = useSessionId();
   const wallet = walletModel.useWalletModel();
-  const rangModel = randModel.useRang();
+  const rangModel = randModel.useRang(); 
   const { setError } = useErrorHandler();
   const telegramId = useUnit($telegramId);
   const sessionId = useUnit($sessionId);
@@ -58,18 +58,22 @@ export const useAuth = () => {
         });
 
         if (!response.error) {
+          // Set initial score and available clicks from the backend response
           clickerModel.valueInited(response.payload.score);
           clickerModel.availableInited(response.payload.available_clicks);
 
+          // Update wallet if available
           if (response.payload.wallet) {
             wallet.updateWallet(response.payload.wallet);
           }
 
+          // Update rank level
           rangModel.update(response.payload.level);
 
           // Set telegram_id for global access
           setTelegramId(response.payload.telegram_id);
 
+          // Navigate to the main page after successful authentication
           navigate("/main");
           setIsAuth(true);
         } else {
