@@ -6,23 +6,25 @@ import { $sessionId } from "@/shared/model/session";
 export const MAX_AVAILABLE = 500;
 export const CLICK_STEP = 1;
 
-// Define events
 const valueInited = createEvent<number>();
 const availableInited = createEvent<number>();
-const availableUpdated = createEvent<number>(); // New event to handle updates for available clicks
 const clicked = createEvent<{
   score: number;
   click_score: number;
   available_clicks: number;
 }>();
 
-// Define stores
+// New event to track errors
+const errorUpdated = createEvent<boolean>();
+
 const $value = createStore(0);
 const $available = createStore(MAX_AVAILABLE);
 
+// New store to track errors
+const $error = createStore(false).on(errorUpdated, (_, error) => error);
+
 const $canBeClicked = $available.map((state) => state >= CLICK_STEP);
 
-// Sample for handling click events
 sample({
   clock: clicked,
   fn: ({ score }) => score,
@@ -35,7 +37,6 @@ sample({
   target: $available,
 });
 
-// Initialize values when events are triggered
 sample({
   clock: valueInited,
   target: $value,
@@ -43,12 +44,6 @@ sample({
 
 sample({
   clock: availableInited,
-  target: $available,
-});
-
-// Update available clicks when `availableUpdated` is triggered
-sample({
-  clock: availableUpdated,
   target: $available,
 });
 
@@ -77,6 +72,7 @@ const useClicker = () => {
 
       if (!response.ok) {
         console.error("Failed to initialize score:", data.error || "Unknown error");
+        errorUpdated(true);
         return;
       }
 
@@ -85,6 +81,7 @@ const useClicker = () => {
       setIsSyncing(false);
     } catch (error) {
       console.error("Error initializing score:", error);
+      errorUpdated(true);
       setIsSyncing(false);
     }
   }
@@ -106,13 +103,15 @@ const useClicker = () => {
 
       if (!response.ok) {
         console.error("Failed to update points:", data.error || "Unknown error");
+        errorUpdated(true);
         return;
       }
 
       valueInited(data.currentScore);
-      availableUpdated(MAX_AVAILABLE - data.currentScore); // Use availableUpdated here to handle independent updates
+      availableInited(MAX_AVAILABLE - data.currentScore);
     } catch (error) {
       console.error("Error updating points:", error);
+      errorUpdated(true);
     }
   }
 
@@ -167,5 +166,5 @@ export const clickerModel = {
   clicked,
   useCanBeClicked,
   useClicker,
-  availableUpdated, // Export the new event as part of the model
+  errorUpdated, // Added errorUpdated to the export
 };
