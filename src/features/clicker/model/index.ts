@@ -13,17 +13,19 @@ const clicked = createEvent<{
   click_score: number;
   available_clicks: number;
 }>();
-
-// New event to track errors
+const availableUpdated = createEvent<number>();
 const errorUpdated = createEvent<boolean>();
 
+const $isMultiAccount = createStore(false);
 const $value = createStore(0);
 const $available = createStore(MAX_AVAILABLE);
 
-// New store to track errors
-const $error = createStore(false).on(errorUpdated, (_, error) => error);
-
 const $canBeClicked = $available.map((state) => state >= CLICK_STEP);
+
+sample({
+  clock: availableUpdated,
+  target: $available,
+});
 
 sample({
   clock: clicked,
@@ -47,44 +49,16 @@ sample({
   target: $available,
 });
 
+sample({
+  clock: errorUpdated,
+  target: $isMultiAccount,
+});
+
 const useCanBeClicked = () => useUnit($canBeClicked);
 
 const useClicker = () => {
   const [clickBuffer, setClickBuffer] = useState(0);
   const sessionId = useUnit($sessionId);
-  const [isSyncing, setIsSyncing] = useState(false);
-
-  async function initializeScore() {
-    if (!sessionId) {
-      console.error("No session ID available for initialization");
-      return;
-    }
-
-    try {
-      setIsSyncing(true);
-      const response = await fetch("/api/game/initScore", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("Failed to initialize score:", data.error || "Unknown error");
-        errorUpdated(true);
-        return;
-      }
-
-      valueInited(data.currentScore);
-      availableInited(MAX_AVAILABLE - data.currentScore);
-      setIsSyncing(false);
-    } catch (error) {
-      console.error("Error initializing score:", error);
-      errorUpdated(true);
-      setIsSyncing(false);
-    }
-  }
 
   async function sendPointsUpdate(score: number) {
     if (!sessionId) {
@@ -103,27 +77,19 @@ const useClicker = () => {
 
       if (!response.ok) {
         console.error("Failed to update points:", data.error || "Unknown error");
-        errorUpdated(true);
         return;
       }
 
       valueInited(data.currentScore);
-      availableInited(MAX_AVAILABLE - data.currentScore);
+      availableInited(data.availableClicks);
     } catch (error) {
       console.error("Error updating points:", error);
-      errorUpdated(true);
     }
   }
 
   function onClick() {
     setClickBuffer((prev) => {
       const newBuffer = prev + CLICK_STEP;
-      clicked({
-        score: $value.getState() + CLICK_STEP,
-        click_score: newBuffer,
-        available_clicks: $available.getState() - CLICK_STEP,
-      }); // Update UI immediately
-
       if (newBuffer >= 10) {
         sendPointsUpdate(newBuffer);
         return 0;
@@ -138,8 +104,6 @@ const useClicker = () => {
       return;
     }
 
-    initializeScore(); // Initial sync only once
-
     const interval = setInterval(() => {
       if (clickBuffer > 0) {
         sendPointsUpdate(clickBuffer);
@@ -148,13 +112,13 @@ const useClicker = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [clickBuffer, sessionId]);
+  }, [clickBuffer, sessionId]); // Add sessionId as a dependency
 
   return {
     value: useUnit($value),
     available: useUnit($available),
     canBeClicked: useUnit($canBeClicked),
-    isSyncing,
+    isMultiError: useUnit($isMultiAccount),
     onClick,
   };
 };
@@ -163,8 +127,9 @@ const useClicker = () => {
 export const clickerModel = {
   valueInited,
   availableInited,
+  availableUpdated,
   clicked,
+  errorUpdated,
   useCanBeClicked,
   useClicker,
-  errorUpdated, // Added errorUpdated to the export
 };
