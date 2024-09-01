@@ -75,14 +75,21 @@ sample({
   target: availableInited,
 });
 
-// Error handling
-const lastMessage = /* your logic to get lastMessage */;
-if (lastMessage && typeof lastMessage.data === 'string' && lastMessage.data.includes('CODE')) {
-    const errorMessage = lastMessage.data.includes('1001')
-        ? 'Error: Code 1001 encountered'
-        : 'Error: Unexpected code encountered';
-    clickerModel.errorUpdated(errorMessage);
-}
+// Error handling logic
+const handleError = () => {
+  const lastMessage = /* your logic to get lastMessage */;
+  if (lastMessage && typeof lastMessage.data === 'string' && lastMessage.data.includes('CODE')) {
+      const errorMessage = lastMessage.data.includes('1001')
+          ? 'Error: Code 1001 encountered'
+          : 'Error: Unexpected code encountered';
+      errorUpdated(errorMessage); // Directly update error without referencing clickerModel
+  }
+};
+
+// Call handleError at the appropriate point in your app's lifecycle
+useEffect(() => {
+  handleError();
+}, [/* dependencies, if any */]);
 
 export const clickerModel = {
   valueInited,
