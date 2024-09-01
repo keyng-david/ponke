@@ -148,6 +148,9 @@ const useClicker = () => {
   };
 };
 
+// Ensure that syncWithBackend is assigned before the export
+const { syncWithBackend } = useClicker();
+
 export const clickerModel = {
   valueInited,
   availableInited,
@@ -156,5 +159,5 @@ export const clickerModel = {
   errorUpdated,
   useCanBeClicked,
   useClicker,
-  syncWithBackend,  // Export sync method here
+  syncWithBackend, // Properly initialize syncWithBackend here
 };
