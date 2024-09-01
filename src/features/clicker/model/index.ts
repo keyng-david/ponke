@@ -1,141 +1,88 @@
 import { useState, useEffect } from "react";
-import { createEvent, createStore, sample } from "effector";
+import { createEvent, createStore, sample, createEffect } from "effector";
 import { useUnit } from "effector-react";
 import { useSocket } from "@/app/socketProvider";
 import { $sessionId } from "@/shared/model/session";
+import axios from "axios"; // Import axios for HTTP requests
 
 export const MAX_AVAILABLE = 500;
 export const CLICK_STEP = 1;
 
 const valueInited = createEvent<number>();
 const availableInited = createEvent<number>();
-const clicked = createEvent<{
-  score: number;
-  click_score: number;
-  available_clicks: number;
-}>();
-const availableUpdated = createEvent<number>();
-const errorUpdated = createEvent<boolean>();
+const clicked = createEvent<{ score: number; click_score: number }>();
+const errorUpdated = createEvent<string>();
 
-const $isMultiAccount = createStore(false);
-const $value = createStore(0);
-const $available = createStore(MAX_AVAILABLE);
+// Create an effect to sync with backend
+const syncWithBackendFx = createEffect(async () => {
+  const sessionId = $sessionId.getState(); // Assuming this is how sessionId is stored
+  if (!sessionId) return; // Handle case where sessionId is not available
 
-const $canBeClicked = $available.map((state) => state >= CLICK_STEP);
+  try {
+    const response = await axios.post("/api/updatePoints", {
+      session_id: sessionId,
+    });
 
-sample({
-  clock: availableUpdated,
-  target: $available,
+    if (response.data.currentScore) {
+      return response.data.currentScore;
+    } else {
+      throw new Error("Failed to sync with backend");
+    }
+  } catch (error) {
+    console.error("Error syncing with backend:", error);
+    throw error;
+  }
 });
 
-sample({
-  clock: clicked,
-  fn: ({ score }) => score,
-  target: $value,
-});
+const $value = createStore(0).on(valueInited, (_, value) => value);
+const $available = createStore(MAX_AVAILABLE).on(
+  availableInited,
+  (_, available) => available
+);
 
-sample({
-  clock: clicked,
-  fn: ({ available_clicks }) => available_clicks,
-  target: $available,
-});
-
-sample({
-  clock: valueInited,
-  target: $value,
-});
-
-sample({
-  clock: availableInited,
-  target: $available,
-});
-
-sample({
-  clock: errorUpdated,
-  target: $isMultiAccount,
-});
-
-const useCanBeClicked = () => useUnit($canBeClicked);
+const useCanBeClicked = () => {
+  const available = useUnit($available);
+  return available > 0;
+};
 
 const useClicker = () => {
-  const [clickBuffer, setClickBuffer] = useState(0);
-  const sessionId = useUnit($sessionId);
+  const value = useUnit($value);
+  const available = useUnit($available);
+  const canBeClicked = useCanBeClicked();
 
-  async function sendPointsUpdate(score: number) {
-    if (!sessionId) {
-      console.error("No session ID available");
-      return;
+  const onClick = () => {
+    if (canBeClicked) {
+      clicked({ score: value + CLICK_STEP, click_score: CLICK_STEP });
     }
-
-    console.log("Sending request:", { session_id: sessionId, click_score: score });
-    try {
-      const response = await fetch("/api/game/updatePoints", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId, click_score: score }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("Failed to update points:", data.error || "Unknown error");
-        return; // Early return on error
-      }
-
-      console.log("Points updated:", data);
-
-      // Update the score and available clicks based on the backend response
-      clickerModel.valueInited(data.currentScore);
-      // Assuming available clicks are also updated in the backend and returned
-      // Replace with actual available clicks if returned from backend
-      clickerModel.availableInited(MAX_AVAILABLE - data.currentScore);
-
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error updating points:", error.message);
-      } else {
-        console.error("Error updating points:", error);
-      }
-    }
-  }
-
-  function onClick() {
-    setClickBuffer((prev) => {
-      const newBuffer = prev + CLICK_STEP;
-      if (newBuffer >= 10) {
-        sendPointsUpdate(newBuffer); // Send a batch update every 10 clicks
-        return 0;
-      }
-      return newBuffer;
-    });
-  }
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (clickBuffer > 0) {
-        sendPointsUpdate(clickBuffer);
-        setClickBuffer(0);
-      }
-    }, 1000); // Send updates every second if clicks are buffered
-
-    return () => clearInterval(interval);
-  }, [clickBuffer]);
+  };
 
   return {
-    value: useUnit($value),
-    available: useUnit($available),
-    canBeClicked: useUnit($canBeClicked),
-    isMultiError: useUnit($isMultiAccount),
+    value,
+    available,
+    canBeClicked,
     onClick,
   };
 };
 
+// Sync with backend and update store values when backend sync is successful
+sample({
+  clock: syncWithBackendFx.doneData,
+  target: valueInited,
+});
+
+sample({
+  clock: syncWithBackendFx.doneData,
+  target: availableInited,
+});
+
 export const clickerModel = {
   valueInited,
   availableInited,
-  availableUpdated,
   clicked,
   errorUpdated,
   useCanBeClicked,
   useClicker,
+  syncWithBackend: syncWithBackendFx, // Add syncWithBackend method to the model
 };
+
+export { $value, $available };
