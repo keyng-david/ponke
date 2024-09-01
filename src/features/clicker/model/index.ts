@@ -144,12 +144,9 @@ const useClicker = () => {
     canBeClicked: useUnit($canBeClicked),
     isMultiError: useUnit($isMultiAccount),
     onClick,
-    syncWithBackend,  // Expose sync method
+    syncWithBackend,  // Expose sync method here
   };
 };
-
-// Ensure that syncWithBackend is assigned before the export
-const { syncWithBackend } = useClicker();
 
 export const clickerModel = {
   valueInited,
@@ -158,6 +155,5 @@ export const clickerModel = {
   clicked,
   errorUpdated,
   useCanBeClicked,
-  useClicker,
-  syncWithBackend, // Properly initialize syncWithBackend here
+  useClicker,  // Expose the hook itself, not its contents
 };
