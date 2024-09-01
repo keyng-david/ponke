@@ -58,7 +58,7 @@ export const useAuth = () => {
         });
 
         if (!response.error) {
-          // Set initial score and available clicks from the backend response
+          // Initialize clickerModel with backend response
           clickerModel.valueInited(response.payload.score);
           clickerModel.availableInited(response.payload.available_clicks);
 
