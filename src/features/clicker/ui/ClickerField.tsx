@@ -13,7 +13,7 @@ let timeout1: NodeJS.Timeout;
 let timeout2: NodeJS.Timeout;
 
 export const ClickerField = () => {
-    const { value, available, canBeClicked, onClick } = clickerModel.useClicker();
+    const { value, available, canBeClicked, onClick, syncWithBackend } = clickerModel.useClicker();
     const { haptic } = useTelegram();
 
     const [isClickEnabled, setIsClickEnabled] = useState(true);
@@ -25,11 +25,11 @@ export const ClickerField = () => {
     // Periodically sync with backend to update score and available clicks
     useEffect(() => {
         const syncInterval = setInterval(() => {
-            clickerModel.syncWithBackend();  // Add a new method to your model to handle this
+            syncWithBackend();  // Use the sync method from the model
         }, 5000); // Sync every 5 seconds
 
         return () => clearInterval(syncInterval); // Clear interval on component unmount
-    }, []);
+    }, [syncWithBackend]);
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
