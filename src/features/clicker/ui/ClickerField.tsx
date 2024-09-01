@@ -1,4 +1,4 @@
-import React, { TouchEvent, useCallback, useMemo, useState } from "react";
+import React, { TouchEvent, useCallback, useMemo, useState, useEffect } from "react";
 import progress from '@/shared/assets/images/main/progress.png';
 import pointImage from '@/shared/assets/images/main/point.png';
 import leftHand from '@/shared/assets/images/main/left-hand.png';
@@ -8,6 +8,7 @@ import styles from './ClickerField.module.scss';
 import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/lib/number";
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
 
+// Define timeouts at the module level to prevent them from being recreated on each render
 let timeout1: NodeJS.Timeout;
 let timeout2: NodeJS.Timeout;
 
@@ -20,6 +21,15 @@ export const ClickerField = () => {
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
 
     const valueString = useMemo(() => toFormattedNumber(value), [value]);
+
+    // Periodically sync with backend to update score and available clicks
+    useEffect(() => {
+        const syncInterval = setInterval(() => {
+            clickerModel.syncWithBackend();  // Add a new method to your model to handle this
+        }, 5000); // Sync every 5 seconds
+
+        return () => clearInterval(syncInterval); // Clear interval on component unmount
+    }, []);
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
