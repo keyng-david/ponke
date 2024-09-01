@@ -19,13 +19,11 @@ const $sessionId = createStore<string | null>(null).on(setSessionId, (_, id) => 
 const setIsAuth = createEvent<boolean>();
 const $isAuth = createStore(false).on(setIsAuth, (_, value) => value);
 
-const setIsLoading = createEvent<boolean>();
-const $isLoading = createStore<boolean>(false).on(setIsLoading, (_, value) => value);
-
+// Simplify initialization to only set state on authentication
 export const useAuth = () => {
   const navigate = useNavigate();
   const isAuth = useUnit($isAuth);
-  const isLoading = useUnit($isLoading); // Add loading state
+  const isLoading = useUnit($isLoading);
   const sessionIdStore = useSessionId();
   const wallet = walletModel.useWalletModel();
   const rangModel = randModel.useRang(); 
