@@ -12,7 +12,7 @@ const valueInited = createEvent<number>();
 const availableInited = createEvent<number>();
 const clicked = createEvent<{ score: number; click_score: number }>();
 const errorUpdated = createEvent<string>();
-const availableUpdated = createEvent<number>(); // Added event to handle available updates
+const availableUpdated = createEvent<number>();
 
 // Create an effect to sync with backend
 const syncWithBackendFx = createEffect(async () => {
@@ -38,7 +38,7 @@ const syncWithBackendFx = createEffect(async () => {
 const $value = createStore(0).on(valueInited, (_, value) => value);
 const $available = createStore(MAX_AVAILABLE)
   .on(availableInited, (_, available) => available)
-  .on(availableUpdated, (_, available) => available); // Added handler for availableUpdated
+  .on(availableUpdated, (_, available) => available);
 
 const useCanBeClicked = () => {
   const available = useUnit($available);
@@ -75,15 +75,24 @@ sample({
   target: availableInited,
 });
 
+// Error handling
+const lastMessage = /* your logic to get lastMessage */;
+if (lastMessage && typeof lastMessage.data === 'string' && lastMessage.data.includes('CODE')) {
+    const errorMessage = lastMessage.data.includes('1001')
+        ? 'Error: Code 1001 encountered'
+        : 'Error: Unexpected code encountered';
+    clickerModel.errorUpdated(errorMessage);
+}
+
 export const clickerModel = {
   valueInited,
   availableInited,
-  availableUpdated, // Exported availableUpdated
+  availableUpdated,
   clicked,
   errorUpdated,
   useCanBeClicked,
   useClicker,
-  syncWithBackend: syncWithBackendFx, // Add syncWithBackend method to the model
+  syncWithBackend: syncWithBackendFx,
 };
 
 export { $value, $available };
