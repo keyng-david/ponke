@@ -8,10 +8,6 @@ import styles from './ClickerField.module.scss';
 import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/lib/number";
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
 
-// Define timeouts at the module level to prevent them from being recreated on each render
-let timeout1: NodeJS.Timeout;
-let timeout2: NodeJS.Timeout;
-
 export const ClickerField = () => {
     const { value, available, canBeClicked, onClick, syncWithBackend } = clickerModel.useClicker();
     const { haptic } = useTelegram();
@@ -37,6 +33,7 @@ export const ClickerField = () => {
         return <div>Loading...</div>; // Display loading indicator
     }
 
+    // Ensure onTouchStart function is not conditional
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
             for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
@@ -57,27 +54,24 @@ export const ClickerField = () => {
 
                     document.querySelector('#clicker')!.appendChild(pointParent);
                     haptic();
-                    timeout1 = setTimeout(() => {
+                    setTimeout(() => {
                         document.querySelector('#clicker')!.removeChild(pointParent);
-                        clearTimeout(timeout1);
                     }, 500);
 
                     if (leftClasses.length === 1 && rightClasses.length === 1) {
                         setLeftClasses(prevState => [...prevState, styles['hand-animated']]);
                         setRightClasses(prevState => [...prevState, styles['hand-animated']]);
-                        timeout2 = setTimeout(() => {
+                        setTimeout(() => {
                             setRightClasses([styles['hand-right']]);
                             setLeftClasses([styles['hand-left']]);
-                            clearTimeout(timeout2);
                         }, 350);
                     }
                 }
             }
 
             setIsClickEnabled(false);
-            timeout1 = setTimeout(() => {
+            setTimeout(() => {
                 setIsClickEnabled(true);
-                clearTimeout(timeout1);
             }, 150);
         }
     }, [isClickEnabled, canBeClicked, onClick, haptic, leftClasses.length, rightClasses.length]);
