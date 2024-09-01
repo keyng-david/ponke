@@ -82,7 +82,6 @@ const useClicker = () => {
 
       valueInited(data.currentScore);
       availableInited(MAX_AVAILABLE - data.currentScore);
-
     } catch (error) {
       console.error("Error updating points:", error);
     }
@@ -110,7 +109,6 @@ const useClicker = () => {
 
       valueInited(data.currentScore);
       availableInited(data.availableClicks);
-
     } catch (error) {
       console.error("Error syncing with backend:", error);
     }
@@ -144,10 +142,11 @@ const useClicker = () => {
     canBeClicked: useUnit($canBeClicked),
     isMultiError: useUnit($isMultiAccount),
     onClick,
-    syncWithBackend,  // Expose sync method here
+    syncWithBackend, // Expose syncWithBackend here
   };
 };
 
+// Export the hook and necessary functions
 export const clickerModel = {
   valueInited,
   availableInited,
@@ -155,5 +154,5 @@ export const clickerModel = {
   clicked,
   errorUpdated,
   useCanBeClicked,
-  useClicker,  // Expose the hook itself, not its contents
+  useClicker,
 };
