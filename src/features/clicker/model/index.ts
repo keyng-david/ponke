@@ -80,8 +80,8 @@ const useClicker = () => {
         return;
       }
 
-      clickerModel.valueInited(data.currentScore);
-      clickerModel.availableInited(MAX_AVAILABLE - data.currentScore);
+      valueInited(data.currentScore);
+      availableInited(MAX_AVAILABLE - data.currentScore);
 
     } catch (error) {
       console.error("Error updating points:", error);
@@ -108,8 +108,8 @@ const useClicker = () => {
         return;
       }
 
-      clickerModel.valueInited(data.currentScore);
-      clickerModel.availableInited(data.availableClicks);
+      valueInited(data.currentScore);
+      availableInited(data.availableClicks);
 
     } catch (error) {
       console.error("Error syncing with backend:", error);
@@ -156,5 +156,5 @@ export const clickerModel = {
   errorUpdated,
   useCanBeClicked,
   useClicker,
-  syncWithBackend,  // Add sync method here
+  syncWithBackend,  // Export sync method here
 };
