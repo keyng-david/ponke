@@ -1,4 +1,4 @@
-import React, { TouchEvent, useCallback, useMemo, useState, useEffect } from "react";
+import React, { TouchEvent, useCallback, useMemo, useState } from "react";
 import progress from '@/shared/assets/images/main/progress.png';
 import pointImage from '@/shared/assets/images/main/point.png';
 import leftHand from '@/shared/assets/images/main/left-hand.png';
@@ -12,6 +12,8 @@ export const ClickerField = () => {
     const { value, available, canBeClicked, onClick } = clickerModel.useClicker();
     const { haptic } = useTelegram();
 
+    const [localScore, setLocalScore] = useState(value);
+    const [localAvailable, setLocalAvailable] = useState(available);
     const [isClickEnabled, setIsClickEnabled] = useState(true);
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
@@ -19,42 +21,46 @@ export const ClickerField = () => {
     const [syncError, setSyncError] = useState<string | null>(null);
 
     const handleClick = useCallback(() => {
-        onClick(); // Update local state immediately
-    }, [onClick]);
+        if (canBeClicked) {
+            // Update local state immediately
+            setLocalScore(prev => prev + 1);
+            setLocalAvailable(prev => prev - 1);
+
+            onClick(); // Update backend in batch
+
+            // Simulate point update visually
+            const point = document.createElement('img');
+            point.src = pointImage;
+            point.alt = 'point';
+            point.style.transform = `rotate(${getRandomInt(-25, 25)}deg) scale(${getRandomArbitrary(0.8, 1.2)})`;
+
+            const pointParent = document.createElement('div');
+            pointParent.appendChild(point);
+            pointParent.style.top = `${clientY}px`;
+            pointParent.style.left = `${clientX}px`;
+            pointParent.className = styles.point;
+
+            document.querySelector('#clicker')!.appendChild(pointParent);
+            haptic();
+            setTimeout(() => {
+                document.querySelector('#clicker')!.removeChild(pointParent);
+            }, 500);
+
+            if (leftClasses.length === 1 && rightClasses.length === 1) {
+                setLeftClasses(prevState => [...prevState, styles['hand-animated']]);
+                setRightClasses(prevState => [...prevState, styles['hand-animated']]);
+                setTimeout(() => {
+                    setRightClasses([styles['hand-right']]);
+                    setLeftClasses([styles['hand-left']]);
+                }, 350);
+            }
+        }
+    }, [canBeClicked, onClick, haptic, leftClasses, rightClasses]);
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
             for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
-                const { clientX, clientY } = e.touches[i];
-                if (canBeClicked) {
-                    handleClick(); 
-
-                    const point = document.createElement('img');
-                    point.src = pointImage;
-                    point.alt = 'point';
-                    point.style.transform = `rotate(${getRandomInt(-25, 25)}deg) scale(${getRandomArbitrary(0.8, 1.2)})`;
-
-                    const pointParent = document.createElement('div');
-                    pointParent.appendChild(point);
-                    pointParent.style.top = `${clientY}px`;
-                    pointParent.style.left = `${clientX}px`;
-                    pointParent.className = styles.point;
-
-                    document.querySelector('#clicker')!.appendChild(pointParent);
-                    haptic();
-                    setTimeout(() => {
-                        document.querySelector('#clicker')!.removeChild(pointParent);
-                    }, 500);
-
-                    if (leftClasses.length === 1 && rightClasses.length === 1) {
-                        setLeftClasses(prevState => [...prevState, styles['hand-animated']]);
-                        setRightClasses(prevState => [...prevState, styles['hand-animated']]);
-                        setTimeout(() => {
-                            setRightClasses([styles['hand-right']]);
-                            setLeftClasses([styles['hand-left']]);
-                        }, 350);
-                    }
-                }
+                handleClick(); // Handle click on touch
             }
 
             setIsClickEnabled(false);
@@ -62,7 +68,7 @@ export const ClickerField = () => {
                 setIsClickEnabled(true);
             }, 150);
         }
-    }, [isClickEnabled, canBeClicked, handleClick, haptic, leftClasses, rightClasses]);
+    }, [isClickEnabled, handleClick]);
 
     function handleTouchMove(event: TouchEvent<HTMLDivElement>) {
         event.preventDefault();
@@ -72,7 +78,7 @@ export const ClickerField = () => {
         event.preventDefault();
     }
 
-    const valueString = useMemo(() => toFormattedNumber(value), [value]);
+    const valueString = useMemo(() => toFormattedNumber(localScore), [localScore]);
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -91,7 +97,7 @@ export const ClickerField = () => {
             onTouchEnd={handleTouchEnd}
         >
             <p className={styles.value}>{valueString}</p>
-            <ProgressBar value={available} />
+            <ProgressBar value={localAvailable} />
             <div className={styles.hands}>
                 <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
                 <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
