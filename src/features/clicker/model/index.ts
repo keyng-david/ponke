@@ -3,11 +3,13 @@ import { createEvent, createStore, sample, createEffect } from "effector";
 import { useUnit } from "effector-react";
 import { useSocket } from "@/app/socketProvider";
 import { $sessionId } from "@/shared/model/session";
-import axios from "axios"; // Import axios for HTTP requests
+import axios from "axios";
 
+// Constants
 export const MAX_AVAILABLE = 500;
 export const CLICK_STEP = 1;
 
+// Events
 const valueInited = createEvent<number>();
 const availableInited = createEvent<number>();
 const clicked = createEvent<{ score: number; click_score: number }>();
@@ -24,7 +26,10 @@ const syncWithBackendFx = createEffect(async () => {
     });
 
     if (response.data.currentScore) {
-      return response.data.currentScore;
+      return {
+        currentScore: response.data.currentScore,
+        availableClicks: response.data.availableClicks || MAX_AVAILABLE,
+      };
     } else {
       throw new Error("Failed to sync with backend");
     }
@@ -34,12 +39,33 @@ const syncWithBackendFx = createEffect(async () => {
   }
 });
 
+// Stores
 const $value = createStore(0).on(valueInited, (_, value) => value);
 const $available = createStore(MAX_AVAILABLE).on(
   availableInited,
   (_, available) => available
 );
 
+// Handle successful sync and update the stores
+sample({
+  clock: syncWithBackendFx.doneData,
+  fn: (data) => data.currentScore,
+  target: valueInited,
+});
+
+sample({
+  clock: syncWithBackendFx.doneData,
+  fn: (data) => data.availableClicks,
+  target: availableInited,
+});
+
+// Handle sync errors
+sample({
+  clock: syncWithBackendFx.failData,
+  target: errorUpdated,
+});
+
+// Custom Hooks
 const useCanBeClicked = () => {
   const available = useUnit($available);
   return available > 0;
@@ -64,17 +90,7 @@ const useClicker = () => {
   };
 };
 
-// Sync with backend and update store values when backend sync is successful
-sample({
-  clock: syncWithBackendFx.doneData,
-  target: valueInited,
-});
-
-sample({
-  clock: syncWithBackendFx.doneData,
-  target: availableInited,
-});
-
+// Model export
 export const clickerModel = {
   valueInited,
   availableInited,
@@ -82,7 +98,7 @@ export const clickerModel = {
   errorUpdated,
   useCanBeClicked,
   useClicker,
-  syncWithBackend: syncWithBackendFx, // Add syncWithBackend method to the model
+  syncWithBackend: syncWithBackendFx, // Export syncWithBackend method
 };
 
 export { $value, $available };
