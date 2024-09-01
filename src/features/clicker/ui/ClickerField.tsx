@@ -19,21 +19,23 @@ export const ClickerField = () => {
     const [isClickEnabled, setIsClickEnabled] = useState(true);
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
-    const [clicksSinceLastSync, setClicksSinceLastSync] = useState(0);
+    const [isLoading, setIsLoading] = useState(true); // Add a loading state
 
-    // Initialize data and periodically sync with backend
     useEffect(() => {
-        syncWithBackend(); // Call syncWithBackend to initialize data
+        syncWithBackend().then(() => {
+            setIsLoading(false); // Set loading to false after syncing
+        });
 
         const syncInterval = setInterval(() => {
-            if (clicksSinceLastSync > 0) {
-                syncWithBackend(); // Sync with backend if there were clicks
-                setClicksSinceLastSync(0); // Reset click buffer
-            }
-        }, 3000); // Sync every 3 seconds if there were clicks
+            syncWithBackend();  // Periodic syncing
+        }, 5000);
 
-        return () => clearInterval(syncInterval); // Clear interval on component unmount
-    }, [syncWithBackend, clicksSinceLastSync]);
+        return () => clearInterval(syncInterval);
+    }, [syncWithBackend]);
+
+    if (isLoading) {
+        return <div>Loading...</div>; // Display loading indicator
+    }
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
@@ -41,7 +43,6 @@ export const ClickerField = () => {
                 const { clientX, clientY } = e.touches[i];
                 if (canBeClicked) {
                     onClick();  // Call onClick only if clicking is allowed
-                    setClicksSinceLastSync(prev => prev + 1); // Increment click buffer
 
                     const point = document.createElement('img');
                     point.src = pointImage;
@@ -56,7 +57,7 @@ export const ClickerField = () => {
 
                     document.querySelector('#clicker')!.appendChild(pointParent);
                     haptic();
-                    const timeout1 = setTimeout(() => {
+                    timeout1 = setTimeout(() => {
                         document.querySelector('#clicker')!.removeChild(pointParent);
                         clearTimeout(timeout1);
                     }, 500);
