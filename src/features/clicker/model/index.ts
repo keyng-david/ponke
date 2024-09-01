@@ -6,19 +6,23 @@ import { $sessionId } from "@/shared/model/session";
 export const MAX_AVAILABLE = 500;
 export const CLICK_STEP = 1;
 
+// Define events
 const valueInited = createEvent<number>();
 const availableInited = createEvent<number>();
+const availableUpdated = createEvent<number>(); // New event to handle updates for available clicks
 const clicked = createEvent<{
   score: number;
   click_score: number;
   available_clicks: number;
 }>();
 
+// Define stores
 const $value = createStore(0);
 const $available = createStore(MAX_AVAILABLE);
 
 const $canBeClicked = $available.map((state) => state >= CLICK_STEP);
 
+// Sample for handling click events
 sample({
   clock: clicked,
   fn: ({ score }) => score,
@@ -31,6 +35,7 @@ sample({
   target: $available,
 });
 
+// Initialize values when events are triggered
 sample({
   clock: valueInited,
   target: $value,
@@ -38,6 +43,12 @@ sample({
 
 sample({
   clock: availableInited,
+  target: $available,
+});
+
+// Update available clicks when `availableUpdated` is triggered
+sample({
+  clock: availableUpdated,
   target: $available,
 });
 
@@ -99,7 +110,7 @@ const useClicker = () => {
       }
 
       valueInited(data.currentScore);
-      availableInited(MAX_AVAILABLE - data.currentScore);
+      availableUpdated(MAX_AVAILABLE - data.currentScore); // Use availableUpdated here to handle independent updates
     } catch (error) {
       console.error("Error updating points:", error);
     }
@@ -156,4 +167,5 @@ export const clickerModel = {
   clicked,
   useCanBeClicked,
   useClicker,
+  availableUpdated, // Export the new event as part of the model
 };
