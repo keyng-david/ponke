@@ -16,26 +16,43 @@ export const ClickerField = () => {
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
     const [isLoading, setIsLoading] = useState(true); // Add a loading state
+    const [syncError, setSyncError] = useState<string | null>(null); // Error state for syncing issues
+
+    // Function to sync with the backend and handle loading/error states
+    const syncData = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            await syncWithBackend();
+            setIsLoading(false);
+        } catch (error) {
+            setIsLoading(false);
+            setSyncError("Failed to sync data with backend. Please try again.");
+        }
+    }, [syncWithBackend]);
 
     useEffect(() => {
-        syncWithBackend().then(() => {
-            setIsLoading(false); // Set loading to false after syncing
-        });
+        syncData(); // Initial sync
 
         const syncInterval = setInterval(() => {
-            syncWithBackend();  // Periodic syncing
+            syncData();  // Periodic syncing
         }, 5000);
 
         return () => clearInterval(syncInterval);
-    }, [syncWithBackend]);
+    }, [syncData]);
+
+    const handleClick = useCallback(() => {
+        // Real-time score update locally
+        onClick();
+    }, [onClick]);
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
             for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
                 const { clientX, clientY } = e.touches[i];
                 if (canBeClicked) {
-                    onClick();  // Call onClick only if clicking is allowed
+                    handleClick(); // Call local onClick handler
 
+                    // Create point animation
                     const point = document.createElement('img');
                     point.src = pointImage;
                     point.alt = 'point';
@@ -53,6 +70,7 @@ export const ClickerField = () => {
                         document.querySelector('#clicker')!.removeChild(pointParent);
                     }, 500);
 
+                    // Handle hand animations
                     if (leftClasses.length === 1 && rightClasses.length === 1) {
                         setLeftClasses(prevState => [...prevState, styles['hand-animated']]);
                         setRightClasses(prevState => [...prevState, styles['hand-animated']]);
@@ -69,7 +87,7 @@ export const ClickerField = () => {
                 setIsClickEnabled(true);
             }, 150);
         }
-    }, [isClickEnabled, canBeClicked, onClick, haptic, leftClasses, rightClasses]);
+    }, [isClickEnabled, canBeClicked, handleClick, haptic, leftClasses, rightClasses]);
 
     function handleTouchMove(event: TouchEvent<HTMLDivElement>) {
         event.preventDefault();
@@ -81,8 +99,13 @@ export const ClickerField = () => {
 
     const valueString = useMemo(() => toFormattedNumber(value), [value]);
 
+    // Render loading or error states
     if (isLoading) {
-        return <div>Loading...</div>; // Display loading indicator
+        return <div>Loading...</div>;
+    }
+
+    if (syncError) {
+        return <div className={styles.error}>{syncError}</div>;
     }
 
     return (
