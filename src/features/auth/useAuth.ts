@@ -19,11 +19,9 @@ const $sessionId = createStore<string | null>(null).on(setSessionId, (_, id) => 
 const setIsAuth = createEvent<boolean>();
 const $isAuth = createStore(false).on(setIsAuth, (_, value) => value);
 
-// Simplify initialization to only set state on authentication
 export const useAuth = () => {
   const navigate = useNavigate();
   const isAuth = useUnit($isAuth);
-  const isLoading = useUnit($isLoading);
   const sessionIdStore = useSessionId();
   const wallet = walletModel.useWalletModel();
   const rangModel = randModel.useRang(); 
@@ -32,7 +30,6 @@ export const useAuth = () => {
   const sessionId = useUnit($sessionId);
 
   const initialize = useCallback(async () => {
-    setIsLoading(true); // Start loading
     try {
       if (!isAuth) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -40,10 +37,9 @@ export const useAuth = () => {
 
         if (sessionId) {
           sessionIdStore.set(sessionId);
-          setSessionId(sessionId);
+          setSessionId(sessionId); // Save sessionId to global state
         } else {
           setError("No session ID found");
-          setIsLoading(false); // Stop loading
           return;
         }
 
@@ -62,16 +58,22 @@ export const useAuth = () => {
         });
 
         if (!response.error) {
+          // Set initial score and available clicks from the backend response
           clickerModel.valueInited(response.payload.score);
           clickerModel.availableInited(response.payload.available_clicks);
 
+          // Update wallet if available
           if (response.payload.wallet) {
             wallet.updateWallet(response.payload.wallet);
           }
 
+          // Update rank level
           rangModel.update(response.payload.level);
+
+          // Set telegram_id for global access
           setTelegramId(response.payload.telegram_id);
 
+          // Navigate to the main page after successful authentication
           navigate("/main");
           setIsAuth(true);
         } else {
@@ -82,10 +84,8 @@ export const useAuth = () => {
     } catch (e) {
       sessionIdStore.remove();
       setError(`Error during authentication: ${e instanceof Error ? e.message : String(e)}`);
-    } finally {
-      setIsLoading(false); // Stop loading
     }
   }, [isAuth, sessionIdStore, wallet, rangModel, navigate, setError]);
 
-  return { initialize, telegramId, sessionId, isLoading };
+  return { initialize, telegramId, sessionId };
 };
