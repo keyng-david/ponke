@@ -8,11 +8,7 @@ export const CLICK_STEP = 1;
 
 const valueInited = createEvent<number>();
 const availableInited = createEvent<number>();
-const clicked = createEvent<{
-  score: number;
-  click_score: number;
-  available_clicks: number;
-}>();
+const clicked = createEvent<number>(); // Changed to single number for click increment
 const availableUpdated = createEvent<number>();
 const errorUpdated = createEvent<boolean>();
 
@@ -29,13 +25,13 @@ sample({
 
 sample({
   clock: clicked,
-  fn: ({ score }) => score,
+  fn: (click_score) => click_score,
   target: $value,
 });
 
 sample({
   clock: clicked,
-  fn: ({ available_clicks }) => available_clicks,
+  fn: (click_score) => MAX_AVAILABLE - click_score,
   target: $available,
 });
 
@@ -88,37 +84,37 @@ const useClicker = () => {
   }
 
   async function syncWithBackend() {
-  if (!sessionId) {
-    console.error("No session ID available for syncing");
-    return;
-  }
-
-  try {
-    // Call the existing updatePoints endpoint to fetch user data
-    const response = await fetch("/api/game/updatePoints", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ session_id: sessionId }), // Only session_id is needed for fetching data
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("Failed to sync with backend:", data.error || "Unknown error");
+    if (!sessionId) {
+      console.error("No session ID available for syncing");
       return;
     }
 
-    // Update stores with the fetched user score and max available clicks
-    valueInited(data.currentScore);
-    availableInited(data.maxAvailable);
-  } catch (error) {
-    console.error("Error syncing with backend:", error);
+    try {
+      const response = await fetch("/api/game/updatePoints", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Failed to sync with backend:", data.error || "Unknown error");
+        return;
+      }
+
+      // Correct optimistic updates based on backend data
+      valueInited(data.currentScore);
+      availableInited(data.maxAvailable);
+    } catch (error) {
+      console.error("Error syncing with backend:", error);
+    }
   }
-}
 
   function onClick() {
     setClickBuffer((prev) => {
       const newBuffer = prev + CLICK_STEP;
+      clicked(newBuffer); // Optimistically update the store
       if (newBuffer >= 10) {
         sendPointsUpdate(newBuffer);
         return 0;
@@ -141,7 +137,7 @@ const useClicker = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [clickBuffer, sessionId]); // Add sessionId as a dependency
+  }, [clickBuffer, sessionId]);
 
   return {
     value: useUnit($value),
@@ -149,7 +145,7 @@ const useClicker = () => {
     canBeClicked: useUnit($canBeClicked),
     isMultiError: useUnit($isMultiAccount),
     onClick,
-    syncWithBackend, // Expose syncWithBackend here
+    syncWithBackend,
   };
 };
 
