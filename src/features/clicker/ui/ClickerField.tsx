@@ -15,10 +15,9 @@ export const ClickerField = () => {
     const [isClickEnabled, setIsClickEnabled] = useState(true);
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
-    const [isLoading, setIsLoading] = useState(true); // Add a loading state
-    const [syncError, setSyncError] = useState<string | null>(null); // Error state for syncing issues
+    const [isLoading, setIsLoading] = useState(true);
+    const [syncError, setSyncError] = useState<string | null>(null);
 
-    // Function to sync with the backend and handle loading/error states
     const syncData = useCallback(async () => {
         try {
             setIsLoading(true);
@@ -41,8 +40,7 @@ export const ClickerField = () => {
     }, [syncData]);
 
     const handleClick = useCallback(() => {
-        // Real-time score update locally
-        onClick();
+        onClick(); // Optimistic UI update on click
     }, [onClick]);
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
@@ -50,9 +48,8 @@ export const ClickerField = () => {
             for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
                 const { clientX, clientY } = e.touches[i];
                 if (canBeClicked) {
-                    handleClick(); // Call local onClick handler
+                    handleClick();
 
-                    // Create point animation
                     const point = document.createElement('img');
                     point.src = pointImage;
                     point.alt = 'point';
@@ -70,7 +67,6 @@ export const ClickerField = () => {
                         document.querySelector('#clicker')!.removeChild(pointParent);
                     }, 500);
 
-                    // Handle hand animations
                     if (leftClasses.length === 1 && rightClasses.length === 1) {
                         setLeftClasses(prevState => [...prevState, styles['hand-animated']]);
                         setRightClasses(prevState => [...prevState, styles['hand-animated']]);
@@ -99,7 +95,6 @@ export const ClickerField = () => {
 
     const valueString = useMemo(() => toFormattedNumber(value), [value]);
 
-    // Render loading or error states
     if (isLoading) {
         return <div>Loading...</div>;
     }
