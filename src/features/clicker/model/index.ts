@@ -88,34 +88,34 @@ const useClicker = () => {
   }
 
   async function syncWithBackend() {
-  if (!sessionId) {
-    console.error("No session ID available for syncing");
-    return;
-  }
-
-  try {
-    // Use the same endpoint as updatePoints since it's handled by the same code
-    const response = await fetch("/api/game/updatePoints", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      // No click_score required for this call, as we're just querying the score
-      body: JSON.stringify({ session_id: sessionId, click_score: 0 }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("Failed to sync with backend:", data.error || "Unknown error");
+    if (!sessionId) {
+      console.error("No session ID available for syncing");
       return;
     }
 
-    // Update stores with the current score and available clicks from the response
-    valueInited(data.currentScore);
-    availableInited(MAX_AVAILABLE - data.currentScore);
-  } catch (error) {
-    console.error("Error syncing with backend:", error);
+    try {
+      // Use the same endpoint as updatePoints since it's handled by the same code
+      const response = await fetch("/api/game/updatePoints", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // No click_score required for this call, as we're just querying the score
+        body: JSON.stringify({ session_id: sessionId, click_score: 0 }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Failed to sync with backend:", data.error || "Unknown error");
+        return;
+      }
+
+      // Update stores with the current score and available clicks from the response
+      valueInited(data.currentScore);
+      availableInited(MAX_AVAILABLE - data.currentScore);
+    } catch (error) {
+      console.error("Error syncing with backend:", error);
+    }
   }
-}
 
   function onClick() {
     setClickBuffer((prev) => {
@@ -129,6 +129,11 @@ const useClicker = () => {
   }
 
   useEffect(() => {
+    if (!sessionId) {
+      console.error("Session ID is not set");
+      return;
+    }
+
     const interval = setInterval(() => {
       if (clickBuffer > 0) {
         sendPointsUpdate(clickBuffer);
@@ -137,7 +142,7 @@ const useClicker = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [clickBuffer]);
+  }, [clickBuffer, sessionId]); // Add sessionId as a dependency
 
   return {
     value: useUnit($value),
