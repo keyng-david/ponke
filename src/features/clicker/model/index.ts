@@ -88,31 +88,34 @@ const useClicker = () => {
   }
 
   async function syncWithBackend() {
-    if (!sessionId) {
-      console.error("No session ID available for syncing");
+  if (!sessionId) {
+    console.error("No session ID available for syncing");
+    return;
+  }
+
+  try {
+    // Use the same endpoint as updatePoints since it's handled by the same code
+    const response = await fetch("/api/game/updatePoints", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // No click_score required for this call, as we're just querying the score
+      body: JSON.stringify({ session_id: sessionId, click_score: 0 }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Failed to sync with backend:", data.error || "Unknown error");
       return;
     }
 
-    try {
-      const response = await fetch("/api/game/getUserScore", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("Failed to sync with backend:", data.error || "Unknown error");
-        return;
-      }
-
-      valueInited(data.currentScore);
-      availableInited(data.availableClicks);
-    } catch (error) {
-      console.error("Error syncing with backend:", error);
-    }
+    // Update stores with the current score and available clicks from the response
+    valueInited(data.currentScore);
+    availableInited(MAX_AVAILABLE - data.currentScore);
+  } catch (error) {
+    console.error("Error syncing with backend:", error);
   }
+}
 
   function onClick() {
     setClickBuffer((prev) => {
