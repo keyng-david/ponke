@@ -8,7 +8,11 @@ export const CLICK_STEP = 1;
 
 const valueInited = createEvent<number>();
 const availableInited = createEvent<number>();
-const clicked = createEvent<number>(); // Changed to single number for click increment
+const clicked = createEvent<{
+  score: number;
+  click_score: number;
+  available_clicks: number;
+}>();
 const availableUpdated = createEvent<number>();
 const errorUpdated = createEvent<boolean>();
 
@@ -25,13 +29,13 @@ sample({
 
 sample({
   clock: clicked,
-  fn: (click_score) => click_score,
+  fn: ({ score }) => score,
   target: $value,
 });
 
 sample({
   clock: clicked,
-  fn: (click_score) => MAX_AVAILABLE - click_score,
+  fn: ({ available_clicks }) => available_clicks,
   target: $available,
 });
 
@@ -103,7 +107,6 @@ const useClicker = () => {
         return;
       }
 
-      // Correct optimistic updates based on backend data
       valueInited(data.currentScore);
       availableInited(data.maxAvailable);
     } catch (error) {
@@ -114,7 +117,12 @@ const useClicker = () => {
   function onClick() {
     setClickBuffer((prev) => {
       const newBuffer = prev + CLICK_STEP;
-      clicked(newBuffer); // Optimistically update the store
+      clicked({
+        score: $value.getState() + CLICK_STEP,
+        click_score: newBuffer,
+        available_clicks: $available.getState() - CLICK_STEP,
+      }); // Update UI immediately
+
       if (newBuffer >= 10) {
         sendPointsUpdate(newBuffer);
         return 0;
