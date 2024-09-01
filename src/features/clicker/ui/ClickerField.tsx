@@ -19,20 +19,21 @@ export const ClickerField = () => {
     const [isClickEnabled, setIsClickEnabled] = useState(true);
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
+    const [clicksSinceLastSync, setClicksSinceLastSync] = useState(0);
 
-    // Remove redundant syncWithBackend declaration
-    // const { syncWithBackend } = useClicker(); // Remove this line
-
+    // Initialize data and periodically sync with backend
     useEffect(() => {
         syncWithBackend(); // Call syncWithBackend to initialize data
 
-        // Periodically sync with backend to update score and available clicks
         const syncInterval = setInterval(() => {
-            syncWithBackend();  // Use the sync method from the model
-        }, 5000); // Sync every 5 seconds
+            if (clicksSinceLastSync > 0) {
+                syncWithBackend(); // Sync with backend if there were clicks
+                setClicksSinceLastSync(0); // Reset click buffer
+            }
+        }, 3000); // Sync every 3 seconds if there were clicks
 
         return () => clearInterval(syncInterval); // Clear interval on component unmount
-    }, [syncWithBackend]);
+    }, [syncWithBackend, clicksSinceLastSync]);
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
@@ -40,6 +41,7 @@ export const ClickerField = () => {
                 const { clientX, clientY } = e.touches[i];
                 if (canBeClicked) {
                     onClick();  // Call onClick only if clicking is allowed
+                    setClicksSinceLastSync(prev => prev + 1); // Increment click buffer
 
                     const point = document.createElement('img');
                     point.src = pointImage;
