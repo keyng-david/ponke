@@ -59,8 +59,6 @@ const useCanBeClicked = () => useUnit($canBeClicked);
 
 const useClicker = () => {
   const [clickBuffer, setClickBuffer] = useState(0);
-
-  // Use the global session ID from Effector store
   const sessionId = useUnit($sessionId);
 
   async function sendPointsUpdate(score: number) {
@@ -85,6 +83,13 @@ const useClicker = () => {
       }
 
       console.log("Points updated:", data);
+
+      // Update the score and available clicks based on the backend response
+      clickerModel.valueInited(data.currentScore);
+      // Assuming available clicks are also updated in the backend and returned
+      // Replace with actual available clicks if returned from backend
+      clickerModel.availableInited(MAX_AVAILABLE - data.currentScore);
+
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error updating points:", error.message);
