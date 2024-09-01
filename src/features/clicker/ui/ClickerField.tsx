@@ -3,7 +3,7 @@ import progress from '@/shared/assets/images/main/progress.png';
 import pointImage from '@/shared/assets/images/main/point.png';
 import leftHand from '@/shared/assets/images/main/left-hand.png';
 import rightHand from '@/shared/assets/images/main/right-hand.png';
-import { MAX_AVAILABLE, clickerModel, useClicker } from "../model";
+import { MAX_AVAILABLE, clickerModel } from "../model";
 import styles from './ClickerField.module.scss';
 import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/lib/number";
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
@@ -20,13 +20,13 @@ export const ClickerField = () => {
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
 
-    const { syncWithBackend } = useClicker();
-syncWithBackend();
+    // Remove redundant syncWithBackend declaration
+    // const { syncWithBackend } = useClicker(); // Remove this line
 
-    const valueString = useMemo(() => toFormattedNumber(value), [value]);
-
-    // Periodically sync with backend to update score and available clicks
     useEffect(() => {
+        syncWithBackend(); // Call syncWithBackend to initialize data
+
+        // Periodically sync with backend to update score and available clicks
         const syncInterval = setInterval(() => {
             syncWithBackend();  // Use the sync method from the model
         }, 5000); // Sync every 5 seconds
@@ -86,6 +86,8 @@ syncWithBackend();
     function handleTouchEnd(event: TouchEvent<HTMLDivElement>) {
         event.preventDefault();
     }
+
+    const valueString = useMemo(() => toFormattedNumber(value), [value]);
 
     return (
         <div
