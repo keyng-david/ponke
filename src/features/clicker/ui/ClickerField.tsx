@@ -9,124 +9,99 @@ import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/li
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
 
 export const ClickerField = () => {
-    const { value, available, canBeClicked, onClick, syncWithBackend } = clickerModel.useClicker();
-    const { haptic } = useTelegram();
+  const { value, available, canBeClicked, onClick, isSyncing } = clickerModel.useClicker();
+  const { haptic } = useTelegram();
 
-    const [isClickEnabled, setIsClickEnabled] = useState(true);
-    const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
-    const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [syncError, setSyncError] = useState<string | null>(null);
+  const [isClickEnabled, setIsClickEnabled] = useState(true);
+  const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
+  const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
 
-    const syncData = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            await syncWithBackend();
-            setIsLoading(false);
-        } catch (error) {
-            setIsLoading(false);
-            setSyncError("Failed to sync data with backend. Please try again.");
-        }
-    }, [syncWithBackend]);
+  const handleClick = useCallback(() => {
+    if (!isSyncing) {
+      onClick(); // Optimistic UI update on click
+    }
+  }, [onClick, isSyncing]);
 
-    useEffect(() => {
-        syncData(); // Initial sync
+  const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
+    if (isClickEnabled) {
+      for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
+        const { clientX, clientY } = e.touches[i];
+        if (canBeClicked) {
+          handleClick();
 
-        const syncInterval = setInterval(() => {
-            syncData();  // Periodic syncing
-        }, 5000);
+          const point = document.createElement('img');
+          point.src = pointImage;
+          point.alt = 'point';
+          point.style.transform = `rotate(${getRandomInt(-25, 25)}deg) scale(${getRandomArbitrary(0.8, 1.2)})`;
 
-        return () => clearInterval(syncInterval);
-    }, [syncData]);
+          const pointParent = document.createElement('div');
+          pointParent.appendChild(point);
+          pointParent.style.top = `${clientY}px`;
+          pointParent.style.left = `${clientX}px`;
+          pointParent.className = styles.point;
 
-    const handleClick = useCallback(() => {
-        onClick(); // Optimistic UI update on click
-    }, [onClick]);
+          document.querySelector('#clicker')!.appendChild(pointParent);
+          haptic();
+          setTimeout(() => {
+            document.querySelector('#clicker')!.removeChild(pointParent);
+          }, 500);
 
-    const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
-        if (isClickEnabled) {
-            for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
-                const { clientX, clientY } = e.touches[i];
-                if (canBeClicked) {
-                    handleClick();
-
-                    const point = document.createElement('img');
-                    point.src = pointImage;
-                    point.alt = 'point';
-                    point.style.transform = `rotate(${getRandomInt(-25, 25)}deg) scale(${getRandomArbitrary(0.8, 1.2)})`;
-
-                    const pointParent = document.createElement('div');
-                    pointParent.appendChild(point);
-                    pointParent.style.top = `${clientY}px`;
-                    pointParent.style.left = `${clientX}px`;
-                    pointParent.className = styles.point;
-
-                    document.querySelector('#clicker')!.appendChild(pointParent);
-                    haptic();
-                    setTimeout(() => {
-                        document.querySelector('#clicker')!.removeChild(pointParent);
-                    }, 500);
-
-                    if (leftClasses.length === 1 && rightClasses.length === 1) {
-                        setLeftClasses(prevState => [...prevState, styles['hand-animated']]);
-                        setRightClasses(prevState => [...prevState, styles['hand-animated']]);
-                        setTimeout(() => {
-                            setRightClasses([styles['hand-right']]);
-                            setLeftClasses([styles['hand-left']]);
-                        }, 350);
-                    }
-                }
-            }
-
-            setIsClickEnabled(false);
+          if (leftClasses.length === 1 && rightClasses.length === 1) {
+            setLeftClasses(prevState => [...prevState, styles['hand-animated']]);
+            setRightClasses(prevState => [...prevState, styles['hand-animated']]);
             setTimeout(() => {
-                setIsClickEnabled(true);
-            }, 150);
+              setRightClasses([styles['hand-right']]);
+              setLeftClasses([styles['hand-left']]);
+            }, 350);
+          }
         }
-    }, [isClickEnabled, canBeClicked, handleClick, haptic, leftClasses, rightClasses]);
+      }
 
-    function handleTouchMove(event: TouchEvent<HTMLDivElement>) {
-        event.preventDefault();
+      setIsClickEnabled(false);
+      setTimeout(() => {
+        setIsClickEnabled(true);
+      }, 150);
     }
+  }, [isClickEnabled, canBeClicked, handleClick, haptic, leftClasses, rightClasses]);
 
-    function handleTouchEnd(event: TouchEvent<HTMLDivElement>) {
-        event.preventDefault();
-    }
+  function handleTouchMove(event: TouchEvent<HTMLDivElement>) {
+    event.preventDefault();
+  }
 
-    const valueString = useMemo(() => toFormattedNumber(value), [value]);
+  function handleTouchEnd(event: TouchEvent<HTMLDivElement>) {
+    event.preventDefault();
+  }
 
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
+  const valueString = useMemo(() => toFormattedNumber(value), [value]);
 
-    if (syncError) {
-        return <div className={styles.error}>{syncError}</div>;
-    }
+  if (isSyncing) {
+    return <div>Loading...</div>;
+  }
 
-    return (
-        <div
-            id={'clicker'}
-            className={styles.root}
-            onTouchStart={onTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-        >
-            <p className={styles.value}>{valueString}</p>
-            <ProgressBar value={available} />
-            <div className={styles.hands}>
-                <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
-                <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
-            </div>
-        </div>
-    );
+  return (
+    <div
+      id={'clicker'}
+      className={styles.root}
+      onTouchStart={onTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      <p className={styles.value}>{valueString}</p>
+      <ProgressBar value={available} />
+      <div className={styles.hands}>
+        <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
+        <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
+      </div>
+    </div>
+  );
 }
 
 const ProgressBar = React.memo<{
-    value: number
+  value: number
 }>(({ value }) => {
-    const list = useMemo(() => {
-        let count = 0;
-        let curr = value;
+  const list = useMemo(() => {
+    let count = 0;
+    let curr = value;
 
         while (curr >= 0) {
             count += 1;
