@@ -29,11 +29,6 @@ export const ClickerField = () => {
         return () => clearInterval(syncInterval);
     }, [syncWithBackend]);
 
-    if (isLoading) {
-        return <div>Loading...</div>; // Display loading indicator
-    }
-
-    // Ensure onTouchStart function is not conditional
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
             for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
@@ -74,7 +69,7 @@ export const ClickerField = () => {
                 setIsClickEnabled(true);
             }, 150);
         }
-    }, [isClickEnabled, canBeClicked, onClick, haptic, leftClasses.length, rightClasses.length]);
+    }, [isClickEnabled, canBeClicked, onClick, haptic, leftClasses, rightClasses]);
 
     function handleTouchMove(event: TouchEvent<HTMLDivElement>) {
         event.preventDefault();
@@ -85,6 +80,10 @@ export const ClickerField = () => {
     }
 
     const valueString = useMemo(() => toFormattedNumber(value), [value]);
+
+    if (isLoading) {
+        return <div>Loading...</div>; // Display loading indicator
+    }
 
     return (
         <div
