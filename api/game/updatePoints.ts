@@ -17,8 +17,7 @@ module.exports = async (req, res) => {
     }
 
     // Calling the remote procedure 'increment_score'
-    const { data, error } = await supabase
-      .rpc('increment_score', { session_id, click_score });
+    const { data, error } = await supabase.rpc('increment_score', { session_id, click_score });
 
     if (error) {
       console.error('Error updating score:', error);
@@ -28,7 +27,23 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'Failed to update points', details: error.message });
     }
 
-    res.status(200).json(data);
+    // Fetch the updated score from the 'users' table after incrementing
+    const { data: currentScoreData, error: fetchError } = await supabase
+      .from('users')  // Corrected the table name to 'users'
+      .select('score')  // Assuming 'score' is the column name
+      .eq('session_id', session_id)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching current score:', fetchError);
+      return res.status(500).json({ error: 'Failed to fetch current score', details: fetchError.message });
+    }
+
+    // Return both the update status and the current score
+    res.status(200).json({
+      message: 'Points updated successfully',
+      currentScore: currentScoreData.score,
+    });
   } catch (err) {
     console.error('Unexpected error:', err);
     res.status(500).json({ error: 'Unexpected error occurred', details: err.message });
