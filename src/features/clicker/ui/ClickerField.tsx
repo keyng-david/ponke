@@ -17,8 +17,13 @@ const useGameData = () => {
     const [availableClicks, setAvailableClicks] = useState(initialAvailable);
 
     useEffect(() => {
-        clickerModel.$value.watch(setScore);
-        clickerModel.$available.watch(setAvailableClicks);
+        const unsubscribeValue = clickerModel.$value.watch(setScore);
+        const unsubscribeAvailable = clickerModel.$available.watch(setAvailableClicks);
+
+        return () => {
+            unsubscribeValue();
+            unsubscribeAvailable();
+        };
     }, []);
 
     const updateScoreAndAvailable = (newScore: number, newAvailable: number) => {
@@ -45,7 +50,7 @@ export const ClickerField = () => {
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
 
     const handleClick = useCallback(() => {
-        if (canBeClicked) {
+        if (canBeClicked && availableClicks > 0) {
             const newScore = score + 1; // Example logic for updating score
             const newAvailable = availableClicks - 1; // Example logic for updating available clicks
             updateScoreAndAvailable(newScore, newAvailable);
@@ -138,5 +143,3 @@ const ProgressBar = React.memo<{
         </div>
     )
 });
-
-
