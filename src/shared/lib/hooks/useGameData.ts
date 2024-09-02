@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { clickerModel } from "@/features/clicker/model";
 
 // Custom hook for game data management
-const useGameData = () => {
+// useGameData.ts
+export const useGameData = () => {
     // Use Effector's useStore to retrieve reactive state
     const initialValue = useStore(clickerModel.$value);
     const initialAvailable = useStore(clickerModel.$available);
