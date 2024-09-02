@@ -14,7 +14,7 @@ export const ClickerField = () => {
     // Use the custom hook to manage game data
     const { score, availableClicks, updateScoreAndAvailable } = useGameData();
     const { haptic } = useTelegram();
-    const canBeClicked = useStore(clickerModel.$canBeClicked);
+    const canBeClicked = clickerModel.useCanBeClicked();
 
     const [isClickEnabled, setIsClickEnabled] = useState(true);
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
