@@ -1,4 +1,4 @@
-import { useStore } from "effector-react";
+import { useUnit } from "effector-react";
 import { useEffect, useState } from "react";
 import { $value, $available, clickerModel } from "@/features/clicker/model";
 import { useAuth } from "@/shared/lib/hooks/useAuth"; // Import useAuth
@@ -8,8 +8,8 @@ export const useGameData = () => {
     const { userData } = useAuth(); // Assuming userData contains initial score and availableClicks
 
     // Use Effector's useStore to retrieve reactive state
-    const initialValue: number = useStore($value);
-    const initialAvailable: number = useStore($available);
+    const initialValue: number = useUnit($value);
+const initialAvailable: number = useUnit($available);
 
     // Initialize local state with useAuth data
     const [score, setScore] = useState<number>(userData ? userData.initialScore : initialValue);
