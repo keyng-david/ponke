@@ -5,7 +5,7 @@ import leftHand from '@/shared/assets/images/main/left-hand.png';
 import rightHand from '@/shared/assets/images/main/right-hand.png';
 import { MAX_AVAILABLE, clickerModel } from "../model";
 import styles from './ClickerField.module.scss';
-import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/lib/number";
+import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/lib/number';
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
 import { useStore } from "effector-react";
 
@@ -29,8 +29,8 @@ const useGameData = () => {
     const updateScoreAndAvailable = (newScore: number, newAvailable: number) => {
         setScore(newScore);
         setAvailableClicks(newAvailable);
-        clickerModel.updateScore(newScore); // Sync with Effector store
-        clickerModel.updateAvailable(newAvailable); // Sync with Effector store
+        clickerModel.valueInited(newScore); // Sync with Effector store
+        clickerModel.availableInited(newAvailable); // Sync with Effector store
     };
 
     return {
