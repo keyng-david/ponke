@@ -10,8 +10,8 @@ import { useTelegram } from "@/shared/lib/hooks/useTelegram";
 import { useStore } from "effector-react";
 
 const useGameData = () => {
-    const initialValue = clickerModel.$initialValue.getState(); // Initial score from the global store
-    const initialAvailable = clickerModel.$initialAvailable.getState(); // Initial available clicks from the global store
+    const initialValue = clickerModel.$value.getState(); // Initial score from the global store
+    const initialAvailable = clickerModel.$available.getState(); // Initial available clicks from the global store
 
     const [score, setScore] = useState(initialValue);
     const [availableClicks, setAvailableClicks] = useState(initialAvailable);
@@ -138,3 +138,5 @@ const ProgressBar = React.memo<{
         </div>
     )
 });
+
+
