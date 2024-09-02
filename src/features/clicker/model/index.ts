@@ -59,6 +59,7 @@ const useCanBeClicked = () => useUnit($canBeClicked);
 const useClicker = () => {
   const [clickBuffer, setClickBuffer] = useState(0);
   const sessionId = useUnit($sessionId);
+  const [lastClickTime, setLastClickTime] = useState<Date | null>(null);
 
   async function sendPointsUpdate(score: number) {
     if (!sessionId) {
@@ -80,22 +81,12 @@ const useClicker = () => {
         return;
       }
 
+      // Update the state with the returned data
       valueInited(data.currentScore);
-      availableInited(data.availableClicks);
+      availableInited(data.available_clicks);
     } catch (error) {
       console.error("Error updating points:", error);
     }
-  }
-
-  function onClick() {
-    setClickBuffer((prev) => {
-      const newBuffer = prev + CLICK_STEP;
-      if (newBuffer >= 10) {
-        sendPointsUpdate(newBuffer);
-        return 0;
-      }
-      return newBuffer;
-    });
   }
 
   useEffect(() => {
@@ -109,10 +100,27 @@ const useClicker = () => {
         sendPointsUpdate(clickBuffer);
         setClickBuffer(0);
       }
+      
+      if (lastClickTime && (new Date().getTime() - lastClickTime.getTime()) >= 5000) {
+        // Fetch updated data if there's inactivity for 5 seconds
+        sendPointsUpdate(0);  // Call with 0 to only fetch data
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [clickBuffer, sessionId]); // Add sessionId as a dependency
+  }, [clickBuffer, sessionId, lastClickTime]);
+
+  function onClick() {
+    setClickBuffer((prev) => {
+      const newBuffer = prev + CLICK_STEP;
+      setLastClickTime(new Date());
+      if (newBuffer >= 10) {
+        sendPointsUpdate(newBuffer);
+        return 0;
+      }
+      return newBuffer;
+    });
+  }
 
   return {
     value: useUnit($value),
@@ -123,7 +131,6 @@ const useClicker = () => {
   };
 };
 
-// Export the hook and necessary functions
 export const clickerModel = {
   valueInited,
   availableInited,
