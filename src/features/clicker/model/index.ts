@@ -3,25 +3,30 @@ import { createEvent, createStore, sample } from "effector";
 import { useUnit } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
 
+// Constants
 export const MAX_AVAILABLE = 500;
 export const CLICK_STEP = 1;
 
-const valueInited = createEvent<number>();
-const availableInited = createEvent<number>();
-const clicked = createEvent<{
+// Events
+export const valueInited = createEvent<number>();
+export const availableInited = createEvent<number>();
+export const clicked = createEvent<{
   score: number;
   click_score: number;
   available_clicks: number;
 }>();
-const availableUpdated = createEvent<number>();
-const errorUpdated = createEvent<boolean>();
+export const availableUpdated = createEvent<number>();
+export const errorUpdated = createEvent<boolean>();
 
-const $isMultiAccount = createStore(false);
-const $value = createStore(0);
-const $available = createStore(MAX_AVAILABLE);
+// Stores
+export const $isMultiAccount = createStore(false);
+export const $value = createStore(0);
+export const $available = createStore(MAX_AVAILABLE);
 
-const $canBeClicked = $available.map((state) => state >= CLICK_STEP);
+// Derived store
+export const $canBeClicked = $available.map((state) => state >= CLICK_STEP);
 
+// Effector samples
 sample({
   clock: availableUpdated,
   target: $available,
@@ -54,9 +59,10 @@ sample({
   target: $isMultiAccount,
 });
 
-const useCanBeClicked = () => useUnit($canBeClicked);
+// Hooks
+export const useCanBeClicked = () => useUnit($canBeClicked);
 
-const useClicker = () => {
+export const useClicker = () => {
   const [clickBuffer, setClickBuffer] = useState(0);
   const sessionId = useUnit($sessionId);
   const [lastClickTime, setLastClickTime] = useState<Date | null>(null);
@@ -100,8 +106,8 @@ const useClicker = () => {
         sendPointsUpdate(clickBuffer);
         setClickBuffer(0);
       }
-      
-      if (lastClickTime && (new Date().getTime() - lastClickTime.getTime()) >= 5000) {
+
+      if (lastClickTime && new Date().getTime() - lastClickTime.getTime() >= 5000) {
         // Fetch updated data if there's inactivity for 5 seconds
         sendPointsUpdate(0);  // Call with 0 to only fetch data
       }
@@ -131,6 +137,7 @@ const useClicker = () => {
   };
 };
 
+// Export model object with all events, stores, and hooks
 export const clickerModel = {
   valueInited,
   availableInited,
