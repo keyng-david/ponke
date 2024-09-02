@@ -1,6 +1,6 @@
 import { useStore } from "effector-react";
 import { useEffect, useState } from "react";
-import { clickerModel } from "@/features/Clicker/model";
+import { clickerModel } from "@/features/clicker/model";
 
 // Custom hook for game data management
 const useGameData = () => {
