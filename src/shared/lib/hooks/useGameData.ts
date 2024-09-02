@@ -4,24 +4,13 @@ import { $value, $available, clickerModel } from "@/features/clicker/model";
 import { useAuth } from "@/features/auth/useAuth";
 
 export const useGameData = () => {
-    // Retrieve user game data from useAuth
-    const { userData } = useAuth(); // Assuming userData contains initial score and availableClicks
-
-    // Use Effector's useStore to retrieve reactive state
-    const initialValue: number = useUnit($value);
-const initialAvailable: number = useUnit($available);
+    const { initialScore, initialAvailableClicks } = useAuth();
 
     // Initialize local state with useAuth data
-    const [score, setScore] = useState<number>(userData ? userData.initialScore : initialValue);
-    const [availableClicks, setAvailableClicks] = useState<number>(userData ? userData.initialAvailableClicks : initialAvailable);
+    const [score, setScore] = useState<number>(initialScore);
+    const [availableClicks, setAvailableClicks] = useState<number>(initialAvailableClicks);
 
     useEffect(() => {
-        if (userData) {
-            // Update Effector stores based on initial userData
-            clickerModel.valueInited(userData.initialScore);
-            clickerModel.availableInited(userData.initialAvailableClicks);
-        }
-
         // Sync Effector store updates with local state
         const unsubscribeValue = $value.watch(setScore);
         const unsubscribeAvailable = $available.watch(setAvailableClicks);
@@ -30,7 +19,7 @@ const initialAvailable: number = useUnit($available);
             unsubscribeValue();
             unsubscribeAvailable();
         };
-    }, [userData]); // Depend on userData to re-run the effect when it changes
+    }, []); // Removed userData dependency
 
     const updateScoreAndAvailable = (newScore: number, newAvailable: number) => {
         setScore(newScore);
