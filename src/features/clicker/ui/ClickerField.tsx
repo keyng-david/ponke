@@ -8,39 +8,10 @@ import styles from './ClickerField.module.scss';
 import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/lib/number";
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
 import { useStore } from "effector-react";
-
-const useGameData = () => {
-    const initialValue = clickerModel.$value.getState(); // Initial score from the global store
-    const initialAvailable = clickerModel.$available.getState(); // Initial available clicks from the global store
-
-    const [score, setScore] = useState(initialValue);
-    const [availableClicks, setAvailableClicks] = useState(initialAvailable);
-
-    useEffect(() => {
-        const unsubscribeValue = clickerModel.$value.watch(setScore);
-        const unsubscribeAvailable = clickerModel.$available.watch(setAvailableClicks);
-
-        return () => {
-            unsubscribeValue();
-            unsubscribeAvailable();
-        };
-    }, []);
-
-    const updateScoreAndAvailable = (newScore: number, newAvailable: number) => {
-        setScore(newScore);
-        setAvailableClicks(newAvailable);
-        clickerModel.valueInited(newScore); // Sync with Effector store
-        clickerModel.availableInited(newAvailable); // Sync with Effector store
-    };
-
-    return {
-        score,
-        availableClicks,
-        updateScoreAndAvailable,
-    };
-};
+import { useGameData } from "@/shared/lib/hooks/useGameData"; // Import the custom hook
 
 export const ClickerField = () => {
+    // Use the custom hook to manage game data
     const { score, availableClicks, updateScoreAndAvailable } = useGameData();
     const { haptic } = useTelegram();
     const canBeClicked = useStore(clickerModel.$canBeClicked);
@@ -49,6 +20,7 @@ export const ClickerField = () => {
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
 
+    // Handle click logic
     const handleClick = useCallback(() => {
         if (canBeClicked && availableClicks > 0) {
             const newScore = score + 1; // Example logic for updating score
@@ -116,30 +88,3 @@ export const ClickerField = () => {
         </div>
     );
 }
-
-const ProgressBar = React.memo<{
-    value: number
-}>(({ value }) => {
-    const list = useMemo(() => {
-        let count = 0;
-        let curr = value;
-
-        while (curr >= 0) {
-            count += 1;
-            curr = curr - MAX_AVAILABLE / 12;
-        }
-
-        return count;
-    }, [value]);
-
-    return (
-        <div className={styles['progress-bar']}>
-            <span className={styles.available}>{value}</span>
-            <div className={styles.row}>
-                {Array(list).fill(1).map((_, index) => (
-                    <img key={index} className={styles['item']} src={progress} alt={'progress'} />
-                ))}
-            </div>
-        </div>
-    )
-});
