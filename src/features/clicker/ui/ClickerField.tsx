@@ -1,4 +1,4 @@
-import React, { TouchEvent, useCallback, useMemo, useState } from "react";
+import React, { TouchEvent, useCallback, useMemo, useState, useEffect } from "react";
 import progress from '@/shared/assets/images/main/progress.png';
 import pointImage from '@/shared/assets/images/main/point.png';
 import leftHand from '@/shared/assets/images/main/left-hand.png';
@@ -7,60 +7,82 @@ import { MAX_AVAILABLE, clickerModel } from "../model";
 import styles from './ClickerField.module.scss';
 import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/lib/number";
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
+import { useStore } from "effector-react";
+
+const useGameData = () => {
+    const initialValue = clickerModel.$initialValue.getState(); // Initial score from the global store
+    const initialAvailable = clickerModel.$initialAvailable.getState(); // Initial available clicks from the global store
+
+    const [score, setScore] = useState(initialValue);
+    const [availableClicks, setAvailableClicks] = useState(initialAvailable);
+
+    useEffect(() => {
+        clickerModel.$value.watch(setScore);
+        clickerModel.$available.watch(setAvailableClicks);
+    }, []);
+
+    const updateScoreAndAvailable = (newScore: number, newAvailable: number) => {
+        setScore(newScore);
+        setAvailableClicks(newAvailable);
+        clickerModel.updateScore(newScore); // Sync with Effector store
+        clickerModel.updateAvailable(newAvailable); // Sync with Effector store
+    };
+
+    return {
+        score,
+        availableClicks,
+        updateScoreAndAvailable,
+    };
+};
 
 export const ClickerField = () => {
-    const { value, available, canBeClicked, onClick } = clickerModel.useClicker();
+    const { score, availableClicks, updateScoreAndAvailable } = useGameData();
     const { haptic } = useTelegram();
+    const canBeClicked = useStore(clickerModel.$canBeClicked);
 
-    const [localScore, setLocalScore] = useState(value);
-    const [localAvailable, setLocalAvailable] = useState(available);
     const [isClickEnabled, setIsClickEnabled] = useState(true);
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [syncError, setSyncError] = useState<string | null>(null);
 
     const handleClick = useCallback(() => {
         if (canBeClicked) {
-            // Update local state immediately
-            setLocalScore(prev => prev + 1);
-            setLocalAvailable(prev => prev - 1);
-
-            onClick(); // Update backend in batch
-
-            // Simulate point update visually
-            const point = document.createElement('img');
-            point.src = pointImage;
-            point.alt = 'point';
-            point.style.transform = `rotate(${getRandomInt(-25, 25)}deg) scale(${getRandomArbitrary(0.8, 1.2)})`;
-
-            const pointParent = document.createElement('div');
-            pointParent.appendChild(point);
-            pointParent.style.top = `${clientY}px`;
-            pointParent.style.left = `${clientX}px`;
-            pointParent.className = styles.point;
-
-            document.querySelector('#clicker')!.appendChild(pointParent);
-            haptic();
-            setTimeout(() => {
-                document.querySelector('#clicker')!.removeChild(pointParent);
-            }, 500);
-
-            if (leftClasses.length === 1 && rightClasses.length === 1) {
-                setLeftClasses(prevState => [...prevState, styles['hand-animated']]);
-                setRightClasses(prevState => [...prevState, styles['hand-animated']]);
-                setTimeout(() => {
-                    setRightClasses([styles['hand-right']]);
-                    setLeftClasses([styles['hand-left']]);
-                }, 350);
-            }
+            const newScore = score + 1; // Example logic for updating score
+            const newAvailable = availableClicks - 1; // Example logic for updating available clicks
+            updateScoreAndAvailable(newScore, newAvailable);
         }
-    }, [canBeClicked, onClick, haptic, leftClasses, rightClasses]);
+    }, [canBeClicked, score, availableClicks, updateScoreAndAvailable]);
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
             for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
-                handleClick(); // Handle click on touch
+                const { clientX, clientY } = e.touches[i];
+                handleClick();
+
+                const point = document.createElement('img');
+                point.src = pointImage;
+                point.alt = 'point';
+                point.style.transform = `rotate(${getRandomInt(-25, 25)}deg) scale(${getRandomArbitrary(0.8, 1.2)})`;
+
+                const pointParent = document.createElement('div');
+                pointParent.appendChild(point);
+                pointParent.style.top = `${clientY}px`;
+                pointParent.style.left = `${clientX}px`;
+                pointParent.className = styles.point;
+
+                document.querySelector('#clicker')!.appendChild(pointParent);
+                haptic();
+                setTimeout(() => {
+                    document.querySelector('#clicker')!.removeChild(pointParent);
+                }, 500);
+
+                if (leftClasses.length === 1 && rightClasses.length === 1) {
+                    setLeftClasses(prevState => [...prevState, styles['hand-animated']]);
+                    setRightClasses(prevState => [...prevState, styles['hand-animated']]);
+                    setTimeout(() => {
+                        setRightClasses([styles['hand-right']]);
+                        setLeftClasses([styles['hand-left']]);
+                    }, 350);
+                }
             }
 
             setIsClickEnabled(false);
@@ -68,36 +90,20 @@ export const ClickerField = () => {
                 setIsClickEnabled(true);
             }, 150);
         }
-    }, [isClickEnabled, handleClick]);
+    }, [isClickEnabled, handleClick, haptic, leftClasses, rightClasses]);
 
-    function handleTouchMove(event: TouchEvent<HTMLDivElement>) {
-        event.preventDefault();
-    }
-
-    function handleTouchEnd(event: TouchEvent<HTMLDivElement>) {
-        event.preventDefault();
-    }
-
-    const valueString = useMemo(() => toFormattedNumber(localScore), [localScore]);
-
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
-
-    if (syncError) {
-        return <div className={styles.error}>{syncError}</div>;
-    }
+    const valueString = useMemo(() => toFormattedNumber(score), [score]);
 
     return (
         <div
             id={'clicker'}
             className={styles.root}
             onTouchStart={onTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
+            onTouchMove={(e) => e.preventDefault()}
+            onTouchEnd={(e) => e.preventDefault()}
         >
             <p className={styles.value}>{valueString}</p>
-            <ProgressBar value={localAvailable} />
+            <ProgressBar value={availableClicks} />
             <div className={styles.hands}>
                 <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
                 <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
@@ -130,5 +136,5 @@ const ProgressBar = React.memo<{
                 ))}
             </div>
         </div>
-    );
+    )
 });
