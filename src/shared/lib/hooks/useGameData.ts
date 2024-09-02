@@ -1,7 +1,7 @@
 import { useUnit } from "effector-react";
 import { useEffect, useState } from "react";
 import { $value, $available, clickerModel } from "@/features/clicker/model";
-import { useAuth } from "@/shared/lib/hooks/useAuth"; // Import useAuth
+import { useAuth } from "@/features/auth/useAuth";
 
 export const useGameData = () => {
     // Retrieve user game data from useAuth
