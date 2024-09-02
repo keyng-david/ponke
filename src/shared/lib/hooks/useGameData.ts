@@ -5,12 +5,12 @@ import { clickerModel } from "@/features/clicker/model";
 // Custom hook for game data management
 export const useGameData = () => {
     // Use Effector's useStore to retrieve reactive state
-    const initialValue = useStore(clickerModel.$value);
-    const initialAvailable = useStore(clickerModel.$available);
+    const initialValue: number = useStore(clickerModel.$value);  // Assuming $value is a number
+    const initialAvailable: number = useStore(clickerModel.$available);  // Assuming $available is a number
 
     // Local state in the component
-    const [score, setScore] = useState(initialValue);
-    const [availableClicks, setAvailableClicks] = useState(initialAvailable);
+    const [score, setScore] = useState<number>(initialValue);
+    const [availableClicks, setAvailableClicks] = useState<number>(initialAvailable);
 
     // Sync Effector store updates with local state
     useEffect(() => {
@@ -27,13 +27,9 @@ export const useGameData = () => {
     const updateScoreAndAvailable = (newScore: number, newAvailable: number) => {
         setScore(newScore);
         setAvailableClicks(newAvailable);
-        clickerModel.valueInited(newScore); // Update Effector store
-        clickerModel.availableInited(newAvailable); // Update Effector store
+        clickerModel.valueInited(newScore);
+        clickerModel.availableInited(newAvailable);
     };
 
-    return {
-        score,
-        availableClicks,
-        updateScoreAndAvailable,
-    };
+    return { score, availableClicks, updateScoreAndAvailable };
 };
