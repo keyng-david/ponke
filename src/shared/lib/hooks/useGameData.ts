@@ -1,19 +1,28 @@
 import { useStore } from "effector-react";
 import { useEffect, useState } from "react";
 import { $value, $available, clickerModel } from "@/features/clicker/model";
+import { useAuth } from "@/shared/lib/hooks/useAuth"; // Import useAuth
 
-// Custom hook for game data management
 export const useGameData = () => {
+    // Retrieve user game data from useAuth
+    const { userData } = useAuth(); // Assuming userData contains initial score and availableClicks
+
     // Use Effector's useStore to retrieve reactive state
-    const initialValue: number = useStore($value);  // Directly using $value
-    const initialAvailable: number = useStore($available);  // Directly using $available
+    const initialValue: number = useStore($value);
+    const initialAvailable: number = useStore($available);
 
-    // Local state in the component
-    const [score, setScore] = useState<number>(initialValue);
-    const [availableClicks, setAvailableClicks] = useState<number>(initialAvailable);
+    // Initialize local state with useAuth data
+    const [score, setScore] = useState<number>(userData ? userData.initialScore : initialValue);
+    const [availableClicks, setAvailableClicks] = useState<number>(userData ? userData.initialAvailableClicks : initialAvailable);
 
-    // Sync Effector store updates with local state
     useEffect(() => {
+        if (userData) {
+            // Update Effector stores based on initial userData
+            clickerModel.valueInited(userData.initialScore);
+            clickerModel.availableInited(userData.initialAvailableClicks);
+        }
+
+        // Sync Effector store updates with local state
         const unsubscribeValue = $value.watch(setScore);
         const unsubscribeAvailable = $available.watch(setAvailableClicks);
 
@@ -21,9 +30,8 @@ export const useGameData = () => {
             unsubscribeValue();
             unsubscribeAvailable();
         };
-    }, []);
+    }, [userData]); // Depend on userData to re-run the effect when it changes
 
-    // Update both local and global state
     const updateScoreAndAvailable = (newScore: number, newAvailable: number) => {
         setScore(newScore);
         setAvailableClicks(newAvailable);
