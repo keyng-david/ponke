@@ -37,7 +37,7 @@ export const useAuth = () => {
 
         if (sessionId) {
           sessionIdStore.set(sessionId);
-          setSessionId(sessionId); // Save sessionId to global state
+          setSessionId(sessionId);
         } else {
           setError("No session ID found");
           return;
@@ -58,22 +58,16 @@ export const useAuth = () => {
         });
 
         if (!response.error) {
-          // Set initial score and available clicks from the backend response
           clickerModel.valueInited(response.payload.score);
           clickerModel.availableInited(response.payload.available_clicks);
 
-          // Update wallet if available
           if (response.payload.wallet) {
             wallet.updateWallet(response.payload.wallet);
           }
 
-          // Update rank level
           rangModel.update(response.payload.level);
-
-          // Set telegram_id for global access
           setTelegramId(response.payload.telegram_id);
 
-          // Navigate to the main page after successful authentication
           navigate("/main");
           setIsAuth(true);
         } else {
@@ -87,5 +81,13 @@ export const useAuth = () => {
     }
   }, [isAuth, sessionIdStore, wallet, rangModel, navigate, setError]);
 
-  return { initialize, telegramId, sessionId };
+  // Return initialized game data along with other states
+  return {
+    initialize,
+    telegramId,
+    sessionId,
+    isAuth,
+    initialScore: useUnit($value),
+    initialAvailableClicks: useUnit($available)
+  };
 };
