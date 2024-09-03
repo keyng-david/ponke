@@ -73,7 +73,10 @@ export const ClickerField = () => {
         }
     }, [isClickEnabled, handleClick, haptic, leftClasses, rightClasses]);
 
-    const valueString = useMemo(() => toFormattedNumber(score), [score]);
+    const valueString = useMemo(() => {
+    // Check if `score` is a number before formatting, or return "0" as a fallback
+    return typeof score === 'number' ? toFormattedNumber(score) : "10";
+}, [score]);
 
     return (
         <div
