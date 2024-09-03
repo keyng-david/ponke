@@ -24,13 +24,13 @@ export const ClickerField = () => {
 
     // Handle click logic
     const handleClick = useCallback(() => {
-    if (canBeClicked && availableClicks !== null && availableClicks > 0) {
-        if (score !== null) {
-            const newScore = score + 1; // Ensure score is not null
-            const newAvailable = availableClicks - 1;
-            updateScoreAndAvailable(newScore, newAvailable);
-        }
+  if (canBeClicked && availableClicks !== null && availableClicks > 0) {
+    if (score !== null) {
+      const newScore = Number(score) + 1; // Convert score to a number
+      const newAvailable = Number(availableClicks) - 1; // Convert availableClicks to a number
+      updateScoreAndAvailable(newScore, newAvailable);
     }
+  }
 }, [canBeClicked, availableClicks, score, updateScoreAndAvailable]);
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
