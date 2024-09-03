@@ -19,6 +19,13 @@ const $sessionId = createStore<string | null>(null).on(setSessionId, (_, id) => 
 const setIsAuth = createEvent<boolean>();
 const $isAuth = createStore(false).on(setIsAuth, (_, value) => value);
 
+// New global events and stores for score and available clicks
+const setValue = createEvent<number>();
+const $value = createStore<number>(0).on(setValue, (_, value) => value);
+
+const setAvailable = createEvent<number>();
+const $available = createStore<number>(500).on(setAvailable, (_, available) => available);
+
 export const useAuth = () => {
   const navigate = useNavigate();
   const isAuth = useUnit($isAuth);
@@ -58,7 +65,9 @@ export const useAuth = () => {
         });
 
         if (!response.error) {
-          // Initialize the stores with the retrieved values
+          // Initialize global stores with retrieved values
+          setValue(response.payload.score);
+          setAvailable(response.payload.available_clicks);
           clickerModel.valueInited(response.payload.score);
           clickerModel.availableInited(response.payload.available_clicks);
 
@@ -82,13 +91,12 @@ export const useAuth = () => {
     }
   }, [isAuth, sessionIdStore, wallet, rangModel, navigate, setError]);
 
-  // Return initialized game data along with other states
   return {
-        initialize,
-        telegramId,
-        sessionId,
-        isAuth,
-        initialScore: useUnit(clickerModel.$value) ?? 0, // Provide a fallback to 0 if null
-        initialAvailableClicks: useUnit(clickerModel.$available) ?? 0, // Provide a fallback to 0 if null
-    };
+    initialize,
+    telegramId,
+    sessionId,
+    isAuth,
+    initialScore: useUnit($value) ?? 0,
+    initialAvailableClicks: useUnit($available) ?? 0,
+  };
 };
