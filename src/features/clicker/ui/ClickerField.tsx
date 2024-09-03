@@ -8,7 +8,8 @@ import styles from './ClickerField.module.scss';
 import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/lib/number";
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
 import { useUnit } from "effector-react";
-import { useGameData } from "@/shared/lib/hooks/useGameData"; // Import the custom hook
+import { useGameData } from "@/shared/lib/hooks/useGameData";
+import { debounce } from 'lodash';
 
 export const ClickerField = () => {
     const score = useUnit(clickerModel.$value) ?? 0;
@@ -22,17 +23,27 @@ export const ClickerField = () => {
     const [rightClasses, setRightClasses] = useState([styles['hand-right']]);
     const [isClickEnabled, setIsClickEnabled] = useState(true);
 
-    const handleClick = useCallback(() => {
+const { onClick } = clickerModel.useClicker();
+
+const handleClick = useCallback(() => {
   if (canBeClicked && availableClicks > 0) {
     const newScore = score + 1; // Increment score
-    const newAvailable = availableClicks - 1; // Decrement availableClicks
-    updateScoreAndAvailable(newScore, newAvailable); // Update score and clicks
+    const newAvailable = availableClicks - 1; // Decrement available clicks
+    updateScoreAndAvailable(newScore, newAvailable); // Update local state and Effector stores
+
+    // Debounced function to handle the backend call
+    debouncedBackendUpdate();
+
     console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
   } else {
     console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
   }
 }, [canBeClicked, availableClicks, score, updateScoreAndAvailable]);
 
+// Create a debounced function to call the backend update
+const debouncedBackendUpdate = debounce(() => {
+  onClick(); // Call the function to handle backend update
+}, 20000); 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
             for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
