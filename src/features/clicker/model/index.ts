@@ -25,7 +25,7 @@ export const $available = createStore<number | null>(null).on(availableInited, (
 
 
 // Derived store
-export const $canBeClicked = $available.map((state) => state >= CLICK_STEP);
+export const $canBeClicked = $available.map((state) => (state ?? 0) >= CLICK_STEP);
 
 // Effector samples
 sample({
