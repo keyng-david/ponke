@@ -1,10 +1,12 @@
 import { useUnit } from "effector-react";
 import { useEffect, useState } from "react";
-import { $value, $available, clickerModel } from "@/features/clicker/model";
+import { clickerModel } from "@/features/clicker/model";
 import { useAuth } from "@/features/auth/useAuth";
 
 export const useGameData = () => {
     const { initialScore, initialAvailableClicks } = useAuth();
+
+    const { $value, $available } = clickerModel;
 
     // Initialize local state with useAuth data
     const [score, setScore] = useState<number>(initialScore);
