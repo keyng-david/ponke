@@ -11,47 +11,38 @@ module.exports = async (req, res) => {
   try {
     const { session_id, click_score } = req.body;
 
-    // Validate the session_id
     if (!session_id) {
       return res.status(400).json({ error: 'Invalid or missing session_id' });
     }
 
-    // Check if the request is to update points or fetch user data
     if (typeof click_score === 'number' && click_score > 0) {
       // Update points scenario
-
-      // Call the remote procedure 'increment_score'
       const { data, error } = await supabase.rpc('increment_score', { session_id, click_score });
 
       if (error) {
         console.error('Error updating score:', error);
-        if (error.details) {
-          return res.status(400).json({ error: 'Invalid parameters', details: error.details });
-        }
         return res.status(500).json({ error: 'Failed to update points', details: error.message });
       }
 
-      // Fetch the updated score from the 'users' table after incrementing
-      const { data: currentScoreData, error: fetchError } = await supabase
+      // Fetch the updated score and available clicks
+      const { data: currentData, error: fetchError } = await supabase
         .from('users')
-        .select('score')
+        .select('score, available_clicks')
         .eq('session_id', session_id)
         .single();
 
       if (fetchError) {
-        console.error('Error fetching current score:', fetchError);
-        return res.status(500).json({ error: 'Failed to fetch current score', details: fetchError.message });
+        console.error('Error fetching user data:', fetchError);
+        return res.status(500).json({ error: 'Failed to fetch user data', details: fetchError.message });
       }
 
-      // Return both the update status and the current score
       return res.status(200).json({
         message: 'Points updated successfully',
-        currentScore: currentScoreData.score,
+        currentScore: currentData.score,
+        available_clicks: currentData.available_clicks,
       });
     } else {
-      // Fetch user data scenario (initial sync)
-
-      // Fetch the user's current score and max available clicks from the 'users' table
+      // Fetch user data scenario
       const { data: userData, error: fetchError } = await supabase
         .from('users')
         .select('score, available_clicks')
@@ -65,7 +56,7 @@ module.exports = async (req, res) => {
 
       return res.status(200).json({
         currentScore: userData.score,
-        maxAvailable: userData.available_clicks,
+        available_clicks: userData.available_clicks,
       });
     }
   } catch (err) {
