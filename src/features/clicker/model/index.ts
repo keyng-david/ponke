@@ -20,8 +20,8 @@ export const errorUpdated = createEvent<boolean>();
 
 // Stores
 export const $isMultiAccount = createStore(false);
-export const $value = createStore(0).on(valueInited, (_, score) => score);
-export const $available = createStore(MAX_AVAILABLE).on(availableInited, (_, availableClicks) => availableClicks);
+export const $value = createStore<number | null>(null).on(valueInited, (_, score) => score);
+export const $available = createStore<number | null>(null).on(availableInited, (_, availableClicks) => availableClicks);
 
 
 // Derived store
