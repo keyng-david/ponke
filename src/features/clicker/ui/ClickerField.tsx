@@ -23,15 +23,15 @@ export const ClickerField = () => {
     const [isClickEnabled, setIsClickEnabled] = useState(true);
 
     const handleClick = useCallback(() => {
-        if (canBeClicked && availableClicks > 0) {
-            const newScore = score + 1; // Increment score
-            const newAvailable = availableClicks - 1; // Decrement availableClicks
-            updateScoreAndAvailable(newScore, newAvailable);
-            console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
-        } else {
-            console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
-        }
-    }, [canBeClicked, availableClicks, score, updateScoreAndAvailable]);
+  if (canBeClicked && availableClicks > 0) {
+    const newScore = score + 1; // Increment score
+    const newAvailable = availableClicks - 1; // Decrement availableClicks
+    updateScoreAndAvailable(newScore, newAvailable); // Update score and clicks
+    console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
+  } else {
+    console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
+  }
+}, [canBeClicked, availableClicks, score, updateScoreAndAvailable]);
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
