@@ -4,14 +4,15 @@ import { clickerModel } from "@/features/clicker/model";
 import { useAuth } from "@/features/auth/useAuth";
 
 export const useGameData = () => {
-    const { initialScore, initialAvailableClicks } = useAuth();
+    const { valueInited, availableInited } = useAuth();
     const { $value, $available } = clickerModel;
 
-    // Initialize local state with Effector store values
-    const [score, setScore] = useState<number>(initialScore ?? 0);
-    const [availableClicks, setAvailableClicks] = useState<number>(initialAvailableClicks ?? 0);
+    // Initialize local state with the current Effector store values
+    const [score, setScore] = useState<number>($value.getState() ?? 0);
+    const [availableClicks, setAvailableClicks] = useState<number>($available.getState() ?? 0);
 
     useEffect(() => {
+        // Update local state whenever Effector store changes
         const unsubscribeValue = $value.watch((value) => {
             if (value !== null) setScore(value);
         });
@@ -25,9 +26,12 @@ export const useGameData = () => {
         };
     }, [$value, $available]);
 
+    // Function to update both local state and Effector store
     const updateScoreAndAvailable = (newScore: number, newAvailable: number) => {
-        clickerModel.valueInited(newScore);
-        clickerModel.availableInited(newAvailable);
+        setScore(newScore);
+        setAvailableClicks(newAvailable);
+        valueInited(newScore);
+        availableInited(newAvailable);
     };
 
     return { score, availableClicks, updateScoreAndAvailable };
