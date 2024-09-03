@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createEvent, createStore, sample } from "effector";
 import { useUnit } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
+import { debounce } from "lodash"; // Import lodash debounce
 
 // Constants
 export const CLICK_STEP = 1;
@@ -97,6 +98,15 @@ export const useClicker = () => {
     }
   }
 
+  // Debounced function to update points after inactivity
+  const debouncedSendPointsUpdate = useCallback(
+    debounce((score: number) => {
+      sendPointsUpdate(score);
+      setClickBuffer(0); // Reset buffer after sending
+    }, 2000), // 2 seconds debounce
+    [sessionId]
+  );
+
   useEffect(() => {
     if (!sessionId) {
       console.error("Session ID is not set");
@@ -104,28 +114,20 @@ export const useClicker = () => {
     }
 
     const interval = setInterval(() => {
-      if (clickBuffer > 0) {
-        sendPointsUpdate(clickBuffer);
-        setClickBuffer(0);
-      }
-
-      if (lastClickTime && new Date().getTime() - lastClickTime.getTime() >= 5000) {
-        // Fetch updated data if there's inactivity for 5 seconds
-        sendPointsUpdate(0);  // Call with 0 to only fetch data
+      if (clickBuffer > 0 && (!lastClickTime || new Date().getTime() - lastClickTime.getTime() >= 2000)) {
+        // Call debounced update if the user has been inactive for 2 seconds
+        debouncedSendPointsUpdate(clickBuffer);
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [clickBuffer, sessionId, lastClickTime]);
+  }, [clickBuffer, sessionId, lastClickTime, debouncedSendPointsUpdate]);
 
   function onClick() {
     setClickBuffer((prev) => {
       const newBuffer = prev + CLICK_STEP;
       setLastClickTime(new Date());
-      if (newBuffer >= 10) {
-        sendPointsUpdate(newBuffer);
-        return 0;
-      }
+      debouncedSendPointsUpdate.cancel(); // Cancel any ongoing debounce to reset the timer
       return newBuffer;
     });
   }
