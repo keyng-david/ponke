@@ -141,6 +141,8 @@ export const useClicker = () => {
 // Export model object with all events, stores, and hooks
 export const clickerModel = {
   availableUpdated,
+  valueinited,
+  availableinited,
   clicked,
   errorUpdated,
   useCanBeClicked,
