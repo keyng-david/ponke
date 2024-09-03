@@ -43,7 +43,7 @@ const handleClick = useCallback(() => {
 // Create a debounced function to call the backend update
 const debouncedBackendUpdate = debounce(() => {
   onClick(); // Call the function to handle backend update
-}, 20000); 
+}, 2000); 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
             for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
