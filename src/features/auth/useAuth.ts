@@ -58,6 +58,7 @@ export const useAuth = () => {
         });
 
         if (!response.error) {
+          // Initialize the stores with the retrieved values
           clickerModel.valueInited(response.payload.score);
           clickerModel.availableInited(response.payload.available_clicks);
 
@@ -68,8 +69,8 @@ export const useAuth = () => {
           rangModel.update(response.payload.level);
           setTelegramId(response.payload.telegram_id);
 
-          navigate("/main");
           setIsAuth(true);
+          navigate("/main");
         } else {
           sessionIdStore.remove();
           setError("Authentication failed, invalid response");
