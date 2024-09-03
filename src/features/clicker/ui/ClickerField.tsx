@@ -24,7 +24,7 @@ export const ClickerField = () => {
 
     // Handle click logic
     const handleClick = useCallback(() => {
-        if (canBeClicked && availableClicks > 0) {
+        if (canBeClicked && availableClicks !== null && availableClicks > 0) {
             const newScore = score + 1; // Example logic for updating score
             const newAvailable = availableClicks - 1; // Example logic for updating available clicks
             updateScoreAndAvailable(newScore, newAvailable);
