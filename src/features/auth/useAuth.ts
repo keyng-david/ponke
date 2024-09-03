@@ -35,56 +35,66 @@ export const useAuth = () => {
   const sessionId = useUnit($sessionId);
 
   const initialize = useCallback(async () => {
-    try {
-      if (!isAuth) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const sessionId = urlParams.get("session_id");
+  console.log("initialize function called");
+  try {
+    if (!isAuth) {
+      console.log("User is not authenticated, starting authentication process");
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get("session_id");
 
-        if (sessionId) {
-          sessionIdStore.set(sessionId);
-          setSessionId(sessionId);
-        } else {
-          setError("No session ID found");
-          return;
-        }
-
-        const response = await fetch("/api/game/auth", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ sessionId }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          // Store initial game data globally
-          setInitialScore(data.score);
-          console.log("Initial Score set:", data.score); // Log the score to confirm
-
-          setInitialAvailableClicks(data.available_clicks);
-          console.log("Initial Available Clicks set:", data.available_clicks); // Log the clicks to confirm
-
-          if (data.wallet) {
-            wallet.updateWallet(data.wallet);
-          }
-
-          rangModel.update(data.level);
-          setTelegramId(data.telegram_id);
-          setIsAuth(true);
-
-          navigate("/main");
-        } else {
-          sessionIdStore.remove();
-          setError("Authentication failed, invalid response");
-        }
+      if (!sessionId) {
+        console.error("No session ID found in the URL");
+        setError("No session ID found");
+        return;
       }
-    } catch (e) {
-      sessionIdStore.remove();
-      setError(`Error during authentication: ${e instanceof Error ? e.message : String(e)}`);
+
+      console.log("Session ID found:", sessionId);
+      sessionIdStore.set(sessionId);
+      setSessionId(sessionId);
+
+      const response = await fetch("/api/game/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ sessionId }),
+      });
+
+      if (!response.ok) {
+        console.error("Authentication request failed with status:", response.status);
+        setError("Authentication failed, invalid response");
+        sessionIdStore.remove();
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Authentication response data:", data);
+
+      // Store initial game data globally
+      setInitialScore(data.score);
+      console.log("Initial Score set:", data.score);
+
+      setInitialAvailableClicks(data.available_clicks);
+      console.log("Initial Available Clicks set:", data.available_clicks);
+
+      if (data.wallet) {
+        wallet.updateWallet(data.wallet);
+      }
+
+      rangModel.update(data.level);
+      setTelegramId(data.telegram_id);
+      setIsAuth(true);
+
+      console.log("Navigating to /main");
+      navigate("/main");
     }
-  }, [isAuth, sessionIdStore, wallet, rangModel, navigate, setError]);
+  } catch (e) {
+    console.error("Error during initialization:", e);
+    setError(`Error during authentication: ${e instanceof Error ? e.message : String(e)}`);
+    sessionIdStore.remove();
+  }
+}, [isAuth, sessionIdStore, wallet, rangModel, navigate, setError]);
 
   return {
     initialize,
