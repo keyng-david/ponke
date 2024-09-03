@@ -17,18 +17,24 @@ export async function createRequest<T>({
   onError = null,
 }: {
   endpoint: string;
-  method?: 'POST' | 'GET' | 'PUT' | 'DELETE';
+  method?: "POST" | "GET" | "PUT" | "DELETE";
   body?: Record<string, unknown> | null;
   onError?: ((error: any) => void) | null;
 }): Promise<ResponseDefault<T>> {
   try {
-    const token = await localStorage.getItem('jwt-token');
+    // Fetch the session ID from localStorage (or wherever it's stored)
+    const sessionId = await localStorage.getItem("session_id");
+
+    if (!sessionId) {
+      throw new Error("Session ID is not available.");
+    }
 
     const response = await fetch(endpoint, {
       method,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        // Use session_id for Authorization instead of jwt-token
+        Authorization: `Session ${sessionId}`,
       },
       body: body ? JSON.stringify(body) : null,
     });
@@ -45,7 +51,11 @@ export async function createRequest<T>({
     try {
       data = await response.json();
     } catch (parseError) {
-      console.error(`Error parsing JSON response: ${parseError instanceof Error ? parseError.message : "Unknown error"}`);
+      console.error(
+        `Error parsing JSON response: ${
+          parseError instanceof Error ? parseError.message : "Unknown error"
+        }`
+      );
       if (onError) {
         onError("Failed to parse JSON response");
       }
