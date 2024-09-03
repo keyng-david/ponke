@@ -13,7 +13,7 @@ import { useGameData } from "@/shared/lib/hooks/useGameData"; // Import the cust
 export const ClickerField = () => {
     const score = useStore(clickerModel.$value);
   const availableClicks = useStore(clickerModel.$available);
-  const canBeClicked = useCanBeClicked();
+  const canBeClicked = clickerModel.useCanBeClicked();
   const { haptic } = useTelegram();
 
     const { updateScoreAndAvailable } = useGameData();
