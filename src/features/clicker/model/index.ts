@@ -20,8 +20,9 @@ export const errorUpdated = createEvent<boolean>();
 
 // Stores
 export const $isMultiAccount = createStore(false);
-export const $value = createStore(0);
-export const $available = createStore(MAX_AVAILABLE);
+export const $value = createStore(0).on(valueInited, (_, score) => score);
+export const $available = createStore(MAX_AVAILABLE).on(availableInited, (_, availableClicks) => availableClicks);
+
 
 // Derived store
 export const $canBeClicked = $available.map((state) => state >= CLICK_STEP);
@@ -139,11 +140,12 @@ export const useClicker = () => {
 
 // Export model object with all events, stores, and hooks
 export const clickerModel = {
-  valueInited,
-  availableInited,
   availableUpdated,
   clicked,
   errorUpdated,
   useCanBeClicked,
   useClicker,
+  $value, 
+  $available, 
+
 };
