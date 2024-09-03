@@ -12,124 +12,129 @@ import { useGameData } from "@/shared/lib/hooks/useGameData";
 import { debounce } from 'lodash';
 
 export const ClickerField = () => {
-    const score = useUnit(clickerModel.$value) ?? 0;
-    const availableClicks = Number(useUnit(clickerModel.$available)) || 0;
-    const canBeClicked = clickerModel.useCanBeClicked();
-    const { haptic } = useTelegram();
+  const score = useUnit(clickerModel.$value) ?? 0;
+  const availableClicks = Number(useUnit(clickerModel.$available)) || 0;
+  const canBeClicked = clickerModel.useCanBeClicked();
+  const { haptic } = useTelegram();
+  const { updateScoreAndAvailable } = useGameData();
 
-    const { updateScoreAndAvailable } = useGameData();
+  const [leftClasses, setLeftClasses] = useState([styles['hand-left']]);
+  const [rightClasses, setRightClasses] = useState([styles['hand-right']]);
+  const [isClickEnabled, setIsClickEnabled] = useState(true);
 
-    const [leftClasses, setLeftClasses] = useState([styles['hand-left']]);
-    const [rightClasses, setRightClasses] = useState([styles['hand-right']]);
-    const [isClickEnabled, setIsClickEnabled] = useState(true);
+  const { onClick } = clickerModel.useClicker();
 
-const { onClick } = clickerModel.useClicker();
+  // Debounced function to call the backend update
+  const debouncedBackendUpdate = useCallback(
+    debounce(() => {
+      onClick(); // Call the function to handle backend update
+    }, 2000),
+    [onClick]
+  );
 
-const handleClick = useCallback(() => {
-  if (canBeClicked && availableClicks > 0) {
-    const newScore = score + 1; // Increment score
-    const newAvailable = availableClicks - 1; // Decrement available clicks
-    updateScoreAndAvailable(newScore, newAvailable); // Update local state and Effector stores
+  const handleClick = useCallback(() => {
+    if (canBeClicked && availableClicks > 0) {
+      const newScore = score + 1; // Increment score
+      const newAvailable = availableClicks - 1; // Decrement available clicks
 
-    // Debounced function to handle the backend call
-    debouncedBackendUpdate();
+      // Update local state and Effector stores
+      updateScoreAndAvailable(newScore, newAvailable);
+      
+      // Trigger backend update using debounced function
+      debouncedBackendUpdate();
 
-    console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
-  } else {
-    console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
-  }
-}, [canBeClicked, availableClicks, score, updateScoreAndAvailable]);
+      console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
+    } else {
+      console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
+    }
+  }, [canBeClicked, availableClicks, score, updateScoreAndAvailable, debouncedBackendUpdate]);
 
-// Create a debounced function to call the backend update
-const debouncedBackendUpdate = debounce(() => {
-  onClick(); // Call the function to handle backend update
-}, 2000); 
-    const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
-        if (isClickEnabled) {
-            for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
-                const { clientX, clientY } = e.touches[i];
-                handleClick();
+  const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
+    if (isClickEnabled) {
+      for (let i = 0; i < Math.min(e.touches.length, 3); i++) {
+        const { clientX, clientY } = e.touches[i];
+        handleClick();
 
-                const point = document.createElement('img');
-                point.src = pointImage;
-                point.alt = 'point';
-                point.style.transform = `rotate(${getRandomInt(-25, 25)}deg) scale(${getRandomArbitrary(0.8, 1.2)})`;
+        const point = document.createElement('img');
+        point.src = pointImage;
+        point.alt = 'point';
+        point.style.transform = `rotate(${getRandomInt(-25, 25)}deg) scale(${getRandomArbitrary(0.8, 1.2)})`;
 
-                const pointParent = document.createElement('div');
-                pointParent.appendChild(point);
-                pointParent.style.top = `${clientY}px`;
-                pointParent.style.left = `${clientX}px`;
-                pointParent.className = styles.point;
+        const pointParent = document.createElement('div');
+        pointParent.appendChild(point);
+        pointParent.style.top = `${clientY}px`;
+        pointParent.style.left = `${clientX}px`;
+        pointParent.className = styles.point;
 
-                document.querySelector('#clicker')!.appendChild(pointParent);
-                haptic();
-                setTimeout(() => {
-                    document.querySelector('#clicker')!.removeChild(pointParent);
-                }, 500);
+        document.querySelector('#clicker')!.appendChild(pointParent);
+        haptic();
+        setTimeout(() => {
+          document.querySelector('#clicker')!.removeChild(pointParent);
+        }, 500);
 
-                if (leftClasses.length === 1 && rightClasses.length === 1) {
-                    setLeftClasses(prevState => [...prevState, styles['hand-animated']]);
-                    setRightClasses(prevState => [...prevState, styles['hand-animated']]);
-                    setTimeout(() => {
-                        setRightClasses([styles['hand-right']]);
-                        setLeftClasses([styles['hand-left']]);
-                    }, 350);
-                }
-            }
-
-            setIsClickEnabled(false);
-            setTimeout(() => {
-                setIsClickEnabled(true);
-            }, 150);
+        if (leftClasses.length === 1 && rightClasses.length === 1) {
+          setLeftClasses(prevState => [...prevState, styles['hand-animated']]);
+          setRightClasses(prevState => [...prevState, styles['hand-animated']]);
+          setTimeout(() => {
+            setRightClasses([styles['hand-right']]);
+            setLeftClasses([styles['hand-left']]);
+          }, 350);
         }
-    }, [isClickEnabled, handleClick, haptic, leftClasses, rightClasses]);
+      }
 
-    const valueString = useMemo(() => {
-        return typeof score === 'number' ? toFormattedNumber(score) : "0";
-    }, [score]);
+      setIsClickEnabled(false);
+      setTimeout(() => {
+        setIsClickEnabled(true);
+      }, 150);
+    }
+  }, [isClickEnabled, handleClick, haptic, leftClasses, rightClasses]);
 
-    return (
-        <div
-            id={'clicker'}
-            className={styles.root}
-            onTouchStart={onTouchStart}
-            onTouchMove={(e) => e.preventDefault()}
-            onTouchEnd={(e) => e.preventDefault()}
-        >
-            <p className={styles.value}>{valueString}</p>
-            <ProgressBar value={availableClicks} maxAvailable={availableClicks} />
-            <div className={styles.hands}>
-                <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
-                <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
-            </div>
-        </div>
-    );
+  const valueString = useMemo(() => {
+    return typeof score === 'number' ? toFormattedNumber(score) : "0";
+  }, [score]);
+
+  return (
+    <div
+      id={'clicker'}
+      className={styles.root}
+      onTouchStart={onTouchStart}
+      onTouchMove={(e) => e.preventDefault()}
+      onTouchEnd={(e) => e.preventDefault()}
+    >
+      <p className={styles.value}>{valueString}</p>
+      <ProgressBar value={availableClicks} maxAvailable={availableClicks} />
+      <div className={styles.hands}>
+        <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
+        <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
+      </div>
+    </div>
+  );
 }
 
 const ProgressBar = React.memo<{
-    value: number,
-    maxAvailable: number
+  value: number,
+  maxAvailable: number
 }>(({ value, maxAvailable }) => {
-    const list = useMemo(() => {
-        let count = 0;
-        let curr = value;
+  const list = useMemo(() => {
+    let count = 0;
+    let curr = value;
 
-        while (curr > 0) {
-            count += 1;
-            curr -= maxAvailable / 12;
-        }
+    while (curr > 0) {
+      count += 1;
+      curr -= maxAvailable / 12;
+    }
 
-        return count;
-    }, [value, maxAvailable]);
+    return count;
+  }, [value, maxAvailable]);
 
-    return (
-        <div className={styles['progress-bar']}>
-            <span className={styles.available}>{value}</span>
-            <div className={styles.row}>
-                {Array.from({ length: list }).map((_, index) => (
-                    <img key={index} className={styles['item']} src={progress} alt={'progress'} />
-                ))}
-            </div>
-        </div>
-    );
+  return (
+    <div className={styles['progress-bar']}>
+      <span className={styles.available}>{value}</span>
+      <div className={styles.row}>
+        {Array.from({ length: list }).map((_, index) => (
+          <img key={index} className={styles['item']} src={progress} alt={'progress'} />
+        ))}
+      </div>
+    </div>
+  );
 });
