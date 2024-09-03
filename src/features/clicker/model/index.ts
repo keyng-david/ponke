@@ -20,8 +20,8 @@ export const errorUpdated = createEvent<boolean>();
 
 // Stores
 export const $isMultiAccount = createStore(false);
-export const $value = createStore<number | null>(null).on(valueInited, (_, score) => score);
-export const $available = createStore<number | null>(null).on(availableInited, (_, availableClicks) => availableClicks);
+export const $value = createStore<number | null>(null, { skipVoid: false }).on(valueInited, (_, score) => score);
+export const $available = createStore<number | null>(null, { skipVoid: false }).on(availableInited, (_, availableClicks) => availableClicks);
 
 // Derived store
 export const $canBeClicked = $available.map((state) => (state ?? 0) >= CLICK_STEP);
