@@ -11,22 +11,25 @@ import { useUnit } from "effector-react";
 import { useGameData } from "@/shared/lib/hooks/useGameData"; // Import the custom hook
 
 export const ClickerField = () => {
-    const score = useUnit(clickerModel.$value) ?? 0; // 
+    const score = useUnit(clickerModel.$value) ?? 0;
     const availableClicks = Number(useUnit(clickerModel.$available)) || 0;
     const canBeClicked = clickerModel.useCanBeClicked();
     const { haptic } = useTelegram();
 
-    const { updateScoreAndAvailable } = useGameData();
+    console.log("Rendered ClickerField with score:", score);
+    console.log("Available Clicks:", availableClicks);
+    console.log("Can Be Clicked:", canBeClicked);
 
-    const [isClickEnabled, setIsClickEnabled] = useState(true);
-    const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
-    const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
+    const { updateScoreAndAvailable } = useGameData();
 
     const handleClick = useCallback(() => {
         if (canBeClicked && availableClicks > 0) {
             const newScore = score + 1; // Increment score
             const newAvailable = availableClicks - 1; // Decrement availableClicks
             updateScoreAndAvailable(newScore, newAvailable);
+            console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
+        } else {
+            console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
         }
     }, [canBeClicked, availableClicks, score, updateScoreAndAvailable]);
 
