@@ -7,14 +7,14 @@ import { clickerModel } from "../model";
 import styles from './ClickerField.module.scss';
 import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/lib/number";
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
-import { useStore } from "effector-react";
+import { useUnit } from "effector-react";
 import { useGameData } from "@/shared/lib/hooks/useGameData"; // Import the custom hook
 
 export const ClickerField = () => {
-    const score = useStore(clickerModel.$value) ?? '11';
-    const availableClicks = useStore(clickerModel.$available) ?? '590';
-  const canBeClicked = clickerModel.useCanBeClicked();
-  const { haptic } = useTelegram();
+    const score = useUnit(clickerModel.$value) ?? 0; // 
+    const availableClicks = Number(useUnit(clickerModel.$available)) || 0;
+    const canBeClicked = clickerModel.useCanBeClicked();
+    const { haptic } = useTelegram();
 
     const { updateScoreAndAvailable } = useGameData();
 
@@ -22,16 +22,13 @@ export const ClickerField = () => {
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']]);
 
-    // Handle click logic
     const handleClick = useCallback(() => {
-  if (canBeClicked && availableClicks !== null && availableClicks > 0) {
-    if (score !== null) {
-      const newScore = Number(score) + 1; // Convert score to a number
-      const newAvailable = Number(availableClicks) - 1; // Convert availableClicks to a number
-      updateScoreAndAvailable(newScore, newAvailable);
-    }
-  }
-}, [canBeClicked, availableClicks, score, updateScoreAndAvailable]);
+        if (canBeClicked && availableClicks > 0) {
+            const newScore = score + 1; // Increment score
+            const newAvailable = availableClicks - 1; // Decrement availableClicks
+            updateScoreAndAvailable(newScore, newAvailable);
+        }
+    }, [canBeClicked, availableClicks, score, updateScoreAndAvailable]);
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
@@ -74,9 +71,8 @@ export const ClickerField = () => {
     }, [isClickEnabled, handleClick, haptic, leftClasses, rightClasses]);
 
     const valueString = useMemo(() => {
-    // Check if `score` is a number before formatting, or return "0" as a fallback
-    return typeof score === 'number' ? toFormattedNumber(score) : "10";
-}, [score]);
+        return typeof score === 'number' ? toFormattedNumber(score) : "0";
+    }, [score]);
 
     return (
         <div
@@ -87,7 +83,7 @@ export const ClickerField = () => {
             onTouchEnd={(e) => e.preventDefault()}
         >
             <p className={styles.value}>{valueString}</p>
-            <ProgressBar value={availableClicks} maxAvailable={availableClicks} /> {/* Correctly using ProgressBar */}
+            <ProgressBar value={availableClicks} maxAvailable={availableClicks} /> {/* Ensure both values are numbers */}
             <div className={styles.hands}>
                 <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
                 <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
