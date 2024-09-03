@@ -11,8 +11,8 @@ import { useStore } from "effector-react";
 import { useGameData } from "@/shared/lib/hooks/useGameData"; // Import the custom hook
 
 export const ClickerField = () => {
-    const score = useStore(clickerModel.$value);
-  const availableClicks = useStore(clickerModel.$available);
+    const score = useStore(clickerModel.$value) ?? 0;
+  const availableClicks = useStore(clickerModel.$available) ?? 500;
   const canBeClicked = clickerModel.useCanBeClicked();
   const { haptic } = useTelegram();
 
