@@ -17,7 +17,6 @@ export const ClickerField = () => {
   const { haptic } = useTelegram();
 
     const { updateScoreAndAvailable } = useGameData();
-    const canBeClicked = clickerModel.useCanBeClicked();
 
     const [isClickEnabled, setIsClickEnabled] = useState(true);
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']]);
