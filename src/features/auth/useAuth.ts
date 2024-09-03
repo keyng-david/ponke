@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { createEvent, createStore } from "effector";
 import { useUnit } from "effector-react";
 import { useSessionId } from "@/shared/model/session";
-import { createRequest } from "@/shared/lib/api/createRequest";
 import { walletModel } from "@/shared/model/wallet";
 import { randModel } from "@/shared/model/rang"; 
 import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
@@ -49,29 +48,27 @@ export const useAuth = () => {
           return;
         }
 
-        const response = await createRequest<{
-          score: number;
-          available_clicks: number;
-          wallet: string | null;
-          level: number;
-          telegram_id: string;
-        }>({
-          endpoint: "/api/game/auth",
+        const response = await fetch("/api/game/auth", {
           method: "POST",
-          body: { sessionId },
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ sessionId }),
         });
 
-        if (!response.error) {
-          // Store initial game data globally
-          setInitialScore(response.payload.score);
-          setInitialAvailableClicks(response.payload.available_clicks);
+        const data = await response.json();
 
-          if (response.payload.wallet) {
-            wallet.updateWallet(response.payload.wallet);
+        if (response.ok) {
+          // Store initial game data globally
+          setInitialScore(data.score);
+          setInitialAvailableClicks(data.available_clicks);
+
+          if (data.wallet) {
+            wallet.updateWallet(data.wallet);
           }
 
-          rangModel.update(response.payload.level);
-          setTelegramId(response.payload.telegram_id);
+          rangModel.update(data.level);
+          setTelegramId(data.telegram_id);
           setIsAuth(true);
 
           navigate("/main");
