@@ -14,14 +14,24 @@ export const useGameData = () => {
 
     useEffect(() => {
         // Sync Effector store updates with local state
-        const unsubscribeValue = $value.watch(setScore);
-        const unsubscribeAvailable = $available.watch(setAvailableClicks);
+        const unsubscribeValue = $value.watch((value) => {
+            // Ensure value is a number before setting state
+            if (value !== null) {
+                setScore(value);
+            }
+        });
+        const unsubscribeAvailable = $available.watch((available) => {
+            // Ensure available is a number before setting state
+            if (available !== null) {
+                setAvailableClicks(available);
+            }
+        });
 
         return () => {
             unsubscribeValue();
             unsubscribeAvailable();
         };
-    }, []); // Removed userData dependency
+    }, [$value, $available]); // Added dependencies to useEffect
 
     const updateScoreAndAvailable = (newScore: number, newAvailable: number) => {
         setScore(newScore);
