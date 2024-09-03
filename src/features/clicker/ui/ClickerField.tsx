@@ -84,7 +84,7 @@ export const ClickerField = () => {
             onTouchEnd={(e) => e.preventDefault()}
         >
             <p className={styles.value}>{valueString}</p>
-            <ProgressBar value={availableClicks} /> {/* Correctly using ProgressBar */}
+            <ProgressBar value={availableClicks} maxAvailable={availableClicks} /> {/* Correctly using ProgressBar */}
             <div className={styles.hands}>
                 <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
                 <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
@@ -95,19 +95,20 @@ export const ClickerField = () => {
 
 // Reintroduce the ProgressBar component
 const ProgressBar = React.memo<{
-    value: number
-}>(({ value }) => {
+    value: number,
+    maxAvailable: number
+}>(({ value, maxAvailable }) => {
     const list = useMemo(() => {
         let count = 0;
         let curr = value;
 
         while (curr >= 0) {
             count += 1;
-            curr = curr - MAX_AVAILABLE / 12;
+            curr = curr - maxAvailable / 12;
         }
 
         return count;
-    }, [value]);
+    }, [value, maxAvailable]);
 
     return (
         <div className={styles['progress-bar']}>
