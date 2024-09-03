@@ -4,7 +4,7 @@ import { useUnit } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
 
 // Constants
-export const MAX_AVAILABLE = 500;
+
 export const CLICK_STEP = 1;
 
 // Events
@@ -22,7 +22,6 @@ export const errorUpdated = createEvent<boolean>();
 export const $isMultiAccount = createStore(false);
 export const $value = createStore<number | null>(null).on(valueInited, (_, score) => score);
 export const $available = createStore<number | null>(null).on(availableInited, (_, availableClicks) => availableClicks);
-
 
 // Derived store
 export const $canBeClicked = $available.map((state) => (state ?? 0) >= CLICK_STEP);
@@ -148,6 +147,5 @@ export const clickerModel = {
   useCanBeClicked,
   useClicker,
   $value, 
-  $available, 
-
+  $available,
 };
