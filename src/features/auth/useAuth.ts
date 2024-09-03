@@ -18,11 +18,8 @@ const setIsAuth = createEvent<boolean>();
 const $isAuth = createStore(false).on(setIsAuth, (_, value) => value);
 
 // New global stores for game data
-const setInitialScore = createEvent<number>();
-const $initialScore = createStore<number>(0).on(setInitialScore, (_, score) => score ?? 0);
 
-const setInitialAvailableClicks = createEvent<number>();
-const $initialAvailableClicks = createStore<number>(0).on(setInitialAvailableClicks, (_, clicks) => clicks ?? 0);
+const { valueInited, availableInited } = clickerModel;
 
 export const useAuth = () => {
   const navigate = useNavigate();
@@ -78,10 +75,9 @@ export const useAuth = () => {
       }
 
       // Store initial game data globally
-      setInitialScore(data.payload.score);
+      valueInited(data.payload.score);
       console.log("Initial Score set:", data.payload.score);
-
-      setInitialAvailableClicks(data.payload.available_clicks);
+     availableInited(data.payload.available_clicks);
       console.log("Initial Available Clicks set:", data.payload.available_clicks);
 
       if (data.payload.wallet) {
@@ -109,7 +105,7 @@ export const useAuth = () => {
     telegramId,
     sessionId,
     isAuth,
-    initialScore: useUnit($initialScore),
-    initialAvailableClicks: useUnit($initialAvailableClicks),
+    valueInited,
+    availableInited,
   };
 };
