@@ -6,6 +6,7 @@ import { useSessionId } from "@/shared/model/session";
 import { walletModel } from "@/shared/model/wallet";
 import { randModel } from "@/shared/model/rang";
 import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
+import { clickerModel } from "@/features/clicker/model";
 
 // Events and stores for global state
 const setTelegramId = createEvent<string>();
