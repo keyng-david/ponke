@@ -54,7 +54,7 @@ module.exports = async (req, res) => {
       // Fetch the user's current score and max available clicks from the 'users' table
       const { data: userData, error: fetchError } = await supabase
         .from('users')
-        .select('score, max_available') // Adjust column names as needed
+        .select('score, available_clicks')
         .eq('session_id', session_id)
         .single();
 
@@ -63,10 +63,9 @@ module.exports = async (req, res) => {
         return res.status(500).json({ error: 'Failed to fetch user data', details: fetchError.message });
       }
 
-      // Return the user's score and max available clicks
       return res.status(200).json({
         currentScore: userData.score,
-        maxAvailable: userData.max_available,
+        maxAvailable: userData.available_clicks,
       });
     }
   } catch (err) {
