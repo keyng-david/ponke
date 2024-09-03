@@ -4,7 +4,6 @@ import { useUnit } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
 
 // Constants
-
 export const CLICK_STEP = 1;
 
 // Events
@@ -21,16 +20,10 @@ export const errorUpdated = createEvent<boolean>();
 // Stores
 export const $isMultiAccount = createStore(false);
 export const $value = createStore<number | null>(null, { skipVoid: false })
-  .on(valueInited, (_, score) => {
-    console.log("Value initialized:", score);
-    return score;
-  });
+  .on(valueInited, (_, score) => score);
 
 export const $available = createStore<number | null>(null, { skipVoid: false })
-  .on(availableInited, (_, availableClicks) => {
-    console.log("Available clicks initialized:", availableClicks);
-    return availableClicks;
-  });
+  .on(availableInited, (_, availableClicks) => availableClicks);
 
 // Derived store
 export const $canBeClicked = $available.map((state) => (state ?? 0) >= CLICK_STEP);
