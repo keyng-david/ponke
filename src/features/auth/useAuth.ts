@@ -87,7 +87,7 @@ export const useAuth = () => {
     telegramId,
     sessionId,
     isAuth,
-    initialScore: useUnit($value),
-    initialAvailableClicks: useUnit($available)
+    initialScore: useUnit(clickerModel.$value),
+    initialAvailableClicks: useUnit(clickerModel.$available)
   };
 };
