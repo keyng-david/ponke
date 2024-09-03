@@ -84,11 +84,11 @@ export const useAuth = () => {
 
   // Return initialized game data along with other states
   return {
-    initialize,
-    telegramId,
-    sessionId,
-    isAuth,
-    initialScore: useUnit(clickerModel.$value),
-    initialAvailableClicks: useUnit(clickerModel.$available)
-  };
+        initialize,
+        telegramId,
+        sessionId,
+        isAuth,
+        initialScore: useUnit(clickerModel.$value) ?? 0, // Provide a fallback to 0 if null
+        initialAvailableClicks: useUnit(clickerModel.$available) ?? 0, // Provide a fallback to 0 if null
+    };
 };
