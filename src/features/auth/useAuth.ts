@@ -4,7 +4,7 @@ import { createEvent, createStore } from "effector";
 import { useUnit } from "effector-react";
 import { useSessionId } from "@/shared/model/session";
 import { walletModel } from "@/shared/model/wallet";
-import { randModel } from "@/shared/model/rang"; 
+import { randModel } from "@/shared/model/rang";
 import { useErrorHandler } from "@/shared/lib/hooks/useErrorHandler";
 
 // Events and stores for global state
@@ -29,7 +29,7 @@ export const useAuth = () => {
   const isAuth = useUnit($isAuth);
   const sessionIdStore = useSessionId();
   const wallet = walletModel.useWalletModel();
-  const rangModel = randModel.useRang(); 
+  const rangModel = randModel.useRang();
   const { setError } = useErrorHandler();
   const telegramId = useUnit($telegramId);
   const sessionId = useUnit($sessionId);
