@@ -1,4 +1,4 @@
-import React, { TouchEvent, useCallback, useMemo, useState, useEffect } from "react";
+import React, { TouchEvent, useCallback, useMemo, useState } from "react";
 import progress from '@/shared/assets/images/main/progress.png';
 import pointImage from '@/shared/assets/images/main/point.png';
 import leftHand from '@/shared/assets/images/main/left-hand.png';
@@ -16,11 +16,11 @@ export const ClickerField = () => {
     const canBeClicked = clickerModel.useCanBeClicked();
     const { haptic } = useTelegram();
 
-    console.log("Rendered ClickerField with score:", score);
-    console.log("Available Clicks:", availableClicks);
-    console.log("Can Be Clicked:", canBeClicked);
-
     const { updateScoreAndAvailable } = useGameData();
+
+    const [leftClasses, setLeftClasses] = useState([styles['hand-left']]);
+    const [rightClasses, setRightClasses] = useState([styles['hand-right']]);
+    const [isClickEnabled, setIsClickEnabled] = useState(true);
 
     const handleClick = useCallback(() => {
         if (canBeClicked && availableClicks > 0) {
@@ -86,7 +86,7 @@ export const ClickerField = () => {
             onTouchEnd={(e) => e.preventDefault()}
         >
             <p className={styles.value}>{valueString}</p>
-            <ProgressBar value={availableClicks} maxAvailable={availableClicks} /> {/* Ensure both values are numbers */}
+            <ProgressBar value={availableClicks} maxAvailable={availableClicks} />
             <div className={styles.hands}>
                 <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
                 <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
@@ -95,7 +95,6 @@ export const ClickerField = () => {
     );
 }
 
-// Reintroduce the ProgressBar component
 const ProgressBar = React.memo<{
     value: number,
     maxAvailable: number
@@ -104,9 +103,9 @@ const ProgressBar = React.memo<{
         let count = 0;
         let curr = value;
 
-        while (curr >= 0) {
+        while (curr > 0) {
             count += 1;
-            curr = curr - maxAvailable / 12;
+            curr -= maxAvailable / 12;
         }
 
         return count;
@@ -116,7 +115,7 @@ const ProgressBar = React.memo<{
         <div className={styles['progress-bar']}>
             <span className={styles.available}>{value}</span>
             <div className={styles.row}>
-                {Array(list).fill(1).map((_, index) => (
+                {Array.from({ length: list }).map((_, index) => (
                     <img key={index} className={styles['item']} src={progress} alt={'progress'} />
                 ))}
             </div>
