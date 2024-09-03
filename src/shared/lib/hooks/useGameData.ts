@@ -8,9 +8,9 @@ export const useGameData = () => {
 
     const { $value, $available } = clickerModel;
 
-    // Initialize local state with useAuth data
-    const [score, setScore] = useState<number>(initialScore);
-    const [availableClicks, setAvailableClicks] = useState<number>(initialAvailableClicks);
+    // Initialize local state with useAuth data and provide a default value if null
+    const [score, setScore] = useState<number>(initialScore ?? 0);
+    const [availableClicks, setAvailableClicks] = useState<number>(initialAvailableClicks ?? 0);
 
     useEffect(() => {
         // Sync Effector store updates with local state
