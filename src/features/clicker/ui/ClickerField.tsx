@@ -3,7 +3,7 @@ import progress from '@/shared/assets/images/main/progress.png';
 import pointImage from '@/shared/assets/images/main/point.png';
 import leftHand from '@/shared/assets/images/main/left-hand.png';
 import rightHand from '@/shared/assets/images/main/right-hand.png';
-import { MAX_AVAILABLE, clickerModel } from "../model";
+import { clickerModel } from "../model";
 import styles from './ClickerField.module.scss';
 import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/lib/number";
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
@@ -11,8 +11,12 @@ import { useStore } from "effector-react";
 import { useGameData } from "@/shared/lib/hooks/useGameData"; // Import the custom hook
 
 export const ClickerField = () => {
-    // Use the custom hook to manage game data
-    const { score, availableClicks, updateScoreAndAvailable } = useGameData();
+    const score = useStore(clickerModel.$value);
+  const availableClicks = useStore(clickerModel.$available);
+  const canBeClicked = useStore(clickerModel.$canBeClicked);
+  const { haptic } = useTelegram();
+
+    const { updateScoreAndAvailable } = useGameData();
     const { haptic } = useTelegram();
     const canBeClicked = clickerModel.useCanBeClicked();
 
