@@ -61,7 +61,10 @@ export const useAuth = () => {
         if (response.ok) {
           // Store initial game data globally
           setInitialScore(data.score);
+          console.log("Initial Score set:", data.score); // Log the score to confirm
+
           setInitialAvailableClicks(data.available_clicks);
+          console.log("Initial Available Clicks set:", data.available_clicks); // Log the clicks to confirm
 
           if (data.wallet) {
             wallet.updateWallet(data.wallet);
