@@ -17,7 +17,6 @@ export const ClickerField = () => {
   const { haptic } = useTelegram();
 
     const { updateScoreAndAvailable } = useGameData();
-    const { haptic } = useTelegram();
     const canBeClicked = clickerModel.useCanBeClicked();
 
     const [isClickEnabled, setIsClickEnabled] = useState(true);
