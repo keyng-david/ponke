@@ -70,41 +70,45 @@ export const useClicker = () => {
   const sessionId = useUnit($sessionId);
   const [lastClickTime, setLastClickTime] = useState<Date | null>(null);
 
-  async function sendPointsUpdate(score: number) {
-    if (!sessionId) {
-      console.error("No session ID available");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/game/updatePoints", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId, click_score: score }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("Failed to update points:", data.error || "Unknown error");
+  // Function to send points update
+  const sendPointsUpdate = useCallback(
+    async (score: number) => {
+      if (!sessionId) {
+        console.error("No session ID available");
         return;
       }
 
-      // Update the state with the returned data
-      valueInited(data.currentScore);
-      availableInited(data.available_clicks);
-    } catch (error) {
-      console.error("Error updating points:", error);
-    }
-  }
+      try {
+        const response = await fetch("/api/game/updatePoints", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id: sessionId, click_score: score }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.error("Failed to update points:", data.error || "Unknown error");
+          return;
+        }
+
+        // Update the state with the returned data
+        valueInited(data.currentScore);
+        availableInited(data.available_clicks);
+      } catch (error) {
+        console.error("Error updating points:", error);
+      }
+    },
+    [sessionId]
+  );
 
   // Debounced function to update points after inactivity
   const debouncedSendPointsUpdate = useCallback(
-    debounce((score: number) => {
-      sendPointsUpdate(score);
+    debounce(async (score: number) => {
+      await sendPointsUpdate(score);
       setClickBuffer(0); // Reset buffer after sending
-    }, 2000), // 2 seconds debounce
-    [sessionId]
+    }, 2000),
+    [sendPointsUpdate]
   );
 
   useEffect(() => {
