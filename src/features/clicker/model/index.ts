@@ -115,7 +115,7 @@ export const useClicker = () => {
 
   const onClick = (increment: number, availableClicks: number) => {
     setClickBuffer((prev) => {
-        const newBuffer = prev + incrememt;
+        const newBuffer = prev + increment;
         setLastClickTime(new Date());    
 
         // Use the debounced version to handle backend calls
