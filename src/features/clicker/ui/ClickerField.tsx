@@ -24,21 +24,21 @@ export const ClickerField = () => {
   const { onClick } = clickerModel.useClicker();
 
   const handleClick = useCallback(() => {
-  if (canBeClicked && availableClicks > 0) {
-    const newScore = score + 1;
-    const newAvailable = availableClicks - 1;
+    if (canBeClicked && availableClicks > 0) {
+        const newScore = score + 1;
+        const newAvailable = availableClicks - 1;
 
-    // Update local state and Effector stores
-    updateScoreAndAvailable(newScore, newAvailable);
+        // Update both local state and backend through Effector's store
+        updateScoreAndAvailable(newScore, newAvailable);
 
-    // Directly call backend update without debounce in UI
-    onClick(newScore, newAvailable); // Pass both score and availableClicks
+        // Only call the debounced function here
+        debouncedSendPointsUpdate(newScore, newAvailable);
 
-    console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
-  } else {
-    console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
-  }
-}, [canBeClicked, availableClicks, score, updateScoreAndAvailable, onClick]);
+        console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
+    } else {
+        console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
+    }
+}, [canBeClicked, availableClicks, score, updateScoreAndAvailable, debouncedSendPointsUpdate]);
 
   const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
     if (isClickEnabled) {
