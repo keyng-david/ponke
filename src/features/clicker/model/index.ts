@@ -73,7 +73,11 @@ export const useClicker = () => {
 
   // Use a ref to store the latest availableClicks value
   const availableClicksRef = useRef<number | null>(null);
-  availableClicksRef.current = useUnit($available); // Update ref with the latest value
+  const availableClicks = useUnit($available); // Correctly call useUnit at the top level
+  availableClicksRef.current = availableClicks; // Update ref with the latest value
+
+  // Get the current value from the store
+  const currentValue = useUnit($value) ?? 0; // Correctly call useUnit at the top level
 
   const sendPointsUpdate = useCallback(
     async (score: number, availableClicks: number) => {
@@ -116,23 +120,20 @@ export const useClicker = () => {
   );
 
   const onClick = (increment: number) => {
-  setClickBuffer((prev) => prev + increment);
-  setTotalClicks((prev) => prev + 1);
-  setLastClickTime(new Date());
+    setClickBuffer((prev) => prev + increment);
+    setTotalClicks((prev) => prev + 1);
+    setLastClickTime(new Date());
 
-  // Update the local state optimistically
-  const newAvailable = (availableClicksRef.current || 0) - 1;
+    // Update the local state optimistically
+    const newAvailable = (availableClicksRef.current || 0) - 1;
 
-  // Get the current value from the store
-  const currentValue = useUnit($value) ?? 0;
+    // Update with the incremented value
+    valueInited(currentValue + increment);
+    availableInited(newAvailable);
 
-  // Update with the incremented value
-  valueInited(currentValue + increment);
-  availableInited(newAvailable);
-
-  // Use the debounced version to handle backend calls
-  debouncedSendPointsUpdate(currentValue + increment, newAvailable);
-};
+    // Use the debounced version to handle backend calls
+    debouncedSendPointsUpdate(currentValue + increment, newAvailable);
+  };
 
   useEffect(() => {
     if (!sessionId) {
@@ -151,8 +152,8 @@ export const useClicker = () => {
   }, [clickBuffer, sessionId, lastClickTime, debouncedSendPointsUpdate, totalClicks]);
 
   return {
-    value: useUnit($value),
-    available: useUnit($available),
+    value: currentValue,
+    available: availableClicks,
     canBeClicked: useUnit($canBeClicked),
     isMultiError: useUnit($isMultiAccount),
     onClick,
