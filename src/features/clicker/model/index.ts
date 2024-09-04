@@ -106,20 +106,20 @@ export const useClicker = () => {
   );
 
   const debouncedSendPointsUpdate = useCallback(
-    debounce(async (score: number, availableClicks: number) => {
-      await sendPointsUpdate(score, availableClicks);
-      setClickBuffer(0); // Reset buffer after sending
+    debounce(async (clickScore: number, availableClicks: number) => {
+      await sendPointsUpdate(clickScore, availableClicks);
+      setClickBuffer(0);
     }, 2000),
     [sendPointsUpdate]
   );
 
-  const onClick = (score: number, availableClicks: number) => {
+  const onClick = (increment: number, availableClicks: number) => {
     setClickBuffer((prev) => {
-        const newBuffer = prev + CLICK_STEP;
+        const newBuffer = prev + incrememt;
         setLastClickTime(new Date());    
 
         // Use the debounced version to handle backend calls
-        debouncedSendPointsUpdate(score, availableClicks);     
+        debouncedSendPointsUpdate(incrememt, availableClicks);     
         
         return newBuffer;
     });
