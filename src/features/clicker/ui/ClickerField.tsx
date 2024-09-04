@@ -23,17 +23,21 @@ export const ClickerField = () => {
   const [isClickEnabled, setIsClickEnabled] = useState(true);
 
   const handleClick = useCallback(() => {
-    if (canBeClicked && availableClicks > 0) {
-        const newScore = score + 1;
-        const newAvailable = availableClicks - 1;
+  if (canBeClicked && availableClicks > 0) {
+    const increment = 1;
+    const newScore = score + increment;
+    const newAvailable = availableClicks - 1;
 
-        updateScoreAndAvailable(newScore, newAvailable);
-       debouncedSendPointsUpdate(newScore, newAvailable);
+    // Update the local state optimistically
+    updateScoreAndAvailable(newScore, newAvailable);
 
-        console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
-    } else {
-        console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
-    }
+    // Send the increment and updated available clicks to the backend
+    debouncedSendPointsUpdate(increment, newAvailable);
+
+    console.log("Clicked: Increment:", increment, "New Available:", newAvailable);
+  } else {
+    console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
+  }
 }, [canBeClicked, availableClicks, score, updateScoreAndAvailable, debouncedSendPointsUpdate]);
 
   const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
