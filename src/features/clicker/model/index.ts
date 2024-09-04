@@ -119,10 +119,8 @@ export const useClicker = () => {
         setLastClickTime(new Date());    
 
         // Use the debounced version to handle backend calls
-        debouncedSendPointsUpdate(score, availableClicks);
-
-        // Cancel any ongoing debounce to reset the timer
-        debouncedSendPointsUpdate.cancel();
+        debouncedSendPointsUpdate(score, availableClicks);     
+        
         return newBuffer;
     });
 };
