@@ -115,17 +115,17 @@ export const useClicker = () => {
 
   const onClick = (score: number, availableClicks: number) => {
     setClickBuffer((prev) => {
-      const newBuffer = prev + CLICK_STEP;
-      setLastClickTime(new Date());
+        const newBuffer = prev + CLICK_STEP;
+        setLastClickTime(new Date());    
 
-      // Call backend update immediately with both arguments
-      sendPointsUpdate(score, availableClicks);
+        // Use the debounced version to handle backend calls
+        debouncedSendPointsUpdate(score, availableClicks);
 
-      // Cancel any ongoing debounce to reset the timer
-      debouncedSendPointsUpdate.cancel();
-      return newBuffer;
+        // Cancel any ongoing debounce to reset the timer
+        debouncedSendPointsUpdate.cancel();
+        return newBuffer;
     });
-  };
+};
 
   useEffect(() => {
     if (!sessionId) {
