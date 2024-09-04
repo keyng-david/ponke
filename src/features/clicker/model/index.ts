@@ -149,6 +149,7 @@ export const useClicker = () => {
     canBeClicked: useUnit($canBeClicked),
     isMultiError: useUnit($isMultiAccount),
     onClick,
+    debouncedSendPointsUpdate,
   };
 };
 
@@ -160,7 +161,6 @@ export const clickerModel = {
   errorUpdated,
   useCanBeClicked,
   useClicker,
-  debouncedSendPointsUpdate, 
   $value, 
   $available,
 };
