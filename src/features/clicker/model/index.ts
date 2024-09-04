@@ -72,35 +72,50 @@ export const useClicker = () => {
 
   // Function to send points update
   const sendPointsUpdate = useCallback(
-    async (score: number) => {
-      if (!sessionId) {
-        console.error("No session ID available");
+  async (score: number, availableClicks: number) => {
+    if (!sessionId) {
+      console.error("No session ID available");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/game/updatePoints", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId, click_score: score, available_clicks: availableClicks }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Failed to update points:", data.error || "Unknown error");
         return;
       }
 
-      try {
-        const response = await fetch("/api/game/updatePoints", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ session_id: sessionId, click_score: score }),
-        });
+      // Update the state with the returned data
+      valueInited(data.currentScore);
+      availableInited(data.available_clicks);
+    } catch (error) {
+      console.error("Error updating points:", error);
+    }
+  },
+  [sessionId]
+);
 
-        const data = await response.json();
+  // Immediate call to sendPointsUpdate after a click
+  const onClick = () => {
+    setClickBuffer((prev) => {
+      const newBuffer = prev + CLICK_STEP;
+      setLastClickTime(new Date());
 
-        if (!response.ok) {
-          console.error("Failed to update points:", data.error || "Unknown error");
-          return;
-        }
+      // Call backend update immediately
+      sendPointsUpdate(newBuffer);
 
-        // Update the state with the returned data
-        valueInited(data.currentScore);
-        availableInited(data.available_clicks);
-      } catch (error) {
-        console.error("Error updating points:", error);
-      }
-    },
-    [sessionId]
-  );
+      // Cancel any ongoing debounce to reset the timer
+      debouncedSendPointsUpdate.cancel(); 
+      return newBuffer;
+    });
+  };
 
   // Debounced function to update points after inactivity
   const debouncedSendPointsUpdate = useCallback(
@@ -126,15 +141,6 @@ export const useClicker = () => {
 
     return () => clearInterval(interval);
   }, [clickBuffer, sessionId, lastClickTime, debouncedSendPointsUpdate]);
-
-  function onClick() {
-    setClickBuffer((prev) => {
-      const newBuffer = prev + CLICK_STEP;
-      setLastClickTime(new Date());
-      debouncedSendPointsUpdate.cancel(); // Cancel any ongoing debounce to reset the timer
-      return newBuffer;
-    });
-  }
 
   return {
     value: useUnit($value),
