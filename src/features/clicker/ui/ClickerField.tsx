@@ -22,8 +22,6 @@ export const ClickerField = () => {
   const [rightClasses, setRightClasses] = useState([styles['hand-right']]);
   const [isClickEnabled, setIsClickEnabled] = useState(true);
 
-  const { onClick } = clickerModel.useClicker();
-
   const handleClick = useCallback(() => {
     if (canBeClicked && availableClicks > 0) {
         const newScore = score + 1;
