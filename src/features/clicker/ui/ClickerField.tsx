@@ -31,8 +31,7 @@ export const ClickerField = () => {
     // Update the local state optimistically
     updateScoreAndAvailable(newScore, newAvailable);
 
-    // Send the increment and updated available clicks to the backend
-    debouncedSendPointsUpdate(increment, newAvailable);
+    onClick(increment);
 
     console.log("Clicked: Increment:", increment, "New Available:", newAvailable);
   } else {
