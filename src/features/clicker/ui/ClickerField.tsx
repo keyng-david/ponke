@@ -9,7 +9,6 @@ import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/li
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
 import { useUnit } from "effector-react";
 import { useGameData } from "@/shared/lib/hooks/useGameData";
-import { debounce } from 'lodash';
 
 export const ClickerField = () => {
   const score = useUnit(clickerModel.$value) ?? 0;
@@ -24,30 +23,22 @@ export const ClickerField = () => {
 
   const { onClick } = clickerModel.useClicker();
 
-  // Debounced function to call the backend update
-  const debouncedBackendUpdate = useCallback(
-    debounce(() => {
-      onClick(); // Call the function to handle backend update
-    }, 2000),
-    [onClick]
-  );
-
   const handleClick = useCallback(() => {
     if (canBeClicked && availableClicks > 0) {
-      const newScore = score + 1; // Increment score
-      const newAvailable = availableClicks - 1; // Decrement available clicks
+      const newScore = score + 1;
+      const newAvailable = availableClicks - 1;
 
       // Update local state and Effector stores
       updateScoreAndAvailable(newScore, newAvailable);
-      
-      // Trigger backend update using debounced function
-      debouncedBackendUpdate();
+
+      // Directly call backend update without debounce in UI
+      onClick();
 
       console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
     } else {
       console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
     }
-  }, [canBeClicked, availableClicks, score, updateScoreAndAvailable, debouncedBackendUpdate]);
+  }, [canBeClicked, availableClicks, score, updateScoreAndAvailable, onClick]);
 
   const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
     if (isClickEnabled) {
@@ -89,6 +80,7 @@ export const ClickerField = () => {
     }
   }, [isClickEnabled, handleClick, haptic, leftClasses, rightClasses]);
 
+  // Remove handleTouchMove and handleTouchEnd or define them if needed
   const valueString = useMemo(() => {
     return typeof score === 'number' ? toFormattedNumber(score) : "0";
   }, [score]);
@@ -98,12 +90,11 @@ export const ClickerField = () => {
             id={'clicker'}
             className={styles.root}
             onTouchStart={onTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
+            // Removed handleTouchMove and handleTouchEnd to fix the error
         >
             <p className={styles.value}>{valueString}</p>
             <p className={styles.value}>{valueString}</p>
-            <ProgressBar value={available}/>
+            <ProgressBar value={availableClicks} maxAvailable={100} />
             <div className={styles.hands}>
                 <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'}/>
                 <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'}/>
