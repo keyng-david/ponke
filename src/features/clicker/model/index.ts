@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { createEvent, createStore, sample } from "effector";
 import { useUnit } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
