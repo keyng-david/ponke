@@ -70,6 +70,10 @@ export const useClicker = () => {
   const sessionId = useUnit($sessionId);
   const [lastClickTime, setLastClickTime] = useState<Date | null>(null);
 
+  // Use a ref to store the latest availableClicks value
+  const availableClicksRef = useRef<number | null>(null);
+  availableClicksRef.current = useUnit($available); // Update ref with the latest value
+
   const sendPointsUpdate = useCallback(
     async (score: number, availableClicks: number) => {
       if (!sessionId) {
@@ -101,6 +105,14 @@ export const useClicker = () => {
     [sessionId]
   );
 
+  const debouncedSendPointsUpdate = useCallback(
+    debounce(async (score: number, availableClicks: number) => {
+      await sendPointsUpdate(score, availableClicks);
+      setClickBuffer(0); // Reset buffer after sending
+    }, 2000),
+    [sendPointsUpdate]
+  );
+
   const onClick = (score: number, availableClicks: number) => {
     setClickBuffer((prev) => {
       const newBuffer = prev + CLICK_STEP;
@@ -115,14 +127,6 @@ export const useClicker = () => {
     });
   };
 
-  const debouncedSendPointsUpdate = useCallback(
-    debounce(async (score: number, availableClicks: number) => {
-      await sendPointsUpdate(score, availableClicks);
-      setClickBuffer(0); // Reset buffer after sending
-    }, 2000),
-    [sendPointsUpdate]
-  );
-
   useEffect(() => {
     if (!sessionId) {
       console.error("Session ID is not set");
@@ -131,8 +135,8 @@ export const useClicker = () => {
 
     const interval = setInterval(() => {
       if (clickBuffer > 0 && (!lastClickTime || new Date().getTime() - lastClickTime.getTime() >= 2000)) {
-        // Corrected variable reference
-        debouncedSendPointsUpdate(clickBuffer, useUnit($available)); // Use $available from Effector store
+        // Use the ref to get the latest availableClicks value
+        debouncedSendPointsUpdate(clickBuffer, availableClicksRef.current ?? 0);
       }
     }, 1000);
 
