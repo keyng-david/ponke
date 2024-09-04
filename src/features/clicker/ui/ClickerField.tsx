@@ -28,11 +28,8 @@ export const ClickerField = () => {
         const newScore = score + 1;
         const newAvailable = availableClicks - 1;
 
-        // Update both local state and backend through Effector's store
         updateScoreAndAvailable(newScore, newAvailable);
-
-        // Only call the debounced function here
-        debouncedSendPointsUpdate(newScore, newAvailable);
+        clickerModel.debouncedSendPointsUpdate(newScore, newAvailable);
 
         console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
     } else {
