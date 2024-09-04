@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { createEvent, createStore, sample } from "effector";
 import { useUnit } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
-import { debounce } from "lodash"; // Import lodash debounce
+import { debounce } from "lodash";
 
 // Constants
 export const CLICK_STEP = 1;
@@ -67,6 +67,7 @@ export const useCanBeClicked = () => useUnit($canBeClicked);
 
 export const useClicker = () => {
   const [clickBuffer, setClickBuffer] = useState(0);
+  const [totalClicks, setTotalClicks] = useState(0); // To accumulate clicks
   const sessionId = useUnit($sessionId);
   const [lastClickTime, setLastClickTime] = useState<Date | null>(null);
 
@@ -106,24 +107,27 @@ export const useClicker = () => {
   );
 
   const debouncedSendPointsUpdate = useCallback(
-    debounce(async (clickScore: number, availableClicks: number) => {
-      await sendPointsUpdate(clickScore, availableClicks);
+    debounce(async (totalScore: number, totalAvailableClicks: number) => {
+      await sendPointsUpdate(totalScore, totalAvailableClicks);
       setClickBuffer(0);
+      setTotalClicks(0);
     }, 2000),
     [sendPointsUpdate]
   );
 
-  const onClick = (increment: number, availableClicks: number) => {
-    setClickBuffer((prev) => {
-        const newBuffer = prev + increment;
-        setLastClickTime(new Date());    
+  const onClick = (increment: number) => {
+    setClickBuffer((prev) => prev + increment);
+    setTotalClicks((prev) => prev + 1);
+    setLastClickTime(new Date());
 
-        // Use the debounced version to handle backend calls
-        debouncedSendPointsUpdate(increment, availableClicks);     
-        
-        return newBuffer;
-    });
-};
+    // Update the local state optimistically
+    const newAvailable = (availableClicksRef.current || 0) - 1;
+    valueInited((prev) => (prev ?? 0) + increment);
+    availableInited(newAvailable);
+
+    // Use the debounced version to handle backend calls
+    debouncedSendPointsUpdate(clickBuffer + increment, newAvailable);
+  };
 
   useEffect(() => {
     if (!sessionId) {
@@ -132,14 +136,14 @@ export const useClicker = () => {
     }
 
     const interval = setInterval(() => {
-      if (clickBuffer > 0 && (!lastClickTime || new Date().getTime() - lastClickTime.getTime() >= 2000)) {
-        // Use the ref to get the latest availableClicks value
+      if (totalClicks > 0 && (!lastClickTime || new Date().getTime() - lastClickTime.getTime() >= 2000)) {
+        // Send the aggregated points if there has been no recent activity
         debouncedSendPointsUpdate(clickBuffer, availableClicksRef.current ?? 0);
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [clickBuffer, sessionId, lastClickTime, debouncedSendPointsUpdate]);
+  }, [clickBuffer, sessionId, lastClickTime, debouncedSendPointsUpdate, totalClicks]);
 
   return {
     value: useUnit($value),
