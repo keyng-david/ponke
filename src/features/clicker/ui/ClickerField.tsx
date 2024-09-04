@@ -11,6 +11,7 @@ import { useUnit } from "effector-react";
 import { useGameData } from "@/shared/lib/hooks/useGameData";
 
 export const ClickerField = () => {
+  const { onClick, debouncedSendPointsUpdate } = clickerModel.useClicker();
   const score = useUnit(clickerModel.$value) ?? 0;
   const availableClicks = Number(useUnit(clickerModel.$available)) || 0;
   const canBeClicked = clickerModel.useCanBeClicked();
@@ -29,7 +30,7 @@ export const ClickerField = () => {
         const newAvailable = availableClicks - 1;
 
         updateScoreAndAvailable(newScore, newAvailable);
-        clickerModel.debouncedSendPointsUpdate(newScore, newAvailable);
+       debouncedSendPointsUpdate(newScore, newAvailable);
 
         console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
     } else {
