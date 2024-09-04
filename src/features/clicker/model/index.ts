@@ -119,7 +119,7 @@ export const useClicker = () => {
         setLastClickTime(new Date());    
 
         // Use the debounced version to handle backend calls
-        debouncedSendPointsUpdate(incrememt, availableClicks);     
+        debouncedSendPointsUpdate(increment, availableClicks);     
         
         return newBuffer;
     });
