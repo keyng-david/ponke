@@ -94,21 +94,22 @@ export const ClickerField = () => {
   }, [score]);
 
   return (
-    <div
-      id={'clicker'}
-      className={styles.root}
-      onTouchStart={onTouchStart}
-      onTouchMove={(e) => e.preventDefault()}
-      onTouchEnd={(e) => e.preventDefault()}
-    >
-      <p className={styles.value}>{valueString}</p>
-      <ProgressBar value={availableClicks} maxAvailable={availableClicks} />
-      <div className={styles.hands}>
-        <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
-        <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
-      </div>
-    </div>
-  );
+        <div
+            id={'clicker'}
+            className={styles.root}
+            onTouchStart={onTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+        >
+            <p className={styles.value}>{valueString}</p>
+            <p className={styles.value}>{valueString}</p>
+            <ProgressBar value={available}/>
+            <div className={styles.hands}>
+                <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'}/>
+                <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'}/>
+            </div>
+        </div>
+    )
 }
 
 const ProgressBar = React.memo<{
