@@ -24,21 +24,21 @@ export const ClickerField = () => {
   const { onClick } = clickerModel.useClicker();
 
   const handleClick = useCallback(() => {
-    if (canBeClicked && availableClicks > 0) {
-      const newScore = score + 1;
-      const newAvailable = availableClicks - 1;
+  if (canBeClicked && availableClicks > 0) {
+    const newScore = score + 1;
+    const newAvailable = availableClicks - 1;
 
-      // Update local state and Effector stores
-      updateScoreAndAvailable(newScore, newAvailable);
+    // Update local state and Effector stores
+    updateScoreAndAvailable(newScore, newAvailable);
 
-      // Directly call backend update without debounce in UI
-      onClick(newScore, newAvailable); // Pass both score and availableClicks
+    // Directly call backend update without debounce in UI
+    onClick(newScore, newAvailable); // Pass both score and availableClicks
 
-      console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
-    } else {
-      console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
-    }
-  }, [canBeClicked, availableClicks, score, updateScoreAndAvailable, onClick]);
+    console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
+  } else {
+    console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
+  }
+}, [canBeClicked, availableClicks, score, updateScoreAndAvailable, onClick]);
 
   const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
     if (isClickEnabled) {
@@ -86,21 +86,22 @@ export const ClickerField = () => {
   }, [score]);
 
   return (
-    <div
-      id={'clicker'}
-      className={styles.root}
-      onTouchStart={onTouchStart}
-    >
-      <p className={styles.value}>{valueString}</p>
-      <p className={styles.value}>{valueString}</p>
-      <ProgressBar value={availableClicks} maxAvailable={100} />
-      <div className={styles.hands}>
-        <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
-        <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
-      </div>
-    </div>
-  );
-};
+        <div
+            id={'clicker'}
+            className={styles.root}
+            onTouchStart={onTouchStart}
+            // Removed handleTouchMove and handleTouchEnd to fix the error
+        >
+            <p className={styles.value}>{valueString}</p>
+            <p className={styles.value}>{valueString}</p>
+            <ProgressBar value={availableClicks} maxAvailable={100} />
+            <div className={styles.hands}>
+                <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'}/>
+                <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'}/>
+            </div>
+        </div>
+    )
+}
 
 const ProgressBar = React.memo<{
   value: number,
