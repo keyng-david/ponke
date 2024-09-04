@@ -70,7 +70,6 @@ export const useClicker = () => {
   const sessionId = useUnit($sessionId);
   const [lastClickTime, setLastClickTime] = useState<Date | null>(null);
 
-  // Function to send points update
   const sendPointsUpdate = useCallback(
     async (score: number, availableClicks: number) => {
       if (!sessionId) {
@@ -102,7 +101,6 @@ export const useClicker = () => {
     [sessionId]
   );
 
-  // Immediate call to sendPointsUpdate after a click
   const onClick = (score: number, availableClicks: number) => {
     setClickBuffer((prev) => {
       const newBuffer = prev + CLICK_STEP;
@@ -117,7 +115,6 @@ export const useClicker = () => {
     });
   };
 
-  // Debounced function to update points after inactivity
   const debouncedSendPointsUpdate = useCallback(
     debounce(async (score: number, availableClicks: number) => {
       await sendPointsUpdate(score, availableClicks);
@@ -134,8 +131,8 @@ export const useClicker = () => {
 
     const interval = setInterval(() => {
       if (clickBuffer > 0 && (!lastClickTime || new Date().getTime() - lastClickTime.getTime() >= 2000)) {
-        // Call debounced update if the user has been inactive for 2 seconds
-        debouncedSendPointsUpdate(clickBuffer, available); // Pass availableClicks here
+        // Corrected variable reference
+        debouncedSendPointsUpdate(clickBuffer, useUnit($available)); // Use $available from Effector store
       }
     }, 1000);
 
