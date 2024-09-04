@@ -116,18 +116,23 @@ export const useClicker = () => {
   );
 
   const onClick = (increment: number) => {
-    setClickBuffer((prev) => prev + increment);
-    setTotalClicks((prev) => prev + 1);
-    setLastClickTime(new Date());
+  setClickBuffer((prev) => prev + increment);
+  setTotalClicks((prev) => prev + 1);
+  setLastClickTime(new Date());
 
-    // Update the local state optimistically
-    const newAvailable = (availableClicksRef.current || 0) - 1;
-    valueInited((prev) => (prev ?? 0) + increment);
-    availableInited(newAvailable);
+  // Update the local state optimistically
+  const newAvailable = (availableClicksRef.current || 0) - 1;
 
-    // Use the debounced version to handle backend calls
-    debouncedSendPointsUpdate(clickBuffer + increment, newAvailable);
-  };
+  // Get the current value from the store
+  const currentValue = useUnit($value) ?? 0;
+
+  // Update with the incremented value
+  valueInited(currentValue + increment);
+  availableInited(newAvailable);
+
+  // Use the debounced version to handle backend calls
+  debouncedSendPointsUpdate(currentValue + increment, newAvailable);
+};
 
   useEffect(() => {
     if (!sessionId) {
