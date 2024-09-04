@@ -32,7 +32,7 @@ export const ClickerField = () => {
       updateScoreAndAvailable(newScore, newAvailable);
 
       // Directly call backend update without debounce in UI
-      onClick();
+      onClick(newScore, newAvailable); // Pass both score and availableClicks
 
       console.log("Clicked: New Score:", newScore, "New Available:", newAvailable);
     } else {
@@ -86,22 +86,21 @@ export const ClickerField = () => {
   }, [score]);
 
   return (
-        <div
-            id={'clicker'}
-            className={styles.root}
-            onTouchStart={onTouchStart}
-            // Removed handleTouchMove and handleTouchEnd to fix the error
-        >
-            <p className={styles.value}>{valueString}</p>
-            <p className={styles.value}>{valueString}</p>
-            <ProgressBar value={availableClicks} maxAvailable={100} />
-            <div className={styles.hands}>
-                <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'}/>
-                <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'}/>
-            </div>
-        </div>
-    )
-}
+    <div
+      id={'clicker'}
+      className={styles.root}
+      onTouchStart={onTouchStart}
+    >
+      <p className={styles.value}>{valueString}</p>
+      <p className={styles.value}>{valueString}</p>
+      <ProgressBar value={availableClicks} maxAvailable={100} />
+      <div className={styles.hands}>
+        <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
+        <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
+      </div>
+    </div>
+  );
+};
 
 const ProgressBar = React.memo<{
   value: number,
