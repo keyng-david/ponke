@@ -45,41 +45,41 @@ export const useClicker = () => {
   const currentValue = useUnit($value) ?? 0;
 
   const sendPointsUpdate = useCallback(
-    async (score: number) => {
-      if (!sessionId) {
-        console.error("No session ID available");
+  async (score: number, availableClicks: number) => {
+    if (!sessionId) {
+      console.error("No session ID available");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/game/updatePoints", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId, click_score: score, available_clicks: availableClicks }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        console.error("Failed to update points:", data.error || "Unknown error");
         return;
       }
 
-      try {
-        const response = await fetch("/api/game/updatePoints", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ session_id: sessionId, click_score: score }),
-        });
+      // Real-time updates will manage score updates via WebSocket
 
-        if (!response.ok) {
-          const data = await response.json();
-          console.error("Failed to update points:", data.error || "Unknown error");
-          return;
-        }
-        
-        // Real-time updates will manage score updates via WebSocket
+    } catch (error) {
+      console.error("Error updating points:", error);
+    }
+  },
+  [sessionId]
+);
 
-      } catch (error) {
-        console.error("Error updating points:", error);
-      }
-    },
-    [sessionId]
-  );
-
-  // Debounce the function to send points after 2 seconds of inactivity
-  const debouncedSendPointsUpdate = useCallback(
-    debounce(async () => {
-      await sendPointsUpdate(currentValue);
-    }, 2000),
-    [sendPointsUpdate, currentValue]
-  );
+// Debounce the function to send points after 2 seconds of inactivity
+const debouncedSendPointsUpdate = useCallback(
+  debounce(async () => {
+    await sendPointsUpdate(currentValue, availableClicks);
+  }, 2000),
+  [sendPointsUpdate, currentValue, availableClicks]
+);
 
   const onClick = useCallback(() => {
     setLastClickTime(new Date());
