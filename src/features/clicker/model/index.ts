@@ -95,7 +95,9 @@ export const clickerModel = {
   availableInited,
   availableUpdated,
   errorUpdated,
-  clicked, // Exporting the newly introduced event
+  clicked,
   useCanBeClicked,
   useClicker,
+  $value, 
+  $available,
 };
