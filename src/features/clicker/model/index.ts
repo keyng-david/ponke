@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createEvent, createStore, sample } from "effector";
 import { useUnit } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
 import { debounce } from "lodash";
 
-
-export const CLICK_STEP = 1
+// Constants
+export const CLICK_STEP = 1;
+export const MAX_AVAILABLE = 100; // Set the max refill limit
 
 // Events
 export const valueInited = createEvent<number>();
@@ -15,11 +16,8 @@ export const errorUpdated = createEvent<boolean>();
 
 // Stores
 export const $isMultiAccount = createStore(false);
-export const $value = createStore<number | null>(null, { skipVoid: false })
-  .on(valueInited, (_, score) => score);
-
-export const $available = createStore<number | null>(null, { skipVoid: false })
-  .on(availableInited, (_, availableClicks) => availableClicks);
+export const $value = createStore<number | null>(null, { skipVoid: false }).on(valueInited, (_, score) => score);
+export const $available = createStore<number | null>(null, { skipVoid: false }).on(availableInited, (_, availableClicks) => availableClicks);
 
 // Effector samples
 sample({
@@ -42,70 +40,59 @@ export const useCanBeClicked = () => useUnit($available.map((state) => (state ??
 
 export const useClicker = () => {
   const sessionId = useUnit($sessionId);
-  const [lastClickTime, setLastClickTime] = useState<Date | null>(null);
-
   const availableClicks = useUnit($available);
   const currentValue = useUnit($value) ?? 0;
+  const [lastActivityTime, setLastActivityTime] = useState<number | null>(null);
+  const [isRefilling, setIsRefilling] = useState(false);
 
+  // WebSocket or another method should handle server-side updates
   const sendPointsUpdate = useCallback(
-  async (score: number, availableClicks: number) => {
-    if (!sessionId) {
-      console.error("No session ID available");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/game/updatePoints", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId, click_score: score, available_clicks: availableClicks }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        console.error("Failed to update points:", data.error || "Unknown error");
+    (score: number, availableClicks: number) => {
+      if (!sessionId) {
+        console.error("No session ID available");
         return;
       }
 
-      // Real-time updates will manage score updates via WebSocket
+      // Simulate WebSocket call
+      console.log("Sending WebSocket update:", { session_id: sessionId, click_score: score, available_clicks: availableClicks });
+    },
+    [sessionId]
+  );
 
-    } catch (error) {
-      console.error("Error updating points:", error);
-    }
-  },
-  [sessionId]
-);
+  // Debounced update to avoid rapid firing of events
+  const debouncedSendPointsUpdate = useCallback(
+    debounce((totalScore: number, totalAvailableClicks: number) => {
+      sendPointsUpdate(totalScore, totalAvailableClicks);
+    }, 2000),
+    [sendPointsUpdate]
+  );
 
-// Debounce the function to send points after 2 seconds of inactivity
-const debouncedSendPointsUpdate = useCallback(
-  debounce(async () => {
-    await sendPointsUpdate(currentValue, availableClicks);
-  }, 2000),
-  [sendPointsUpdate, currentValue, availableClicks]
-);
-
-  const onClick = useCallback(() => {
-    setLastClickTime(new Date());
-    debouncedSendPointsUpdate();
-  }, [debouncedSendPointsUpdate]);
-
-  // Monitor for inactivity and send points if necessary
+  // Handle refill logic
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (!lastClickTime || new Date().getTime() - lastClickTime.getTime() >= 2000) {
-        debouncedSendPointsUpdate();
-      }
-    }, 1000);
+    if (!isRefilling && (Date.now() - (lastActivityTime ?? 0)) > 4000 && (availableClicks ?? 0) < MAX_AVAILABLE) {
+      setIsRefilling(true);
+      const refillInterval = setInterval(() => {
+        if ((availableClicks ?? 0) < MAX_AVAILABLE) {
+          availableUpdated((availableClicks ?? 0) + 1);
+        } else {
+          clearInterval(refillInterval);
+          setIsRefilling(false);
+        }
+      }, 1000);
 
-    return () => clearInterval(interval);
-  }, [lastClickTime, debouncedSendPointsUpdate]);
+      return () => clearInterval(refillInterval);
+    }
+  }, [availableClicks, lastActivityTime, isRefilling]);
 
   return {
     value: currentValue,
     available: availableClicks,
     canBeClicked: useUnit($available.map((state) => (state ?? 0) >= CLICK_STEP)),
     isMultiError: useUnit($isMultiAccount),
-    onClick,
+    onClick: (score: number, availableClicks: number) => {
+      setLastActivityTime(Date.now());
+      debouncedSendPointsUpdate(score, availableClicks);
+    },
   };
 };
 
@@ -116,6 +103,6 @@ export const clickerModel = {
   errorUpdated,
   useCanBeClicked,
   useClicker,
-  $value, 
+  $value,
   $available,
 };
