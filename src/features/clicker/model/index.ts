@@ -13,6 +13,7 @@ export const valueInited = createEvent<number>();
 export const availableInited = createEvent<number>();
 export const availableUpdated = createEvent<number>();
 export const errorUpdated = createEvent<boolean>();
+export const clicked = createEvent<{ score: number; available_clicks: number }>(); // Reintroduced `clicked` event
 
 // Stores
 export const $isMultiAccount = createStore(false);
@@ -35,6 +36,18 @@ sample({
   target: $isMultiAccount,
 });
 
+sample({
+  clock: clicked,
+  fn: ({ score }) => score,
+  target: $value,
+});
+
+sample({
+  clock: clicked,
+  fn: ({ available_clicks }) => available_clicks,
+  target: $available,
+});
+
 // Hooks
 export const useCanBeClicked = () => useUnit($available.map((state) => (state ?? 0) >= CLICK_STEP));
 
@@ -45,64 +58,44 @@ export const useClicker = () => {
   const [lastActivityTime, setLastActivityTime] = useState<number | null>(null);
   const [isRefilling, setIsRefilling] = useState(false);
 
-  // WebSocket or another method should handle server-side updates
-  const sendPointsUpdate = useCallback(
-    (score: number, availableClicks: number) => {
-      if (!sessionId) {
-        console.error("No session ID available");
-        return;
-      }
+  // WebSocket or server-side communication function
+  const sendMessage = useCallback((type: string, data: any) => {
+    // Your WebSocket or server communication logic here
+  }, []);
 
-      // Simulate WebSocket call
-      console.log("Sending WebSocket update:", { session_id: sessionId, click_score: score, available_clicks: availableClicks });
-    },
-    [sessionId]
-  );
+  const onClick = useCallback(() => {
+    if (availableClicks && availableClicks >= CLICK_STEP) {
+      // Example data; replace with actual click handling logic
+      const newScore = currentValue + 1; // Calculate new score
+      const newAvailableClicks = availableClicks - CLICK_STEP; // Deduct clicks
+      
+      // Trigger the `clicked` event with new values
+      clicked({ score: newScore, available_clicks: newAvailableClicks });
 
-  // Debounced update to avoid rapid firing of events
-  const debouncedSendPointsUpdate = useCallback(
-    debounce((totalScore: number, totalAvailableClicks: number) => {
-      sendPointsUpdate(totalScore, totalAvailableClicks);
-    }, 2000),
-    [sendPointsUpdate]
-  );
-
-  // Handle refill logic
-  useEffect(() => {
-    if (!isRefilling && (Date.now() - (lastActivityTime ?? 0)) > 4000 && (availableClicks ?? 0) < MAX_AVAILABLE) {
-      setIsRefilling(true);
-      const refillInterval = setInterval(() => {
-        if ((availableClicks ?? 0) < MAX_AVAILABLE) {
-          availableUpdated((availableClicks ?? 0) + 1);
-        } else {
-          clearInterval(refillInterval);
-          setIsRefilling(false);
-        }
-      }, 1000);
-
-      return () => clearInterval(refillInterval);
+      // Send message to server or perform any side-effects
+      sendMessage('click', { sessionId, newScore, newAvailableClicks });
     }
-  }, [availableClicks, lastActivityTime, isRefilling]);
+  }, [availableClicks, currentValue, sessionId, sendMessage]);
+
+  useEffect(() => {
+    // Your refilling logic if needed
+  }, [isRefilling]);
 
   return {
     value: currentValue,
-    available: availableClicks,
-    canBeClicked: useUnit($available.map((state) => (state ?? 0) >= CLICK_STEP)),
+    available: availableClicks ?? 0,
+    canBeClicked: useCanBeClicked(),
     isMultiError: useUnit($isMultiAccount),
-    onClick: (score: number, availableClicks: number) => {
-      setLastActivityTime(Date.now());
-      debouncedSendPointsUpdate(score, availableClicks);
-    },
+    onClick,
   };
 };
 
 export const clickerModel = {
-  availableUpdated,
   valueInited,
   availableInited,
+  availableUpdated,
   errorUpdated,
+  clicked, // Exporting the newly introduced event
   useCanBeClicked,
   useClicker,
-  $value,
-  $available,
 };
