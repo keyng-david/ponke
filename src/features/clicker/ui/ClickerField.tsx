@@ -9,10 +9,9 @@ import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/li
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
 import { useUnit } from "effector-react";
 import { useGameData } from "@/shared/lib/hooks/useGameData";
-import useSupabaseRealtime from "@/shared/lib/hooks/useSupabaseRealtime"; // Import the WebSocket hook
 
 export const ClickerField = () => {
-  const { onClick, debouncedSendPointsUpdate } = clickerModel.useClicker();
+  const { onClick } = clickerModel.useClicker();
   const score = useUnit(clickerModel.$value) ?? 0;
   const availableClicks = Number(useUnit(clickerModel.$available)) || 0;
   const canBeClicked = clickerModel.useCanBeClicked();
@@ -31,7 +30,7 @@ export const ClickerField = () => {
       // Update the local state optimistically
       updateScoreAndAvailable(newScore, newAvailable);
 
-      // Call the modified onClick function correctly
+      // Call the onClick function to handle server update
       onClick(newScore, newAvailable);
 
       console.log("Clicked: Increment:", CLICK_STEP, "New Available:", newAvailable);
