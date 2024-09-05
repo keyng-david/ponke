@@ -4,6 +4,9 @@ import { useUnit } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
 import { debounce } from "lodash";
 
+
+export const CLICK_STEP = 1
+
 // Events
 export const valueInited = createEvent<number>();
 export const availableInited = createEvent<number>();
