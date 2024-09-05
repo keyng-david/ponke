@@ -3,7 +3,7 @@ import progress from '@/shared/assets/images/main/progress.png';
 import pointImage from '@/shared/assets/images/main/point.png';
 import leftHand from '@/shared/assets/images/main/left-hand.png';
 import rightHand from '@/shared/assets/images/main/right-hand.png';
-import { clickerModel } from "../model";
+import { CLICK_STEP, clickerModel } from "../model";
 import styles from './ClickerField.module.scss';
 import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/lib/number";
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
@@ -24,14 +24,13 @@ export const ClickerField = () => {
 
   const handleClick = useCallback(() => {
   if (canBeClicked && availableClicks > 0) {
-    const increment = 1;
-    const newScore = score + increment;
-    const newAvailable = availableClicks - 1;
+    const newScore = score + CLICK_STEP;
+    const newAvailable = availableClicks - CLICK_STEP;
 
     // Update the local state optimistically
     updateScoreAndAvailable(newScore, newAvailable);
 
-    onClick(increment);
+    onClick( );
 
     console.log("Clicked: Increment:", increment, "New Available:", newAvailable);
   } else {
