@@ -6,7 +6,7 @@ import { debounce } from "lodash";
 
 // Constants
 export const CLICK_STEP = 1;
-export const MAX_AVAILABLE = 100; // Set the max refill limit
+export const MAX_AVAILABLE = 500; // Set the max refill limit
 
 // Events
 export const valueInited = createEvent<number>();
