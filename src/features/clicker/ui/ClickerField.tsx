@@ -9,6 +9,7 @@ import { getRandomArbitrary, getRandomInt, toFormattedNumber } from "@/shared/li
 import { useTelegram } from "@/shared/lib/hooks/useTelegram";
 import { useUnit } from "effector-react";
 import { useGameData } from "@/shared/lib/hooks/useGameData";
+import useSupabaseRealtime from "@/shared/lib/hooks/useSupabaseRealtime"; // Import the WebSocket hook
 
 export const ClickerField = () => {
   const { onClick, debouncedSendPointsUpdate } = clickerModel.useClicker();
@@ -16,27 +17,30 @@ export const ClickerField = () => {
   const availableClicks = Number(useUnit(clickerModel.$available)) || 0;
   const canBeClicked = clickerModel.useCanBeClicked();
   const { haptic } = useTelegram();
-  const { updateScoreAndAvailable } = useGameData();
+  const { updateScoreAndAvailable } = useGameData(); // Ensure to use this to update score
 
   const [leftClasses, setLeftClasses] = useState([styles['hand-left']]);
   const [rightClasses, setRightClasses] = useState([styles['hand-right']]);
   const [isClickEnabled, setIsClickEnabled] = useState(true);
 
+  // Use the WebSocket hook to receive real-time updates for the current session
+  useSupabaseRealtime(sessionId); // Ensure the sessionId is passed correctly to the hook
+
   const handleClick = useCallback(() => {
-  if (canBeClicked && availableClicks > 0) {
-    const newScore = score + CLICK_STEP;
-    const newAvailable = availableClicks - CLICK_STEP;
+    if (canBeClicked && availableClicks > 0) {
+      const newScore = score + CLICK_STEP;
+      const newAvailable = availableClicks - CLICK_STEP;
 
-    // Update the local state optimistically
-    updateScoreAndAvailable(newScore, newAvailable);
+      // Update the local state optimistically
+      updateScoreAndAvailable(newScore, newAvailable);
 
-    onClick( );
+      onClick();
 
-    console.log("Clicked: Increment:", increment, "New Available:", newAvailable);
-  } else {
-    console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
-  }
-}, [canBeClicked, availableClicks, score, updateScoreAndAvailable, debouncedSendPointsUpdate]);
+      console.log("Clicked: Increment:", increment, "New Available:", newAvailable);
+    } else {
+      console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
+    }
+  }, [canBeClicked, availableClicks, score, updateScoreAndAvailable, debouncedSendPointsUpdate]);
 
   const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
     if (isClickEnabled) {
@@ -78,28 +82,25 @@ export const ClickerField = () => {
     }
   }, [isClickEnabled, handleClick, haptic, leftClasses, rightClasses]);
 
-  // Remove handleTouchMove and handleTouchEnd or define them if needed
   const valueString = useMemo(() => {
     return typeof score === 'number' ? toFormattedNumber(score) : "0";
   }, [score]);
 
   return (
-        <div
-            id={'clicker'}
-            className={styles.root}
-            onTouchStart={onTouchStart}
-            // Removed handleTouchMove and handleTouchEnd to fix the error
-        >
-            <p className={styles.value}>{valueString}</p>
-            <p className={styles.value}>{valueString}</p>
-            <ProgressBar value={availableClicks} maxAvailable={100} />
-            <div className={styles.hands}>
-                <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'}/>
-                <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'}/>
-            </div>
-        </div>
-    )
-}
+    <div
+      id={'clicker'}
+      className={styles.root}
+      onTouchStart={onTouchStart}
+    >
+      <p className={styles.value}>{valueString}</p>
+      <ProgressBar value={availableClicks} maxAvailable={100} />
+      <div className={styles.hands}>
+        <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'}/>
+        <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'}/>
+      </div>
+    </div>
+  );
+};
 
 const ProgressBar = React.memo<{
   value: number,
