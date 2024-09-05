@@ -17,14 +17,11 @@ export const ClickerField = () => {
   const availableClicks = Number(useUnit(clickerModel.$available)) || 0;
   const canBeClicked = clickerModel.useCanBeClicked();
   const { haptic } = useTelegram();
-  const { updateScoreAndAvailable } = useGameData(); // Ensure to use this to update score
+  const { updateScoreAndAvailable } = useGameData();
 
   const [leftClasses, setLeftClasses] = useState([styles['hand-left']]);
   const [rightClasses, setRightClasses] = useState([styles['hand-right']]);
   const [isClickEnabled, setIsClickEnabled] = useState(true);
-
-  // Use the WebSocket hook to receive real-time updates for the current session
-  useSupabaseRealtime(sessionId); // Ensure the sessionId is passed correctly to the hook
 
   const handleClick = useCallback(() => {
     if (canBeClicked && availableClicks > 0) {
@@ -34,13 +31,14 @@ export const ClickerField = () => {
       // Update the local state optimistically
       updateScoreAndAvailable(newScore, newAvailable);
 
-      onClick();
+      // Call the modified onClick function correctly
+      onClick(newScore, newAvailable);
 
-      console.log("Clicked: Increment:", increment, "New Available:", newAvailable);
+      console.log("Clicked: Increment:", CLICK_STEP, "New Available:", newAvailable);
     } else {
       console.log("Click ignored: canBeClicked:", canBeClicked, "availableClicks:", availableClicks);
     }
-  }, [canBeClicked, availableClicks, score, updateScoreAndAvailable, debouncedSendPointsUpdate]);
+  }, [canBeClicked, availableClicks, score, updateScoreAndAvailable, onClick]);
 
   const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
     if (isClickEnabled) {
@@ -95,8 +93,8 @@ export const ClickerField = () => {
       <p className={styles.value}>{valueString}</p>
       <ProgressBar value={availableClicks} maxAvailable={100} />
       <div className={styles.hands}>
-        <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'}/>
-        <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'}/>
+        <img id={'handLeft'} className={leftClasses.join(' ')} src={leftHand} alt={'left hand'} />
+        <img id={'handRight'} className={rightClasses.join(' ')} src={rightHand} alt={'right hand'} />
       </div>
     </div>
   );
