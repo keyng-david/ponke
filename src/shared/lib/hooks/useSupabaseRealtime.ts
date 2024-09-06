@@ -10,34 +10,23 @@ const useSupabaseRealtime = (sessionId: string) => {
   const { updateScoreAndAvailable } = useGameData(); // Destructure update function from your custom hook
 
   useEffect(() => {
-    // Correct channel name as defined in your Supabase Realtime settings
     const channel = supabase
-      .channel('realtime:public:users')  // Ensure the channel name matches your setup
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'users', filter: `session_id=eq.${sessionId}` },
-        (payload) => {
-          console.log('Realtime update received:', payload);
+      .from(`users:session_id=eq.${sessionId}`)  // Create a subscription to a specific row in the "users" table
+      .on('UPDATE', (payload) => {
+        console.log('Realtime update received:', payload);
 
-          // Extract updated data
-          const { new: newRecord } = payload;
-          if (newRecord) {
-            // Update the UI or state with the new data
-            const updatedScore = newRecord.score;
-            const updatedAvailableClicks = newRecord.available_clicks;
+        // Extract updated data
+        const { new: newRecord } = payload;
+        if (newRecord) {
+          // Update the UI or state with the new data
+          const updatedScore = newRecord.score;
+          const updatedAvailableClicks = newRecord.available_clicks;
 
-            // Update local states using your state management
-            updateScoreAndAvailable(updatedScore, updatedAvailableClicks);
-          }
+          // Update local states using your state management
+          updateScoreAndAvailable(updatedScore, updatedAvailableClicks);
         }
-      )
-      .subscribe()
-      .on('error', (error) => {
-        console.error('Error with the realtime subscription:', error);
       })
-      .on('close', () => {
-        console.log('Realtime subscription closed.');
-      });
+      .subscribe();
 
     // Cleanup function to unsubscribe from the channel
     return () => {
