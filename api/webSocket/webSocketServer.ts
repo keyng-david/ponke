@@ -4,10 +4,19 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const WebSocket = require('ws');
-const port = process.env.PORT || 8080;
-const server = new WebSocket.Server({ port });
+const http = require('http'); // Required to create an HTTP server
 
-server.on('connection', (socket) => {
+const port = process.env.PORT || 8080;
+
+// Create HTTP server
+const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('WebSocket server is running\n'); // HTTP route for Heroku's checks
+});
+
+const wss = new WebSocket.Server({ server }); // Use the HTTP server for WebSocket
+
+wss.on('connection', (socket) => {
     console.log('Client connected');
 
     // Realtime subscription
@@ -47,4 +56,9 @@ server.on('connection', (socket) => {
         console.log('Client disconnected');
         supabase.removeChannel(channel); // Cleanup on disconnect
     });
+});
+
+// Start the server
+server.listen(port, () => {
+    console.log(`Server running on port ${port}`);
 });
