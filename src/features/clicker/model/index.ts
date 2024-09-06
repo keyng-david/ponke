@@ -83,4 +83,6 @@ export const clickerModel = {
 
     useCanBeClicked,
     useClicker,
+    $value,
+    $available,
 }
