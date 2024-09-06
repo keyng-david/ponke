@@ -86,22 +86,14 @@ export const useClicker = () => {
       }
 
       try {
-        const response = await fetch("/api/game/updatePoints", {
+        // Send only the POST request without handling the response
+        await fetch("/api/game/updatePoints", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ session_id: sessionId, click_score: score, available_clicks: availableClicks }),
         });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          console.error("Failed to update points:", data.error || "Unknown error");
-          return;
-        }
-
-        // Update state from the backend response
-        valueInited(data.currentScore);
-        availableInited(data.available_clicks);
+        // No response handling needed since we use real-time updates
       } catch (error) {
         console.error("Error updating points:", error);
       }
@@ -139,7 +131,7 @@ export const useClicker = () => {
       if (availableClicksRef.current !== null && availableClicksRef.current < 1000) {
         availableInited((availableClicksRef.current || 0) + 1);
       }
-    }, 5000); // Refills slowly over time
+    }, 10000); // Refills slowly over time
 
     return () => clearInterval(refillInterval);
   }, []);
