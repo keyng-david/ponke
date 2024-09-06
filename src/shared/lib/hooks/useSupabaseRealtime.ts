@@ -4,15 +4,15 @@ import { useGameData } from "@/shared/lib/hooks/useGameData";  // Import your st
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, { realtime: { enabled: true } });
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);  // Correctly initialize the client
 
 const useSupabaseRealtime = (sessionId: string) => {
   const { updateScoreAndAvailable } = useGameData(); // Destructure update function from your custom hook
 
   useEffect(() => {
-    const subscription = supabase
-      .from(`users:session_id=eq.${sessionId}`)
-      .on('UPDATE', payload => {
+    const channel = supabase
+      .channel('users')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `session_id=eq.${sessionId}` }, payload => {
         console.log('Realtime update received:', payload);
 
         // Extract updated data
@@ -29,7 +29,7 @@ const useSupabaseRealtime = (sessionId: string) => {
       .subscribe();
 
     return () => {
-      subscription.unsubscribe();
+      channel.unsubscribe();
     };
   }, [sessionId, updateScoreAndAvailable]); // Ensure updateScoreAndAvailable is added to the dependency array
 };
