@@ -18,7 +18,7 @@ const clicked = createEvent<{
 const availableUpdated = createEvent<number>();
 const errorUpdated = createEvent<boolean>();
 
-// Throttled event for updating points
+// Event for updating points
 const sendPointsUpdate = createEvent<number>();
 
 const $isMultiAccount = createStore(false);
@@ -29,7 +29,6 @@ const $canBeClicked = $available.map(state => state >= CLICK_STEP);
 // Throttle logic to ensure the score is sent at intervals
 const throttledSendPointsUpdate = throttle(async (score: number) => {
     try {
-        // Send the throttled score update to the backend
         await fetch("/api/game/updatePoints", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -38,32 +37,26 @@ const throttledSendPointsUpdate = throttle(async (score: number) => {
     } catch (error) {
         console.error("Error updating points:", error);
     }
-}, 500); // Throttle for 500ms
+}, 2000);
 
-// Trigger the throttled function whenever the sendPointsUpdate event is triggered
-sample({
-    clock: sendPointsUpdate,
-    fn: (score) => score,
-    target: sendPointsUpdate.watch(throttledSendPointsUpdate),
-});
+// Trigger the throttled function when the score is updated
+sendPointsUpdate.watch(throttledSendPointsUpdate);
 
-sample({
-    clock: availableUpdated,
-    target: $available,
-});
-
+// Sample the clicked event to update score
 sample({
     clock: clicked,
     fn: ({ score }) => score,
     target: $value,
 });
 
+// Sample the available clicks and update the store
 sample({
     clock: clicked,
     fn: ({ available_clicks }) => available_clicks,
     target: $available,
 });
 
+// Initialize stores
 sample({
     clock: valueInited,
     target: $value,
@@ -74,21 +67,19 @@ sample({
     target: $available,
 });
 
+// Handle errors if any
 sample({
     clock: errorUpdated,
     target: $isMultiAccount,
 });
 
-// Exporting hooks to use the states in UI components
+// Export hooks for use in components
 const useCanBeClicked = () => useUnit($canBeClicked);
 
 const useClicker = () => {
-    const { sendMessage } = useSocket();
-
-    function onClick() {
+    const onClick = () => {
         sendMessage("click");
-        // Increment score logic will be handled in the UI component
-    }
+    };
 
     return {
         value: useUnit($value),
