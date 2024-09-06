@@ -21,10 +21,16 @@ export const errorUpdated = createEvent<boolean>();
 // Stores
 export const $isMultiAccount = createStore(false);
 export const $value = createStore<number | null>(null, { skipVoid: false })
-  .on(valueInited, (_, score) => score);
+  .on(valueInited, (_, score) => {
+    console.log("Effector Store Update - $value:", score);
+    return score;
+  });
 
 export const $available = createStore<number | null>(null, { skipVoid: false })
-  .on(availableInited, (_, availableClicks) => availableClicks);
+  .on(availableInited, (_, availableClicks) => {
+    console.log("Effector Store Update - $available:", availableClicks);
+    return availableClicks;
+  });
 
 // Derived store
 export const $canBeClicked = $available.map((state) => (state ?? 0) >= CLICK_STEP);
@@ -111,26 +117,26 @@ export const useClicker = () => {
   );
 
   const onClick = useCallback(() => {
-  setClickBuffer((prev) => prev + CLICK_STEP);
-  setTotalClicks((prev) => prev + 1);
-  setLastClickTime(new Date());
+    setClickBuffer((prev) => prev + CLICK_STEP);
+    setTotalClicks((prev) => prev + 1);
+    setLastClickTime(new Date());
 
-  // Update the local state optimistically
-  const newAvailable = (availableClicksRef.current || 0) - CLICK_STEP;
+    // Update the local state optimistically
+    const newAvailable = (availableClicksRef.current || 0) - CLICK_STEP;
 
-  // Log the current and new state before sending the backend request
-  console.log("Current Value:", currentValue + CLICK_STEP);
-  console.log("New Available Clicks:", newAvailable);
+    // Log the current and new state before sending the backend request
+    console.log("Current Value:", currentValue + CLICK_STEP);
+    console.log("New Available Clicks:", newAvailable);
 
-  // Update with the incremented value
-  valueInited(currentValue + CLICK_STEP);
-  availableInited(newAvailable);
+    // Update with the incremented value
+    valueInited(currentValue + CLICK_STEP);
+    availableInited(newAvailable);
 
-  // Log before calling the debounced function
-  console.log("Sending Points Update - Score:", currentValue + CLICK_STEP, "Available Clicks:", newAvailable);
+    // Log before calling the debounced function
+    console.log("Sending Points Update - Score:", currentValue + CLICK_STEP, "Available Clicks:", newAvailable);
 
-  debouncedSendPointsUpdate(currentValue + CLICK_STEP, newAvailable);
-}, [currentValue, debouncedSendPointsUpdate]);
+    debouncedSendPointsUpdate(currentValue + CLICK_STEP, newAvailable);
+  }, [currentValue, debouncedSendPointsUpdate]);
 
   // Auto refill available clicks on inactivity
   useEffect(() => {
