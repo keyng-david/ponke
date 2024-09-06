@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { session_id, click_score, available_clicks } = req.body;
+    const { session_id, click_score } = req.body; // Removed available_clicks from destructuring
 
     // Validate input
     if (!session_id) {
@@ -20,14 +20,10 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Invalid click_score' });
     }
 
-    if (typeof available_clicks !== 'number' || available_clicks < 0) {
-      return res.status(400).json({ error: 'Invalid available_clicks' });
-    }
-
-    // Update the user's score and available_clicks directly
+    // Update the user's score directly without available_clicks
     const { error: updateError } = await supabase
       .from('users')
-      .update({ score: click_score, available_clicks })
+      .update({ score: click_score })
       .eq('session_id', session_id);
 
     if (updateError) {
