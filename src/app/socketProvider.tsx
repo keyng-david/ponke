@@ -19,7 +19,7 @@ export const useSocket = () => {
 export const SocketProvider = React.memo<React.PropsWithChildren>(({ children }) => {
     const sessionId = useStore($sessionId); // Use the sessionId from the Effector store
     const { sendMessage, lastMessage } = useWebSocket(
-        'https://ponke-alpha.vercel.app/api/game/websocketServer',
+        'wss://ponke-alpha.vercel.app/api/game/websocketServer',
         {
             shouldReconnect: () => true,
             reconnectInterval: 0,
