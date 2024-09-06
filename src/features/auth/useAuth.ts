@@ -19,7 +19,6 @@ const setIsAuth = createEvent<boolean>();
 const $isAuth = createStore(false).on(setIsAuth, (_, value) => value);
 
 // New global stores for game data
-
 const { valueInited, availableInited } = clickerModel;
 
 export const useAuth = () => {
@@ -78,18 +77,27 @@ export const useAuth = () => {
       // Store initial game data globally
       valueInited(data.payload.score);
       console.log("Initial Score set:", data.payload.score);
-     availableInited(data.payload.available_clicks);
+      availableInited(data.payload.available_clicks);
       console.log("Initial Available Clicks set:", data.payload.available_clicks);
 
-      if (data.payload.wallet) {
+      if (data.payload.wallet !== undefined) {
         wallet.updateWallet(data.payload.wallet);
+      } else {
+        console.warn("Wallet data is undefined");
       }
 
       if (typeof data.payload.level === 'number') {
         rangModel.update(data.payload.level);
+      } else {
+        console.warn("Level data is undefined or not a number");
       }
 
-      setTelegramId(data.payload.telegram_id);
+      if (data.payload.telegram_id) {
+        setTelegramId(data.payload.telegram_id);
+      } else {
+        console.warn("Telegram ID is undefined");
+      }
+
       setIsAuth(true);
 
       console.log("Navigating to /main");
