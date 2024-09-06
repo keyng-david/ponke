@@ -108,13 +108,13 @@ export const useClicker = () => {
   );
 
   const debouncedSendPointsUpdate = useCallback(
-    debounce(async () => {
-      await sendPointsUpdate(currentValue, availableClicksRef.current ?? 0);
-      setClickBuffer(0);
-      setTotalClicks(0);
-    }, 2000),
-    [sendPointsUpdate, currentValue]
-  );
+  debounce(async (score: number, availableClicks: number) => {
+    await sendPointsUpdate(score, availableClicks);
+    setClickBuffer(0);
+    setTotalClicks(0);
+  }, 2000),
+  [sendPointsUpdate]
+);
 
   const onClick = useCallback(() => {
     setClickBuffer((prev) => prev + CLICK_STEP);
