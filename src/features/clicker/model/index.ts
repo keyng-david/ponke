@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { createEvent, createStore, sample } from "effector";
 import { useUnit } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
@@ -13,7 +13,7 @@ export const valueInited = createEvent<number>();
 export const availableInited = createEvent<number>();
 export const availableUpdated = createEvent<number>();
 export const errorUpdated = createEvent<boolean>();
-export const clicked = createEvent<{ score: number; available_clicks: number }>(); // Reintroduced `clicked` event
+export const clicked = createEvent<{ score: number; available_clicks: number }>();
 
 // Stores
 export const $isMultiAccount = createStore(false);
@@ -55,31 +55,95 @@ export const useClicker = () => {
   const sessionId = useUnit($sessionId);
   const availableClicks = useUnit($available);
   const currentValue = useUnit($value) ?? 0;
-  const [lastActivityTime, setLastActivityTime] = useState<number | null>(null);
-  const [isRefilling, setIsRefilling] = useState(false);
+  const [clickBuffer, setClickBuffer] = useState(0); // Total click score buffer
+  const [totalClicks, setTotalClicks] = useState(0); // Count of total clicks
+  const [lastClickTime, setLastClickTime] = useState<Date | null>(null);
 
-  // WebSocket or server-side communication function
-  const sendMessage = useCallback((type: string, data: any) => {
-    // Your WebSocket or server communication logic here
-  }, []);
+  // Use a ref to store the latest availableClicks value
+  const availableClicksRef = useRef<number | null>(null);
+  availableClicksRef.current = availableClicks;
+
+  // Function to update points on the server
+  const sendPointsUpdate = useCallback(
+    async (score: number, availableClicks: number) => {
+      if (!sessionId) {
+        console.error("No session ID available");
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/game/updatePoints", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id: sessionId, click_score: score, available_clicks: availableClicks }),
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          console.error("Failed to update points:", data.error || "Unknown error");
+          return;
+        }
+
+        // No need to update local state here since WebSocket handles it
+      } catch (error) {
+        console.error("Error updating points:", error);
+      }
+    },
+    [sessionId]
+  );
+
+  const debouncedSendPointsUpdate = useCallback(
+    debounce(async (totalScore: number, totalAvailableClicks: number) => {
+      await sendPointsUpdate(totalScore, totalAvailableClicks);
+      setClickBuffer(0);
+      setTotalClicks(0);
+    }, 2000),
+    [sendPointsUpdate]
+  );
 
   const onClick = useCallback(() => {
     if (availableClicks && availableClicks >= CLICK_STEP) {
-      // Example data; replace with actual click handling logic
-      const newScore = currentValue + 1; // Calculate new score
-      const newAvailableClicks = availableClicks - CLICK_STEP; // Deduct clicks
-      
-      // Trigger the `clicked` event with new values
-      clicked({ score: newScore, available_clicks: newAvailableClicks });
+      setClickBuffer((prev) => prev + CLICK_STEP);
+      setTotalClicks((prev) => prev + 1);
+      setLastClickTime(new Date());
 
-      // Send message to server or perform any side-effects
-      sendMessage('click', { sessionId, newScore, newAvailableClicks });
+      // Update the local state optimistically
+      const newAvailable = (availableClicksRef.current || 0) - CLICK_STEP;
+
+      // Update with the incremented value
+      valueInited(currentValue + CLICK_STEP);
+      availableInited(newAvailable);
+
+      // Debounce sending updates to the backend
+      debouncedSendPointsUpdate(currentValue + CLICK_STEP, newAvailable);
     }
-  }, [availableClicks, currentValue, sessionId, sendMessage]);
+  }, [availableClicks, currentValue, debouncedSendPointsUpdate]);
+
+  // Auto refill available clicks on inactivity
+  useEffect(() => {
+    const refillInterval = setInterval(() => {
+      if (availableClicksRef.current !== null && availableClicksRef.current < MAX_AVAILABLE) {
+        availableInited((availableClicksRef.current || 0) + 1);
+      }
+    }, 500); // Refills slowly over time
+
+    return () => clearInterval(refillInterval);
+  }, []);
 
   useEffect(() => {
-    // Your refilling logic if needed
-  }, [isRefilling]);
+    if (!sessionId) {
+      console.error("Session ID is not set");
+      return;
+    }
+
+    const interval = setInterval(() => {
+      if (totalClicks > 0 && (!lastClickTime || new Date().getTime() - lastClickTime.getTime() >= 2000)) {
+        debouncedSendPointsUpdate(clickBuffer, availableClicksRef.current ?? 0);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [clickBuffer, sessionId, lastClickTime, debouncedSendPointsUpdate, totalClicks]);
 
   return {
     value: currentValue,
@@ -98,6 +162,6 @@ export const clickerModel = {
   clicked,
   useCanBeClicked,
   useClicker,
-  $value, 
-  $available,
+  $value,
+  $available
 };
