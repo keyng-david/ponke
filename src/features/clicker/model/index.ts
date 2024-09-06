@@ -83,7 +83,10 @@ export const useClicker = () => {
   availableClicksRef.current = availableClicks;
 
   const currentValue = useUnit($value) ?? 0;
+  const canBeClicked = useUnit($canBeClicked);  // Move hook usage outside of callback
+  const isMultiError = useUnit($isMultiAccount); // Move hook usage outside of callback
 
+  // Define debounced function without using hooks inside it
   const sendPointsUpdate = useCallback(
     async (score: number, availableClicks: number) => {
       if (!sessionId) {
@@ -92,14 +95,11 @@ export const useClicker = () => {
       }
 
       try {
-        // Send only the POST request without handling the response
         await fetch("/api/game/updatePoints", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ session_id: sessionId, click_score: score, available_clicks: availableClicks }),
         });
-
-        // No response handling needed since we use real-time updates
       } catch (error) {
         console.error("Error updating points:", error);
       }
@@ -108,35 +108,23 @@ export const useClicker = () => {
   );
 
   const debouncedSendPointsUpdate = useCallback(
-  debounce(async () => {
-    const currentValue = useUnit($value); 
-    const availableClicks = useUnit($available);
-
-    await sendPointsUpdate(currentValue, availableClicks);
-    setClickBuffer(0);
-    setTotalClicks(0);
-  }, 2000),
-  [sendPointsUpdate]
-);
+    debounce(async () => {
+      await sendPointsUpdate(currentValue, availableClicksRef.current ?? 0);
+      setClickBuffer(0);
+      setTotalClicks(0);
+    }, 2000),
+    [sendPointsUpdate, currentValue]
+  );
 
   const onClick = useCallback(() => {
     setClickBuffer((prev) => prev + CLICK_STEP);
     setTotalClicks((prev) => prev + 1);
     setLastClickTime(new Date());
 
-    // Update the local state optimistically
     const newAvailable = (availableClicksRef.current || 0) - CLICK_STEP;
 
-    // Log the current and new state before sending the backend request
-    console.log("Current Value:", currentValue + CLICK_STEP);
-    console.log("New Available Clicks:", newAvailable);
-
-    // Update with the incremented value
     valueInited(currentValue + CLICK_STEP);
     availableInited(newAvailable);
-
-    // Log before calling the debounced function
-    console.log("Sending Points Update - Score:", currentValue + CLICK_STEP, "Available Clicks:", newAvailable);
 
     debouncedSendPointsUpdate(currentValue + CLICK_STEP, newAvailable);
   }, [currentValue, debouncedSendPointsUpdate]);
@@ -147,7 +135,7 @@ export const useClicker = () => {
       if (availableClicksRef.current !== null && availableClicksRef.current < 1000) {
         availableInited((availableClicksRef.current || 0) + 1);
       }
-    }, 10000); // Refills slowly over time
+    }, 10000);
 
     return () => clearInterval(refillInterval);
   }, []);
@@ -170,8 +158,8 @@ export const useClicker = () => {
   return {
     value: currentValue,
     available: availableClicks,
-    canBeClicked: useUnit($canBeClicked),
-    isMultiError: useUnit($isMultiAccount),
+    canBeClicked,
+    isMultiError,
     onClick,
   };
 };
