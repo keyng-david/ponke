@@ -31,7 +31,7 @@ export const ClickerField = () => {
       updateScoreAndAvailable(newScore, newAvailable);
 
       // Call the onClick function to handle server update
-      onClick(newScore, newAvailable);
+      onClick();
 
       console.log("Clicked: Increment:", CLICK_STEP, "New Available:", newAvailable);
     } else {
