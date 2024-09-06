@@ -2,6 +2,7 @@ import { clickerModel } from "@/features/clicker/model";
 import { socketResponseToJSON } from "@/shared/lib/utils/socketResponseToJSON";
 import React, { createContext, useContext, useEffect } from "react";
 import useWebSocket, { SendMessage } from "react-use-websocket";
+import { useStore } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
 
 export const SoketContext = createContext<{
@@ -16,6 +17,7 @@ export const useSocket = () => {
 };
 
 export const SocketProvider = React.memo<React.PropsWithChildren>(({ children }) => {
+    const sessionId = useStore($sessionId); // Use the sessionId from the Effector store
     const { sendMessage, lastMessage } = useWebSocket(
         'https://ponke-alpha.vercel.app/api/game/websocketServer',
         {
@@ -23,8 +25,7 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
             reconnectInterval: 0,
             onOpen: () => {
                 console.log('on open');
-                const { sessionId } = useSessionId(); // Get the session ID from Effector
-                if (sessionId) {
+                if (sessionId) { // Now we can safely use sessionId here
                     sendMessage(`handshake:{"session_id":"${sessionId}"}`);
                 }
             },
