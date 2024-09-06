@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "webSocketServer.ts",
   "scripts": {
-    "start": "ts-node webSocketServer.ts", 
-    "heroku-postbuild": "npm install"
+    "build": "tsc", 
+    "start": "node dist/webSocketServer.js", 
+    "heroku-postbuild": "npm install && npm run build"
   },
   "dependencies": {
     "ws": "^7.5.3",
