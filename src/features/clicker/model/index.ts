@@ -139,7 +139,7 @@ export const useClicker = () => {
       if (availableClicksRef.current !== null && availableClicksRef.current < 1000) {
         availableInited((availableClicksRef.current || 0) + 1);
       }
-    }, 500); // Refills slowly over time
+    }, 5000); // Refills slowly over time
 
     return () => clearInterval(refillInterval);
   }, []);
