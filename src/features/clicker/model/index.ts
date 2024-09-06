@@ -73,22 +73,20 @@ export const useCanBeClicked = () => useUnit($canBeClicked);
 
 export const useClicker = () => {
   const [clickBuffer, setClickBuffer] = useState(0); // Total click score buffer
-  const [totalClicks, setTotalClicks] = useState(0); // Count of total clicks
   const sessionId = useUnit($sessionId);
   const [lastClickTime, setLastClickTime] = useState<Date | null>(null);
 
-  // Use a ref to store the latest availableClicks value
+  const currentValue = useUnit($value) ?? 0;
   const availableClicksRef = useRef<number | null>(null);
   const availableClicks = useUnit($available);
   availableClicksRef.current = availableClicks;
 
-  const currentValue = useUnit($value) ?? 0;
-  const canBeClicked = useUnit($canBeClicked);  // Move hook usage outside of callback
-  const isMultiError = useUnit($isMultiAccount); // Move hook usage outside of callback
+  const canBeClicked = useUnit($canBeClicked);
+  const isMultiError = useUnit($isMultiAccount);
 
-  // Define debounced function without using hooks inside it
+  // Updated function: remove availableClicks from backend request
   const sendPointsUpdate = useCallback(
-    async (score: number, availableClicks: number) => {
+    async (score: number) => {
       if (!sessionId) {
         console.error("No session ID available");
         return;
@@ -98,7 +96,7 @@ export const useClicker = () => {
         await fetch("/api/game/updatePoints", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ session_id: sessionId, click_score: score, available_clicks: availableClicks }),
+          body: JSON.stringify({ session_id: sessionId, click_score: score }),
         });
       } catch (error) {
         console.error("Error updating points:", error);
@@ -108,28 +106,25 @@ export const useClicker = () => {
   );
 
   const debouncedSendPointsUpdate = useCallback(
-  debounce(async (score: number, availableClicks: number) => {
-    await sendPointsUpdate(score, availableClicks);
-    setClickBuffer(0);
-    setTotalClicks(0);
-  }, 2000),
-  [sendPointsUpdate]
-);
+    debounce(async (score: number) => {
+      await sendPointsUpdate(score);
+      setClickBuffer(0);
+    }, 2000),
+    [sendPointsUpdate]
+  );
 
   const onClick = useCallback(() => {
     setClickBuffer((prev) => prev + CLICK_STEP);
-    setTotalClicks((prev) => prev + 1);
     setLastClickTime(new Date());
 
-    const newAvailable = (availableClicksRef.current || 0) - CLICK_STEP;
-
+    // Optimistically update local state
     valueInited(currentValue + CLICK_STEP);
-    availableInited(newAvailable);
 
-    debouncedSendPointsUpdate(currentValue + CLICK_STEP, newAvailable);
+    // Trigger batched backend update
+    debouncedSendPointsUpdate(currentValue + CLICK_STEP);
   }, [currentValue, debouncedSendPointsUpdate]);
 
-  // Auto refill available clicks on inactivity
+  // Refill mechanism managed locally
   useEffect(() => {
     const refillInterval = setInterval(() => {
       if (availableClicksRef.current !== null && availableClicksRef.current < 1000) {
@@ -147,13 +142,13 @@ export const useClicker = () => {
     }
 
     const interval = setInterval(() => {
-      if (totalClicks > 0 && (!lastClickTime || new Date().getTime() - lastClickTime.getTime() >= 2000)) {
-        debouncedSendPointsUpdate(clickBuffer, availableClicksRef.current ?? 0);
+      if (clickBuffer > 0 && (!lastClickTime || new Date().getTime() - lastClickTime.getTime() >= 2000)) {
+        debouncedSendPointsUpdate(clickBuffer);
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [clickBuffer, sessionId, lastClickTime, debouncedSendPointsUpdate, totalClicks]);
+  }, [clickBuffer, sessionId, lastClickTime, debouncedSendPointsUpdate]);
 
   return {
     value: currentValue,
