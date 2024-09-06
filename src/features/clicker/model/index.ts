@@ -6,34 +6,33 @@ import { debounce } from "lodash";
 
 // Constants
 export const CLICK_STEP = 1;
-export const MAX_AVAILABLE = 500; // Set the max refill limit
 
 // Events
 export const valueInited = createEvent<number>();
 export const availableInited = createEvent<number>();
+export const clicked = createEvent<{
+  score: number;
+  click_score: number;
+  available_clicks: number;
+}>();
 export const availableUpdated = createEvent<number>();
 export const errorUpdated = createEvent<boolean>();
-export const clicked = createEvent<{ score: number; available_clicks: number }>();
 
 // Stores
 export const $isMultiAccount = createStore(false);
-export const $value = createStore<number | null>(null, { skipVoid: false }).on(valueInited, (_, score) => score);
-export const $available = createStore<number | null>(null, { skipVoid: false }).on(availableInited, (_, availableClicks) => availableClicks);
+export const $value = createStore<number | null>(null, { skipVoid: false })
+  .on(valueInited, (_, score) => score);
+
+export const $available = createStore<number | null>(null, { skipVoid: false })
+  .on(availableInited, (_, availableClicks) => availableClicks);
+
+// Derived store
+export const $canBeClicked = $available.map((state) => (state ?? 0) >= CLICK_STEP);
 
 // Effector samples
 sample({
   clock: availableUpdated,
   target: $available,
-});
-
-sample({
-  clock: valueInited,
-  target: $value,
-});
-
-sample({
-  clock: errorUpdated,
-  target: $isMultiAccount,
 });
 
 sample({
@@ -48,22 +47,37 @@ sample({
   target: $available,
 });
 
+sample({
+  clock: valueInited,
+  target: $value,
+});
+
+sample({
+  clock: availableInited,
+  target: $available,
+});
+
+sample({
+  clock: errorUpdated,
+  target: $isMultiAccount,
+});
+
 // Hooks
-export const useCanBeClicked = () => useUnit($available.map((state) => (state ?? 0) >= CLICK_STEP));
+export const useCanBeClicked = () => useUnit($canBeClicked);
 
 export const useClicker = () => {
-  const sessionId = useUnit($sessionId);
-  const availableClicks = useUnit($available);
-  const currentValue = useUnit($value) ?? 0;
   const [clickBuffer, setClickBuffer] = useState(0); // Total click score buffer
   const [totalClicks, setTotalClicks] = useState(0); // Count of total clicks
+  const sessionId = useUnit($sessionId);
   const [lastClickTime, setLastClickTime] = useState<Date | null>(null);
 
   // Use a ref to store the latest availableClicks value
   const availableClicksRef = useRef<number | null>(null);
+  const availableClicks = useUnit($available);
   availableClicksRef.current = availableClicks;
 
-  // Function to update points on the server
+  const currentValue = useUnit($value) ?? 0;
+
   const sendPointsUpdate = useCallback(
     async (score: number, availableClicks: number) => {
       if (!sessionId) {
@@ -78,13 +92,16 @@ export const useClicker = () => {
           body: JSON.stringify({ session_id: sessionId, click_score: score, available_clicks: availableClicks }),
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-          const data = await response.json();
           console.error("Failed to update points:", data.error || "Unknown error");
           return;
         }
 
-        // No need to update local state here since WebSocket handles it
+        // Update state from the backend response
+        valueInited(data.currentScore);
+        availableInited(data.available_clicks);
       } catch (error) {
         console.error("Error updating points:", error);
       }
@@ -102,27 +119,24 @@ export const useClicker = () => {
   );
 
   const onClick = useCallback(() => {
-    if (availableClicks && availableClicks >= CLICK_STEP) {
-      setClickBuffer((prev) => prev + CLICK_STEP);
-      setTotalClicks((prev) => prev + 1);
-      setLastClickTime(new Date());
+    setClickBuffer((prev) => prev + CLICK_STEP);
+    setTotalClicks((prev) => prev + 1);
+    setLastClickTime(new Date());
 
-      // Update the local state optimistically
-      const newAvailable = (availableClicksRef.current || 0) - CLICK_STEP;
+    // Update the local state optimistically
+    const newAvailable = (availableClicksRef.current || 0) - CLICK_STEP;
 
-      // Update with the incremented value
-      valueInited(currentValue + CLICK_STEP);
-      availableInited(newAvailable);
+    // Update with the incremented value
+    valueInited(currentValue + CLICK_STEP);
+    availableInited(newAvailable);
 
-      // Debounce sending updates to the backend
-      debouncedSendPointsUpdate(currentValue + CLICK_STEP, newAvailable);
-    }
-  }, [availableClicks, currentValue, debouncedSendPointsUpdate]);
+    debouncedSendPointsUpdate(currentValue + CLICK_STEP, newAvailable);
+  }, [currentValue, debouncedSendPointsUpdate]);
 
   // Auto refill available clicks on inactivity
   useEffect(() => {
     const refillInterval = setInterval(() => {
-      if (availableClicksRef.current !== null && availableClicksRef.current < MAX_AVAILABLE) {
+      if (availableClicksRef.current !== null && availableClicksRef.current < 1000) {
         availableInited((availableClicksRef.current || 0) + 1);
       }
     }, 500); // Refills slowly over time
@@ -147,21 +161,21 @@ export const useClicker = () => {
 
   return {
     value: currentValue,
-    available: availableClicks ?? 0,
-    canBeClicked: useCanBeClicked(),
+    available: availableClicks,
+    canBeClicked: useUnit($canBeClicked),
     isMultiError: useUnit($isMultiAccount),
     onClick,
   };
 };
 
 export const clickerModel = {
+  availableUpdated,
   valueInited,
   availableInited,
-  availableUpdated,
-  errorUpdated,
   clicked,
+  errorUpdated,
   useCanBeClicked,
   useClicker,
-  $value,
-  $available
+  $value, 
+  $available,
 };
