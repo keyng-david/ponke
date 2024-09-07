@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "main": "webSocketServer.ts",
   "scripts": {
-    "build": "tsc", 
-    "start": "node dist/webSocketServer.js", 
+    "build": "tsc",
+    "start": "node dist/webSocketServer.js",
     "heroku-postbuild": "npm install && npm run build"
   },
   "dependencies": {
-    "socket.io": "^4.0.0", 
-    "@supabase/supabase-js": "^1.15.5"
+    "@supabase/supabase-js": "^2.45.3",
+    "socket.io": "^4.0.0"
   },
   "devDependencies": {
     "ts-node": "^10.0.0",
