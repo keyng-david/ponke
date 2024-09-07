@@ -5,7 +5,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const PORT = process.env.PORT || 8080; 
+const PORT = Number(process.env.PORT) || 8080;
 
 const io = new Server(PORT);
 
