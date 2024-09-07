@@ -1,19 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import { Server } from 'socket.io';
-import http from 'http';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Ensure PORT is a number
 const PORT = Number(process.env.PORT) || 8080;
 
-// Create an HTTP server instance
-const httpServer = http.createServer();
-
-// Pass the HTTP server to Socket.IO instead of the port directly
-const io = new Server(httpServer);
+const io = new Server(PORT);
 
 io.on('connection', (socket) => {
     console.log('Client connected');
@@ -60,9 +54,4 @@ io.on('connection', (socket) => {
         console.log('Client disconnected');
         channel.unsubscribe();
     });
-});
-
-// Start the HTTP server on the specified port
-httpServer.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
 });
