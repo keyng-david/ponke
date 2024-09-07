@@ -5,7 +5,7 @@
     "target": "es2020",
     "sourceMap": true,
     "lib": ["es2020"],
-    "types": ["node", "socket.io"]
+    "types": ["node"]
   },
   "include": ["api/webSocket/webSocketServer.ts"]
 }
