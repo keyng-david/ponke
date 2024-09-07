@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "commonjs",
+    "target": "es2020",
+    "sourceMap": true
+  },
+  "include": ["webSocketServer.ts"]
+}
