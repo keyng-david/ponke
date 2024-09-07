@@ -5,7 +5,9 @@ const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const io = new Server(8080); // Create a new Socket.IO server on port 8080
+const PORT = process.env.PORT || 8080; 
+
+const io = new Server(PORT);
 
 io.on('connection', (socket) => {
     console.log('Client connected');
