@@ -1,13 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
-import WebSocket from 'ws';
+import { WebSocketServer } from 'ws';  // Import WebSocketServer from ws
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const server = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocketServer({ port: 8080 });  // Correct WebSocket server initialization
 
-server.on('connection', (socket) => {
+wss.on('connection', (socket) => {
     console.log('Client connected');
 
     // Realtime subscription
