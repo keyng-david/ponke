@@ -7,5 +7,5 @@
     "lib": ["es2020"],
     "types": ["node", "socket.io"]
   },
-  "include": ["webSocketServer.ts"]
+  "include": ["api/webSocket/webSocketServer.ts"]
 }
