@@ -91,7 +91,7 @@ io.on('connection', (socket) => {
             socket.emit('error', { error: 'Server error' });
         }
     });
-    // Handle disconnection
+    // Handle disconnection and cleanup
     socket.on('disconnect', () => {
         console.log('Client disconnected', socket.id);
         channel.unsubscribe();
@@ -101,4 +101,8 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+// Keep-alive ping to prevent Heroku timeout
+setInterval(() => {
+    io.emit('ping', { message: 'keep-alive' });
+}, 50000); // 50 seconds to stay under the 55-second limit
 //# sourceMappingURL=webSocketServer.js.map
