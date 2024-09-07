@@ -3,7 +3,9 @@
     "outDir": "./dist",
     "module": "commonjs",
     "target": "es2020",
-    "sourceMap": true
+    "sourceMap": true,
+    "lib": ["es2020"],
+    "types": ["node"] 
   },
   "include": ["webSocketServer.ts"]
 }
