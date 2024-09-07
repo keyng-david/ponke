@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Server } from 'socket.io';
 import express from 'express';
-import http from 'http';
+import * as http from 'http';
 
 // Initialize Express app and HTTP server
 const app = express();
@@ -27,6 +27,11 @@ const io = new Server(server, {
 
 const PORT = Number(process.env.PORT) || 8080;
 
+// Define interface for payload structure
+interface PayloadData {
+    session_id?: string;
+}
+
 // WebSocket connection logic
 io.on('connection', (socket) => {
     console.log('Client connected', socket.id);
@@ -38,7 +43,7 @@ io.on('connection', (socket) => {
         { event: '*', schema: 'public', table: 'users' },
         (payload) => {
             console.log('Change received:', payload);
-            const roomId = payload.new?.session_id || payload.old?.session_id;
+            const roomId = (payload.new as PayloadData)?.session_id || (payload.old as PayloadData)?.session_id;
 
             if (roomId) {
                 // Broadcast changes to the specific room
