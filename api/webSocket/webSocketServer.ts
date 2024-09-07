@@ -1,26 +1,31 @@
 import { createClient } from '@supabase/supabase-js';
-import { WebSocketServer } from 'ws';  // Import WebSocketServer from ws
+import { Server } from 'socket.io';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const wss = new WebSocketServer({ port: 8080 });  // Correct WebSocket server initialization
+const io = new Server(8080); // Create a new Socket.IO server on port 8080
 
-wss.on('connection', (socket) => {
+io.on('connection', (socket) => {
     console.log('Client connected');
 
     // Realtime subscription
-    const channel = supabase
-        .channel('public:users')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, (payload) => {
+    const channel = supabase.channel('public:users');
+
+    channel.on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'users' },
+        (payload) => {
             console.log('Change received:', payload);
             // Forward this change to all connected clients
-            socket.send(JSON.stringify({ type: 'user_update', data: payload }));
-        })
-        .subscribe();
+            socket.emit('user_update', { type: 'user_update', data: payload });
+        }
+    );
 
-    socket.on('message', async (message) => {
+    channel.subscribe();
+
+    socket.on('message', async (message: string) => {
         try {
             const { session_id } = JSON.parse(message);
             if (session_id) {
@@ -32,19 +37,19 @@ wss.on('connection', (socket) => {
                     .single();
 
                 if (error || !user) {
-                    socket.send(JSON.stringify({ error: 'Invalid session_id' }));
+                    socket.emit('error', { error: 'Invalid session_id' });
                 } else {
-                    socket.send(JSON.stringify({ success: true }));
+                    socket.emit('success', { success: true });
                 }
             }
         } catch (err) {
             console.error('Error processing message:', err);
-            socket.send(JSON.stringify({ error: 'Server error' }));
+            socket.emit('error', { error: 'Server error' });
         }
     });
 
-    socket.on('close', () => {
+    socket.on('disconnect', () => {
         console.log('Client disconnected');
-        supabase.removeChannel(channel);
+        channel.unsubscribe();
     });
 });
