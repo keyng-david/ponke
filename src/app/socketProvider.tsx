@@ -2,11 +2,6 @@ import { CLICK_STEP, clickerModel } from "@/features/clicker/model";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useStore } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const SocketContext = createContext<{
     accumulatePoints: (points: number) => void;
@@ -37,7 +32,7 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         session_id: sessionId,
-                        earnPoint: earnedPoint
+                        earnedPoint // Use earnedPoint here
                     })
                 });
 
@@ -61,30 +56,6 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
         }, 3000); // 3 seconds debounce
         setDebounceTimeout(newTimeout);
     };
-
-    // Supabase real-time listener for user points update
-    useEffect(() => {
-        const subscription = supabase
-            .from('users') // Listen to the 'users' table
-            .on('UPDATE', (payload) => {  // Listen for UPDATE events
-                if (payload.new && payload.new.session_id === sessionId) { // Check if it matches the sessionId
-                    const updatedData = payload.new;
-                    clickerModel.clicked({
-                        score: updatedData.score,
-                        available_clicks: updatedData.available_clicks,
-                        
-                        click_score: CLICK_STEP,
-                    });
-                    
-                    setEarnedPoint(0);
-                }
-            })
-            .subscribe();
-
-        return () => {
-            supabase.removeSubscription(subscription);
-        };
-    }, [sessionId]);
 
     return (
         <SocketContext.Provider value={{ accumulatePoints, debounceSendPoints }}>
