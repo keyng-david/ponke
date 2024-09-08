@@ -1,72 +1,101 @@
 import { clickerModel } from "@/features/clicker/model";
-import { socketResponseToJSON } from "@/shared/lib/utils/socketResponseToJSON";
-import React, { createContext, useContext, useEffect } from "react";
-import useWebSocket, { SendMessage } from "react-use-websocket";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useStore } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
+import { createClient } from '@supabase/supabase-js';
 
-export const SoketContext = createContext<{
-    sendMessage: SendMessage
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
+export const SocketContext = createContext<{
+    accumulatePoints: (points: number) => void;
+    debounceSendPoints: () => void;
 }>({
-    sendMessage: () => 0
+    accumulatePoints: () => {},
+    debounceSendPoints: () => {}
 });
 
-export const useSocket = () => {
-    const socket = useContext(SoketContext);
-    return socket;
-};
+export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = React.memo<React.PropsWithChildren>(({ children }) => {
-    const sessionId = useStore($sessionId); // Use the sessionId from the Effector store
-    const { sendMessage, lastMessage } = useWebSocket(
-        'wss://keyng-c54bd5c2f02b.herokuapp.com',
+    const sessionId = useStore($sessionId);
+    const [earnedPoint, setEarnedPoint] = useState(0);
+    const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
 
+    // Function to accumulate points locally
+    const accumulatePoints = (points: number) => {
+        setEarnedPoint(prev => prev + points);
+    };
 
-        {
-            shouldReconnect: () => true,
-            reconnectInterval: 0,
-            onOpen: () => {
-                console.log('on open');
-                if (sessionId) { // Now we can safely use sessionId here
-                    sendMessage(`handshake:{"session_id":"${sessionId}"}`);
+    // Function to send points to the backend
+    const sendPointUpdate = async () => {
+        if (earnedPoint > 0) {
+            try {
+                const response = await fetch('/api/game/updatePoint', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        earnPoint: earnedPoint
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    // Clear earned points only if update was successful
+                    setEarnedPoint(0);
                 }
-            },
+            } catch (error) {
+                console.error("Error updating points:", error);
+                // Retry logic can be implemented here
+            }
         }
-    );
+    };
 
+    // Debounce mechanism to trigger batch updates
+    const debounceSendPoints = () => {
+        if (debounceTimeout) clearTimeout(debounceTimeout);
+        const newTimeout = setTimeout(() => {
+            sendPointUpdate();
+        }, 3000); // 3 seconds debounce
+        setDebounceTimeout(newTimeout);
+    };
+
+    // Supabase real-time listener for user points update
     useEffect(() => {
-        console.log(lastMessage?.data);
+        const channel = supabase
+            .channel('public:users')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'users',
+                    filter: `id=eq.${sessionId}`, // Filter based on user session_id
+                    columns: ['score', 'available_clicks'], // Listen to updates on score and available_clicks
+                },
+                (payload) => {
+                    // Handle the real-time update data here
+                    const { new: updatedData } = payload;
+                    clickerModel.clicked({
+                        score: updatedData.score,
+                        available_clicks: updatedData.available_clicks,
+                        click_score: CLICK_STEP,
+                    });
+                    // Clear earnedPoint state to prevent resending data
+                    setEarnedPoint(0);
+                }
+            )
+            .subscribe();
 
-        if (lastMessage && typeof lastMessage.data === 'string') {
-            if (lastMessage.data.includes('click_response')) {
-                const data = socketResponseToJSON<{
-                    score: number,
-                    click_score: number,
-                    available_clicks: number
-                }>(lastMessage.data);
-
-                clickerModel.clicked(data);
-            }
-            if (lastMessage.data.includes('availableClicks')) {
-                const data = socketResponseToJSON<{
-                    available_clicks: number,
-                }>(lastMessage.data);
-
-                clickerModel.availableUpdated(data.available_clicks);
-            }
-            if (lastMessage.data.includes('CODE')) {
-                clickerModel.errorUpdated(lastMessage.data.includes('1001'));
-            }
-            if (lastMessage.data.includes('user_update')) {
-                const update = socketResponseToJSON<{ type: string, data: any }>(lastMessage.data);
-                // Handle user updates here
-            }
-        }
-    }, [lastMessage]);
+        // Cleanup on component unmount
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [sessionId]);
 
     return (
-        <SoketContext.Provider value={{ sendMessage }}>
+        <SocketContext.Provider value={{ accumulatePoints, debounceSendPoints }}>
             {children}
-        </SoketContext.Provider>
+        </SocketContext.Provider>
     );
 });
