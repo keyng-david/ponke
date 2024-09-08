@@ -21,9 +21,9 @@ module.exports = async (req, res) => {
     }
 
     // Call the Supabase SQL function to update the user's score
-    const { error: functionError } = await supabase.rpc('ScoreUpdate', {
+    const { error: functionError } = await supabase.rpc('scoreupdate', {
       session_id,
-      earnedpoint: earnedPoint, // Pass 'earnedPoint' correctly
+      earnedpoint: earnedPoint,
     });
 
     if (functionError) {
@@ -31,7 +31,6 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'Failed to update user score', details: functionError.message });
     }
 
-    // Add real-time listener to confirm the update
     const subscription = supabase
       .from('users')
       .on('UPDATE', (payload) => {
