@@ -64,20 +64,11 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
 
     // Supabase real-time listener for user points update
     useEffect(() => {
-        const channel = supabase
-            .channel('public:users')
-            .on(
-                'postgres_changes',
-                {
-                    event: 'UPDATE',
-                    schema: 'public',
-                    table: 'users',
-                    filter: `id=eq.${sessionId}`, // Filter based on user session_id
-                    columns: ['score', 'available_clicks'], // Listen to updates on score and available_clicks
-                },
-                (payload) => {
-                    // Handle the real-time update data here
-                    const { new: updatedData } = payload;
+        const subscription = supabase
+            .from('users') // Listen to the 'users' table
+            .on('UPDATE', (payload) => {  // Listen for UPDATE events
+                if (payload.new && payload.new.session_id === sessionId) { // Check if it matches the sessionId
+                    const updatedData = payload.new;
                     clickerModel.clicked({
                         score: updatedData.score,
                         available_clicks: updatedData.available_clicks,
@@ -86,12 +77,12 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
                     // Clear earnedPoint state to prevent resending data
                     setEarnedPoint(0);
                 }
-            )
+            })
             .subscribe();
 
         // Cleanup on component unmount
         return () => {
-            supabase.removeChannel(channel);
+            supabase.removeSubscription(subscription);
         };
     }, [sessionId]);
 
