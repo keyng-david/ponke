@@ -9,26 +9,26 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { session_id, click_score } = req.body; // Removed available_clicks from destructuring
+    const { session_id, earnedPoint } = req.body; // Accept 'earnedPoint' instead of 'click_score'
 
     // Validate input
     if (!session_id) {
       return res.status(400).json({ error: 'Invalid or missing session_id' });
     }
 
-    if (typeof click_score !== 'number' || click_score < 0) {
-      return res.status(400).json({ error: 'Invalid click_score' });
+    if (typeof earnedPoint !== 'number' || earnedPoint < 0) {
+      return res.status(400).json({ error: 'Invalid earnedPoint' });
     }
 
-    // Update the user's score directly without available_clicks
-    const { error: updateError } = await supabase
-      .from('users')
-      .update({ score: click_score })
-      .eq('session_id', session_id);
+    // Call the Supabase SQL function to update the user's score
+    const { error: functionError } = await supabase.rpc('ScoreUpdate', {
+      session_id,
+      earnedpoint: earnedPoint, // Pass 'earnedPoint' correctly
+    });
 
-    if (updateError) {
-      console.error('Error updating user data:', updateError);
-      return res.status(500).json({ error: 'Failed to update user data', details: updateError.message });
+    if (functionError) {
+      console.error('Error executing ScoreUpdate function:', functionError);
+      return res.status(500).json({ error: 'Failed to update user score', details: functionError.message });
     }
 
     return res.status(200).json({
