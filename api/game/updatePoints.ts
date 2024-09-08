@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { session_id, earnedPoint } = req.body; // Accept 'earnedPoint' instead of 'click_score'
+    const { session_id, earnedPoint } = req.body;
 
     // Validate input
     if (!session_id) {
@@ -35,16 +35,18 @@ module.exports = async (req, res) => {
       .from('users')
       .on('UPDATE', (payload) => {
         if (payload.new && payload.new.session_id === session_id) {
+          // Update the $value and $available states
+          clickerModel.$value.setState(payload.new.score);
+          clickerModel.$available.setState(payload.new.available_clicks);
           // Confirm that the update was successful
           res.status(200).json({ success: true, message: 'Points updated and confirmed successfully' });
         }
       })
       .subscribe();
 
-    // Remove the subscription after a reasonable timeout to prevent memory leaks
     setTimeout(() => {
       supabase.removeSubscription(subscription);
-    }, 10000); // 10 seconds timeout
+    }, 10000);  // 10 seconds timeout
 
   } catch (err) {
     console.error('Unexpected error:', err);
