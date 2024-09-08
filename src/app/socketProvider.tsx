@@ -27,7 +27,7 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
     const sendPointUpdate = async () => {
         if (earnedPoint > 0) {
             try {
-                const response = await fetch('/api/game/updatePoint', {
+                const response = await fetch('/api/game/updatePoints', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
