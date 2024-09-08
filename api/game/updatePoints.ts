@@ -31,9 +31,21 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'Failed to update user score', details: functionError.message });
     }
 
-    return res.status(200).json({
-      message: 'Points updated successfully',
-    });
+    // Add real-time listener to confirm the update
+    const subscription = supabase
+      .from('users')
+      .on('UPDATE', (payload) => {
+        if (payload.new && payload.new.session_id === session_id) {
+          // Confirm that the update was successful
+          res.status(200).json({ success: true, message: 'Points updated and confirmed successfully' });
+        }
+      })
+      .subscribe();
+
+    // Remove the subscription after a reasonable timeout to prevent memory leaks
+    setTimeout(() => {
+      supabase.removeSubscription(subscription);
+    }, 10000); // 10 seconds timeout
 
   } catch (err) {
     console.error('Unexpected error:', err);
