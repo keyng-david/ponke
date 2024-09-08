@@ -4,9 +4,9 @@ import { useStore } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = process.env.SUPABASE_URL || '';
-const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const SocketContext = createContext<{
     accumulatePoints: (points: number) => void;
