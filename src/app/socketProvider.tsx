@@ -1,4 +1,4 @@
-import { clickerModel } from "@/features/clicker/model";
+import { CLICK_STEP, clickerModel } from "@/features/clicker/model";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useStore } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
@@ -73,6 +73,7 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
                         score: updatedData.score,
                         available_clicks: updatedData.available_clicks,
                         
+                        click_score: CLICK_STEP,
                     });
                     
                     setEarnedPoint(0);
