@@ -18,12 +18,16 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
     const [earnedPoint, setEarnedPoint] = useState(0);
     const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
 
-   
-const accumulatePoints = (points: number) => {
-    setEarnedPoint(prev => prev + points);
-    
-    if (prev === 0) debounceSendPoints();
-};
+    // Function to accumulate points locally
+    const accumulatePoints = (points: number) => {
+        // Immediately debounce on the first click or reset state to ensure no delay
+        if (earnedPoint === 0) {
+            setEarnedPoint(points); // Set the first click directly
+            debounceSendPoints();   // Immediately call debounceSendPoints
+        } else {
+            setEarnedPoint(prev => prev + points); // Continue to add subsequent points
+        }
+    };
 
     // Function to send points to the backend
     const sendPointUpdate = async () => {
