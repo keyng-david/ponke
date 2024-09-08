@@ -24,6 +24,13 @@ const $earnedPoint = createStore(0); // New store for accumulated points
 
 const $canBeClicked = $available.map(state => state >= CLICK_STEP);
 
+// New function to handle optimistic UI update
+function updateOptimisticUI(points: number) {
+    $value.on(clicked, (currentValue) => currentValue + points);  // Optimistically update value
+    $available.on(clicked, (currentAvailable) => currentAvailable - points);  // Optimistically reduce available clicks
+}
+
+// Integrating optimistic update to the sample
 sample({
     clock: availableUpdated,
     target: $available
@@ -56,13 +63,21 @@ sample({
     target: $isMultiAccount
 });
 
+// Refill mechanism
+setInterval(() => {
+    if ($available.getState() < MAX_AVAILABLE) {
+        $available.on(availableUpdated, (currentAvailable) => Math.min(currentAvailable + CLICK_STEP, MAX_AVAILABLE));
+        availableUpdated($available.getState());
+    }
+}, 2000);  // Refill every 2 seconds
+
 const useCanBeClicked = () => useUnit($canBeClicked);
 
 const useClicker = () => {
     const { accumulatePoints, debounceSendPoints } = useSocket();
 
     function onClick() {
-        // Accumulate points locally instead of sending a message
+        updateOptimisticUI(CLICK_STEP);  // Trigger optimistic UI update
         accumulatePoints(CLICK_STEP);
         debounceSendPoints();  // Debounced sending of accumulated points
     }
@@ -72,7 +87,6 @@ const useClicker = () => {
         available: useUnit($available),
         canBeClicked: useUnit($canBeClicked),
         isMultiError: useUnit($isMultiAccount),
-
         onClick,
     };
 }
@@ -80,14 +94,12 @@ const useClicker = () => {
 export const clickerModel = {
     valueInited,
     availableInited,
-
     availableUpdated,
     clicked,
     errorUpdated,
-
     useCanBeClicked,
     useClicker,
     $value,
     $available,
-    $earnedPoint,  // Expose new store
+    $earnedPoint,
 };
