@@ -72,15 +72,14 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
                     clickerModel.clicked({
                         score: updatedData.score,
                         available_clicks: updatedData.available_clicks,
-                        click_score: CLICK_STEP,
+                        
                     });
-                    // Clear earnedPoint state to prevent resending data
+                    
                     setEarnedPoint(0);
                 }
             })
             .subscribe();
 
-        // Cleanup on component unmount
         return () => {
             supabase.removeSubscription(subscription);
         };
