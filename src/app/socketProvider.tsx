@@ -18,10 +18,12 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
     const [earnedPoint, setEarnedPoint] = useState(0);
     const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
 
-    // Function to accumulate points locally
-    const accumulatePoints = (points: number) => {
-        setEarnedPoint(prev => prev + points);
-    };
+   
+const accumulatePoints = (points: number) => {
+    setEarnedPoint(prev => prev + points);
+    
+    if (prev === 0) debounceSendPoints();
+};
 
     // Function to send points to the backend
     const sendPointUpdate = async () => {
