@@ -25,9 +25,9 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data) {
-        // Corrected method names from 'setState' to 'set'
-        clickerModel.$value.set(data.score);
-        clickerModel.$available.set(data.available_clicks);
+        // Trigger events to update state in Effector
+        clickerModel.valueInited(data.score);  // Use the valueInited event to update the score
+        clickerModel.availableInited(data.available_clicks);  // Use the availableInited event to update available clicks
         // Optionally reset earned points if necessary based on update logic
       }
     };
