@@ -28,7 +28,6 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
         // Trigger events to update state in Effector
         clickerModel.valueInited(data.score);  // Use the valueInited event to update the score
         clickerModel.availableInited(data.available_clicks);  // Use the availableInited event to update available clicks
-        // Optionally reset earned points if necessary based on update logic
       }
     };
 
@@ -44,34 +43,40 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
 
   // Function to send points to the backend
   const sendPointUpdate = async () => {
-  if (earnedPoint > 0) {
-    try {
+    if (earnedPoint > 0) {
       // Store the current earnedPoint value
       const currentEarnedPoint = earnedPoint;
 
       // Immediately clear earned points before sending the request
       setEarnedPoint(0);
 
-      const response = await fetch("/api/game/updatePoints", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          session_id: sessionId,
-          earnedPoint: currentEarnedPoint, // Use stored earnedPoint value
-        }),
-      });
+      try {
+        const response = await fetch("/api/game/updatePoints", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            session_id: sessionId,
+            earnedPoint: currentEarnedPoint, // Use stored earnedPoint value
+          }),
+        });
 
-      const result = await response.json();
-      if (!result.success) {
-        console.error("Error updating points:", result.message || "Unknown error");
-        // Optionally, handle failure case (e.g., retry logic or showing an error message)
+        const result = await response.json();
+        if (response.status === 200 && result.success) {
+          console.log("Points updated successfully.");
+          // Clear currentEarnedPoint after successful backend confirmation
+          setEarnedPoint(0); // This line is added for clarification, but it's redundant since we already cleared it before the request
+        } else {
+          console.error("Error updating points:", result.message || "Unknown error");
+          // Optionally, restore the points in case of failure
+          setEarnedPoint(currentEarnedPoint); // Restore points to retry later
+        }
+      } catch (error) {
+        console.error("Error updating points:", error);
+        // Restore points to retry later
+        setEarnedPoint(currentEarnedPoint);
       }
-    } catch (error) {
-      console.error("Error updating points:", error);
-      // Retry logic or error handling can be implemented here
     }
-  }
-};
+  };
 
   const debounceSendPoints = () => {
     if (debounceTimeout) clearTimeout(debounceTimeout);
