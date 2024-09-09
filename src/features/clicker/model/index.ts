@@ -64,10 +64,11 @@ sample({
 
 // Refill mechanism
 setInterval(() => {
-    if ($available.getState() < MAX_AVAILABLE) {
-        $available.on(availableUpdated, (currentAvailable) => Math.min(currentAvailable + CLICK_STEP, MAX_AVAILABLE));
-        availableUpdated($available.getState());
-    }
+  const currentAvailable = $available.getState();
+  if (currentAvailable < MAX_AVAILABLE) {
+    const newAvailable = Math.min(currentAvailable + CLICK_STEP, MAX_AVAILABLE);
+    availableUpdated(newAvailable);
+  }
 }, 2000);  // Refill every 2 seconds
 
 const useCanBeClicked = () => useUnit($canBeClicked);
