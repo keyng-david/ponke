@@ -48,14 +48,13 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
     }
   };
 
-  // Debounce mechanism to trigger batch updates
   const debounceSendPoints = () => {
     if (debounceTimeout) clearTimeout(debounceTimeout);
-    const newTimeout = setTimeout(() => {
-      sendPointUpdate();
-    }, 3000); // 3 seconds debounce
+    const newTimeout = setTimeout(async () => {
+        await sendPointUpdate(); // Ensure async-await is used for proper handling
+    }, 3000);
     setDebounceTimeout(newTimeout);
-  };
+};
 
   return (
     <SocketContext.Provider value={{ accumulatePoints, debounceSendPoints }}>
