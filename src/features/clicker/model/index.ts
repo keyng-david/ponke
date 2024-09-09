@@ -26,8 +26,7 @@ const $canBeClicked = $available.map(state => state >= CLICK_STEP);
 
 // New function to handle optimistic UI update
 function updateOptimisticUI(points: number) {
-    $value.on(clicked, (currentValue) => currentValue + points);  // Optimistically update value
-    $available.on(clicked, (currentAvailable) => currentAvailable - points);  // Optimistically reduce available clicks
+    clicked({ score: $value.getState() + points, available_clicks: $available.getState() - points, click_score: points });
 }
 
 // Integrating optimistic update to the sample
