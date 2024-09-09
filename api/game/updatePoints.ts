@@ -31,23 +31,9 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'Failed to update user score', details: functionError.message });
     }
 
-    const subscription = supabase
-      .from('users')
-      .on('UPDATE', (payload) => {
-        if (payload.new && payload.new.session_id === session_id) {
-          // Update the $value and $available states
-          clickerModel.$value.setState(payload.new.score);
-          clickerModel.$available.setState(payload.new.available_clicks);
-          // Confirm that the update was successful
-          res.status(200).json({ success: true, message: 'Points updated and confirmed successfully' });
-        }
-      })
-      .subscribe();
-
-    setTimeout(() => {
-      supabase.removeSubscription(subscription);
-    }, 10000);  // 10 seconds timeout
-
+    // Respond with success if the score update was successful
+    res.status(200).json({ success: true, message: 'Points updated successfully' });
+    
   } catch (err) {
     console.error('Unexpected error:', err);
     return res.status(500).json({ error: 'Unexpected error occurred', details: err.message });
