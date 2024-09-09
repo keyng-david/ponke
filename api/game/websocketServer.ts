@@ -1,11 +1,13 @@
-import { createClient } from '@supabase/supabase-js';
-import { clickerModel } from "@/features/clicker/model";
+const { createClient } = require('@supabase/supabase-js');
+const clickerModel = require('@/features/clicker/model');
+
 
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-export const subscribeToUpdates = (session_id: string) => {
+// Function to subscribe to updates
+const subscribeToUpdates = (session_id) => {
   const subscription = supabase
     .from('users')
     .on('UPDATE', (payload) => {
@@ -23,3 +25,6 @@ export const subscribeToUpdates = (session_id: string) => {
     supabase.removeSubscription(subscription);
   };
 };
+
+// Export the function using module.exports
+module.exports = { subscribeToUpdates };
