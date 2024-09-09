@@ -5,20 +5,21 @@ import { useSocket } from "@/app/socketProvider";
 export const MAX_AVAILABLE = 500;
 export const CLICK_STEP = 1;
 
+// Define events for initializing and updating values
 const valueInited = createEvent<number>();
 const availableInited = createEvent<number>();
+const availableUpdated = createEvent<number>();
 
 const clicked = createEvent<{
     score: number,
     click_score: number,
     available_clicks: number,
 }>();
-const availableUpdated = createEvent<number>();
 const errorUpdated = createEvent<boolean>();
 
 const $isMultiAccount = createStore(false);
-const $value = createStore(0);
-const $available = createStore(MAX_AVAILABLE);
+const $value = createStore(0).on(valueInited, (_, payload) => payload);
+const $available = createStore(MAX_AVAILABLE).on(availableInited, (_, payload) => payload);
 
 const $earnedPoint = createStore(0); // New store for accumulated points
 
