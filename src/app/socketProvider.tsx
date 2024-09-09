@@ -44,28 +44,34 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
 
   // Function to send points to the backend
   const sendPointUpdate = async () => {
-    if (earnedPoint > 0) {
-      try {
-        const response = await fetch("/api/game/updatePoints", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            session_id: sessionId,
-            earnedPoint, // Use earnedPoint here
-          }),
-        });
+  if (earnedPoint > 0) {
+    try {
+      // Store the current earnedPoint value
+      const currentEarnedPoint = earnedPoint;
 
-        const result = await response.json();
-        if (result.success) {
-          // Clear earned points only if update was successful
-          setEarnedPoint(0);
-        }
-      } catch (error) {
-        console.error("Error updating points:", error);
-        // Retry logic can be implemented here
+      // Immediately clear earned points before sending the request
+      setEarnedPoint(0);
+
+      const response = await fetch("/api/game/updatePoints", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: sessionId,
+          earnedPoint: currentEarnedPoint, // Use stored earnedPoint value
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        console.error("Error updating points:", result.message || "Unknown error");
+        // Optionally, handle failure case (e.g., retry logic or showing an error message)
       }
+    } catch (error) {
+      console.error("Error updating points:", error);
+      // Retry logic or error handling can be implemented here
     }
-  };
+  }
+};
 
   const debounceSendPoints = () => {
     if (debounceTimeout) clearTimeout(debounceTimeout);
