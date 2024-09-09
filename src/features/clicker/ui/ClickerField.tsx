@@ -23,7 +23,7 @@ export const ClickerField = () => {
     const [leftClasses, setLeftClasses] = useState<string[]>([styles['hand-left']])
     const [rightClasses, setRightClasses] = useState<string[]>([styles['hand-right']])
 
-    const valueString = useMemo(() => toFormattedNumber(value), [value])
+    const valueString = toFormattedNumber(value);
 
     const onTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
         if (isClickEnabled) {
