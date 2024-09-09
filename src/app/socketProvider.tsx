@@ -18,6 +18,24 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
   const [earnedPoint, setEarnedPoint] = useState(0);
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
 
+  useEffect(() => {
+    // Establish SSE connection to listen for updates
+    const eventSource = new EventSource("/api/game/updatePoints");
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data) {
+        clickerModel.$value.setState(data.score);
+        clickerModel.$available.setState(data.available_clicks);
+        // Optionally reset earned points if necessary based on update logic
+      }
+    };
+
+    return () => {
+      eventSource.close(); // Clean up when component unmounts
+    };
+  }, [sessionId]);
+
   // Function to accumulate points locally
   const accumulatePoints = (points: number) => {
     setEarnedPoint((prev) => prev + points + CLICK_STEP); // Ensure CLICK_STEP is always added
@@ -51,10 +69,10 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
   const debounceSendPoints = () => {
     if (debounceTimeout) clearTimeout(debounceTimeout);
     const newTimeout = setTimeout(async () => {
-        await sendPointUpdate(); // Ensure async-await is used for proper handling
+      await sendPointUpdate(); // Ensure async-await is used for proper handling
     }, 3000);
     setDebounceTimeout(newTimeout);
-};
+  };
 
   return (
     <SocketContext.Provider value={{ accumulatePoints, debounceSendPoints }}>
