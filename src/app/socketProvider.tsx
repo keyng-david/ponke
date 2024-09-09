@@ -1,4 +1,3 @@
-// socketProvider.tsx
 import { CLICK_STEP, clickerModel } from "@/features/clicker/model";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useStore } from "effector-react";
