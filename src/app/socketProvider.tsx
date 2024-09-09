@@ -25,8 +25,9 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data) {
-        clickerModel.$value.setState(data.score);
-        clickerModel.$available.setState(data.available_clicks);
+        // Corrected method names from 'setState' to 'set'
+        clickerModel.$value.set(data.score);
+        clickerModel.$available.set(data.available_clicks);
         // Optionally reset earned points if necessary based on update logic
       }
     };
