@@ -76,8 +76,8 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
   const debounceSendPoints = () => {
     if (debounceTimeout) clearTimeout(debounceTimeout);
     const newTimeout = setTimeout(async () => {
-      await sendPointUpdate(); // Ensure async-await is used for proper handling
-    }, 3000);
+      await sendPointUpdate();
+    }, 500);
     setDebounceTimeout(newTimeout);
   };
 
