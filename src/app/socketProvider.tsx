@@ -48,35 +48,6 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
     }
   };
 
-  // Function to subscribe to updates using SSE
-  const subscribeToUpdates = () => {
-    const eventSource = new EventSource(`/api/game/websocketServer?session_id=${sessionId}`);
-
-    eventSource.onmessage = (event) => {
-      const { score, available_clicks } = JSON.parse(event.data);
-      clickerModel.$value.setState(score);
-      clickerModel.$available.setState(available_clicks);
-      console.log('Points updated and confirmed successfully');
-    };
-
-    eventSource.onerror = (error) => {
-      console.error("Error with SSE connection:", error);
-      eventSource.close(); // Close connection on error
-    };
-
-    return () => {
-      eventSource.close(); // Clean up on component unmount
-    };
-  };
-
-  useEffect(() => {
-    // Subscribe to updates when the component mounts
-    const cleanup = subscribeToUpdates();
-
-    // Cleanup function to unsubscribe from updates
-    return cleanup;
-  }, [sessionId]);
-
   // Debounce mechanism to trigger batch updates
   const debounceSendPoints = () => {
     if (debounceTimeout) clearTimeout(debounceTimeout);
