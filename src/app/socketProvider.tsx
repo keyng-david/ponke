@@ -2,7 +2,6 @@ import { CLICK_STEP, clickerModel } from "@/features/clicker/model";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useStore } from "effector-react";
 import { $sessionId } from "@/shared/model/session";
-import { subscribeToUpdates } from "@/api/game/websocketServer";
 
 export const SocketContext = createContext<{
   accumulatePoints: (points: number) => void;
@@ -18,18 +17,6 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
   const sessionId = useStore($sessionId);
   const [earnedPoint, setEarnedPoint] = useState(0);
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
-
-  // Set up subscription for score updates when the component mounts
-  useEffect(() => {
-    if (sessionId) {
-      const unsubscribe = subscribeToUpdates(sessionId);
-
-      // Clean up the subscription when the component unmounts
-      return () => {
-        unsubscribe();
-      };
-    }
-  }, [sessionId]);
 
   // Function to accumulate points locally
   const accumulatePoints = (points: number) => {
@@ -49,11 +36,6 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
           }),
         });
 
-        if (!response.ok) {
-          const errorText = await response.text(); // Read error as text if not JSON
-          throw new Error(`Failed to update points: ${errorText}`);
-        }
-
         const result = await response.json();
         if (result.success) {
           // Clear earned points only if update was successful
@@ -61,10 +43,34 @@ export const SocketProvider = React.memo<React.PropsWithChildren>(({ children })
         }
       } catch (error) {
         console.error("Error updating points:", error);
-        // Retry logic or user feedback can be implemented here
+        // Retry logic can be implemented here
       }
     }
   };
+
+  // Function to subscribe to updates using HTTP request
+  const subscribeToUpdates = async () => {
+    try {
+      await fetch("/api/game/websocketServer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId }),
+      });
+      console.log('Subscribed to updates successfully');
+    } catch (error) {
+      console.error('Error subscribing to updates:', error);
+    }
+  };
+
+  useEffect(() => {
+    // Subscribe to updates when the component mounts
+    subscribeToUpdates();
+
+    // Cleanup function to unsubscribe from updates if needed
+    return () => {
+      // Optionally implement an endpoint to remove the subscription
+    };
+  }, [sessionId]);
 
   // Debounce mechanism to trigger batch updates
   const debounceSendPoints = () => {
