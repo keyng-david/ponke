@@ -2,8 +2,7 @@ import React, {TouchEvent, useCallback, useMemo, useState} from "react";
 
 import progress from '@/shared/assets/images/main/progress.png'
 import pointImage from '@/shared/assets/images/main/point.png'
-import leftHand from '@/shared/assets/images/main/left-hand.png'
-import rightHand from '@/shared/assets/images/main/right-hand.png'
+import coinImage from '@/shared/assets/images/main/coin.png'
 
 import {MAX_AVAILABLE, clickerModel} from "../model";
 
